@@ -12,6 +12,9 @@ export class InjuredInfo extends BaseEntity implements IInjuredInfo {
 
      @Column()
      lastName: string;
+
+     @Column()
+     birthDate: Date;
      
      @Column()
      phoneNumber: string;

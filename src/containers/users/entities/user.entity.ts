@@ -14,6 +14,9 @@ export class User extends BaseEntity implements IUser {
      lastName: string;
 
      @Column()
+     birthDate: Date;
+
+     @Column()
      phoneNumber: string;
 
      @Column()
