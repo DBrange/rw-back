@@ -3,8 +3,8 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config/dist';
 import * as morgan from 'morgan';
 import { CORS } from './constants/cors';
+import { ValidationPipe } from '@nestjs/common';
 
-// import { ValidationPipe } from '@nestjs/common';
 
 
 
@@ -14,13 +14,13 @@ async function bootstrap() {
 
   app.use(morgan('dev'))
   app.enableCors(CORS);
-  // app.useGlobalPipes(
-  //   new ValidationPipe({
-  //     transformOptions:{
-  //       enableImplicitConversion: true,
-  //     }
-  //   })
-  // )
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transformOptions:{
+        enableImplicitConversion: true,
+      }
+    })
+  )
   app.setGlobalPrefix('v1');
 
   await app.listen(configService.get('PORT'));
