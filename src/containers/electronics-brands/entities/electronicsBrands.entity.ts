@@ -7,7 +7,7 @@ import { Column, Entity, OneToMany } from "typeorm";
 export class ElectronicsBrands extends BaseEntity implements IElectronicsBrands {
      
      @Column()
-     type: string;
+     name: string;
 
      @OneToMany(() => ElectronicsModels, (electronicModels) => electronicModels.electronicsBrands)
      electronicModels: ElectronicsModels[];

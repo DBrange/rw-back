@@ -1,4 +1,5 @@
 export interface ICarBrand {
-     name: string;
- }
+   
+    name: string;
+ };
  

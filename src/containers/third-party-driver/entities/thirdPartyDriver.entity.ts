@@ -10,6 +10,9 @@ export class ThirdPartyDriver extends BaseEntity implements IThirdPartyDriver {
      name: string;
 
      @Column()
+     lastName: string;
+
+     @Column()
      dni: string;
 
      @Column()
