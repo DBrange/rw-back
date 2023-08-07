@@ -20,6 +20,7 @@ export class UsersService {
                throw new Error(error);
           }
      };
+     
 
 
      public async getUsers(): Promise<User[]> {
@@ -41,13 +42,21 @@ export class UsersService {
      public async getUsersById(id: string): Promise<User> {
 
           try {
-               return await this.userRepository
+              const user = await this.userRepository
                .createQueryBuilder('user')
                .where({ id })
                .getOne();
-               
+
+               if(!user) {
+                    throw new ErrorManager({
+                         type: 'BAD_REQUEST',
+                         message: 'No users found',
+                    })
+               }
+               return user;
           } catch (error) {
-               throw new Error(error);
+               throw new ErrorManager.createSignaturError(error.message);
+
           }
      };
      

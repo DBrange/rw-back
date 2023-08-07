@@ -8,7 +8,7 @@ import { Entity, Column, ManyToOne } from "typeorm";
 export class Vehicle extends BaseEntity implements IVehicle {
 
      @Column()
-     year: string;
+     year: number;
 
      @Column()
      color: string;

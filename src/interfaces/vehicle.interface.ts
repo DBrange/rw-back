@@ -1,6 +1,6 @@
 export interface IVehicle {
     
-     year: string;
+     year: number;
      color: string;
      tireBrand: string;
      tireSize: string;
@@ -15,4 +15,4 @@ export interface IVehicle {
      okm: boolean;
  
 };
- 
+

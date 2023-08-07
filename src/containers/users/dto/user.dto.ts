@@ -30,7 +30,7 @@ export class UserDTO implements IUser {
 
      @IsNotEmpty()
      @IsNumber()
-     phoneNumber: string;
+     phoneNumber: number;
 
      @IsNotEmpty()
      @IsEnum(GENDER)
@@ -70,7 +70,7 @@ export class UserUpdateDTO implements IUser {
 
      @IsOptional()
      @IsNumber()
-     phoneNumber: string;
+     phoneNumber: number;
 
      @IsOptional()
      @IsEnum(GENDER)
