@@ -4,10 +4,10 @@ export interface IVehicle {
      color: string;
      tireBrand: string;
      tireSize: string;
-     tireWear: string;
+     tireWear: number;
      damage: boolean;
      damageLocation: string;
-     images: string;
+     images: string[];
      plate: string;
      gnc: boolean;
      fuel: string;

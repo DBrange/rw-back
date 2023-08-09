@@ -1,4 +1,4 @@
-import { IsBoolean, IsNotEmpty, IsString } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CrashDTO {
 
@@ -18,7 +18,7 @@ export class CrashDTO {
      @IsBoolean()
      ambulance: boolean;
 
-     @IsNotEmpty()
+     @IsOptional()
      @IsString()
      ambulanceTo: string;
 

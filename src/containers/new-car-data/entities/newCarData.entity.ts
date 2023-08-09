@@ -7,10 +7,10 @@ import { Entity, Column, OneToOne, JoinColumn } from "typeorm";
 export class NewCarData extends BaseEntity implements INewCarData {
 
      @Column()
-     noBearingCertificate: string;
+     noBearingCertificate: string[];
 
      @Column()
-     purchaseCertificate: string;
+     purchaseCertificate: string[];
 
      @OneToOne(() => Vehicle)
      @JoinColumn()

@@ -20,7 +20,7 @@ export class Vehicle extends BaseEntity implements IVehicle {
      tireSize: string;
 
      @Column()
-     tireWear: string;
+     tireWear: number;
 
      @Column()
      damage: boolean;
@@ -29,7 +29,7 @@ export class Vehicle extends BaseEntity implements IVehicle {
      damageLocation: string;
 
      @Column()
-     images: string;
+     images: string[];
 
      @Column()
      plate: string;

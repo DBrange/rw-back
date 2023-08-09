@@ -2,7 +2,7 @@ export interface IThirdPartyVehicle {
    
      brand: string;
      model: string;
-     year: string;
+     year: number;
      plate: string;
      insuranceCompany: string;
      insurancePolicy: string;

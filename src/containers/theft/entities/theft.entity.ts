@@ -6,6 +6,6 @@ import { Entity, Column } from "typeorm";
 export class Theft extends BaseEntity implements ITheft {
 
      @Column()
-     reportPhoto: string;
+     reportPhoto: string[];
      
 };
