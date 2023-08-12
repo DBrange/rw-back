@@ -38,6 +38,7 @@ export class VehicleService {
                       description: vehicleData.Description._text,
                       carMake: vehicleData.CarMake.CurrentTextValue._text,
                       carModel: vehicleData.CarModel._text,
+                      year: vehicleData.RegistrationYear._text,
                     }
                }
           } catch (error) {
