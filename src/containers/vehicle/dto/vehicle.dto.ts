@@ -16,6 +16,14 @@ export class VehicleDTO implements IVehicle {
 
      @IsNotEmpty()
      @IsString()
+     brand: string;
+
+     @IsNotEmpty()
+     @IsString()
+     model: string;
+
+     @IsNotEmpty()
+     @IsString()
      tireBrand: string;
 
      @IsNotEmpty()
@@ -25,7 +33,6 @@ export class VehicleDTO implements IVehicle {
      @IsNotEmpty()
      @IsNumber()
      tireWear: number;
-
 
      @IsNotEmpty()
      @IsBoolean()
@@ -37,7 +44,7 @@ export class VehicleDTO implements IVehicle {
 
      @IsNotEmpty()
      @IsString()
-     images: string[];
+     images: string;
 
      @IsNotEmpty()
      @IsString()

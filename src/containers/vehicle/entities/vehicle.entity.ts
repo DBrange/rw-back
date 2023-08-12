@@ -1,8 +1,8 @@
 import { BaseEntity } from "../../../config/base.entity";
 import { FUEL, TYPE } from "../../../constants/enums";
-import { CarModel } from "../../../containers/car-models/entities/carModel.entity";
+// import { CarModel } from "../../../containers/car-models/entities/carModel.entity";
 import { IVehicle } from "../../../interfaces/vehicle.interface";
-import { Entity, Column, ManyToOne } from "typeorm";
+import { Entity, Column, } from "typeorm";
 
 @Entity()
 export class Vehicle extends BaseEntity implements IVehicle {
@@ -13,6 +13,13 @@ export class Vehicle extends BaseEntity implements IVehicle {
      @Column()
      color: string;
 
+     @Column()
+     brand: string;
+
+     @Column()
+     model: string;
+
+     
      @Column()
      tireBrand: string;
 
@@ -29,7 +36,7 @@ export class Vehicle extends BaseEntity implements IVehicle {
      damageLocation: string;
 
      @Column()
-     images: string[];
+     images: string;
 
      @Column()
      plate: string;
@@ -46,6 +53,6 @@ export class Vehicle extends BaseEntity implements IVehicle {
      @Column()
      okm: boolean;
 
-     @ManyToOne(() => CarModel, (carModel) => carModel.vehicle)
-     carModel: CarModel;
+     // @ManyToOne(() => CarModel, (carModel) => carModel.vehicle)
+     // carModel: CarModel;
 };

@@ -5,11 +5,11 @@ export class NewCarDataDTO {
      
      @IsNotEmpty()
      @IsString()
-     noBearingCertificate: string[];
+     noBearingCertificate: string;
 
      @IsNotEmpty()
      @IsString()
-     purceCertificate: string[];
+     purceCertificate: string;
 
      @IsOptional()
      @IsUUID()

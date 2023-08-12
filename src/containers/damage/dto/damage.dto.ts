@@ -9,5 +9,5 @@ export class DamageDTO  {
 
      @IsNotEmpty()
      @IsString()
-     photo: string[];
+     photo: string;
 };

@@ -4,7 +4,7 @@ export class TheftDTO {
 
      @IsNotEmpty()
      @IsString()
-     reportPhoto: string[];
+     reportPhoto: string;
 
      
 };

@@ -1,7 +1,7 @@
 export interface INewCarData {
     
-     noBearingCertificate: string[];
-     purchaseCertificate: string[];
+     noBearingCertificate: string;
+     purchaseCertificate: string;
 
 };
  

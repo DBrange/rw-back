@@ -5,7 +5,7 @@ export interface IThirdPartyDriver {
      dni: string;
      address: string;
      phoneNumber: string;
-     licensePhoto: string[];
+     licensePhoto: string;
      email: string;
 
 };

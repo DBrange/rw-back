@@ -26,7 +26,7 @@ export class ThirdPartyDriverDTO {
 
      @IsNotEmpty()
      @IsString()
-     licensePhoto: string[];
+     licensePhoto: string;
 
      @IsNotEmpty()
      @IsEmail()
