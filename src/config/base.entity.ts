@@ -16,4 +16,8 @@ export abstract class BaseEntity {
           name: 'updated_at',
      })
      updated_at: Date;
+
+     
+
+     
 };

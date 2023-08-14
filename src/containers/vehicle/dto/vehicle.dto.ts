@@ -16,6 +16,14 @@ export class VehicleDTO implements IVehicle {
 
      @IsNotEmpty()
      @IsString()
+     brand: string;
+
+     @IsNotEmpty()
+     @IsString()
+     model: string;
+
+     @IsNotEmpty()
+     @IsString()
      tireBrand: string;
 
      @IsNotEmpty()
@@ -23,14 +31,14 @@ export class VehicleDTO implements IVehicle {
      tireSize: string;
 
      @IsNotEmpty()
-     @IsString()
-     tireWear: string;
+     @IsNumber()
+     tireWear: number;
 
      @IsNotEmpty()
      @IsBoolean()
      damage: boolean;
 
-     @IsNotEmpty()
+     @IsOptional()
      @IsString()
      damageLocation: string;
 
@@ -60,5 +68,5 @@ export class VehicleDTO implements IVehicle {
 
      @IsOptional()
      @IsUUID()
-     modelId: CarModel;
+     carModel: CarModel;
 };

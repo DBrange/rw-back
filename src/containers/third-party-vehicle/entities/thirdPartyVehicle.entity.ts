@@ -13,7 +13,7 @@ export class ThirdPartyVehicle extends BaseEntity implements IThirdPartyVehicle 
      model: string;
 
      @Column()
-     year: string;
+     year: number;
 
      @Column()
      plate: string;

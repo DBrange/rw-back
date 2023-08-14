@@ -1,10 +1,10 @@
-import { IsDate, IsMilitaryTime, IsNotEmpty, IsString, IsUUID } from "class-validator";
+import { IsDate, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
 import { Asset } from "src/containers/asset/entities/asset.entity";
 
 export class SinisterDTO {
 
      @IsNotEmpty()
-     @IsMilitaryTime()
+     @IsString()
      time: string;
 
      @IsNotEmpty()
@@ -13,9 +13,9 @@ export class SinisterDTO {
 
      @IsNotEmpty()
      @IsString()
-     locations: string;
+     location: string;
      
-     @IsNotEmpty()
+     @IsOptional()
      @IsUUID()
      asset: Asset;
 }

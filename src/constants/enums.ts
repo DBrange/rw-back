@@ -1,23 +1,23 @@
 export enum FUEL {
      DIESEL = "DIESEL",
-     GASOLINE = "GASOLINE"
+     GASOLINE = "GASOLINA"
  };
 
  export enum TYPE {
-     TRUCK = "TRUCK",
-     CAR = "CAR",
-     MOTORBIKE = "MOTORBIKE"
+     TRUCK = "CAMIONETA",
+     CAR = "AUTOMOVIL",
+     MOTORBIKE = "MOTOCICLETA"
  };
 
  export enum GENDER {
-     MAN = "MAN",
-     WOMAN = "WOMAN",
-     OTHER = "OTHER"
+     MAN = "HOMBRE",
+     WOMAN = "MUJER",
+     OTHER = "OTRO"
  };
 
  export enum ETYPE {
      TABLET = "TABLET",
-     SMARTPHONE = "SMARTPHONE",
+     SMARTPHONE = "CELULAR",
      NOTEBOOK = "NOTEBOOK"
  };
- 
+    

@@ -23,6 +23,7 @@ import { ThirdPartyDriverModule } from './containers/third-party-driver/third-pa
 import { ThirdPartyVehicleModule } from './containers/third-party-vehicle/third-party-vehicle.module';
 import { UsersModule } from './containers/users/users.module';
 import { VehicleModule } from './containers/vehicle/vehicle.module';
+import { GncModule } from './containers/gnc/gnc.module';
 
 
 @Module({
@@ -41,6 +42,7 @@ import { VehicleModule } from './containers/vehicle/vehicle.module';
     ElectronicsBrandsModule,
     ElectronicsModelsModule,
     FireModule,
+    GncModule,
     InjuredModule,
     InjuredInfoModule,
     LegalUsersModule,
@@ -53,6 +55,7 @@ import { VehicleModule } from './containers/vehicle/vehicle.module';
     ThirdPartyVehicleModule,
     UsersModule,
     VehicleModule,
+    GncModule,
   ],
 })
 export class AppModule {}

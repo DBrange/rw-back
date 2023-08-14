@@ -2,9 +2,11 @@ export interface IVehicle {
     
      year: number;
      color: string;
+     brand: string;
+     model: string;
      tireBrand: string;
      tireSize: string;
-     tireWear: string;
+     tireWear: number;
      damage: boolean;
      damageLocation: string;
      images: string;

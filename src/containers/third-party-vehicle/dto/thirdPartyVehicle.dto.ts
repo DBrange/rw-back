@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsUUID } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString, IsUUID } from "class-validator";
 import { Sinister } from "src/containers/sinister/entities/sinister.entity";
 
 export class ThirdPartyVehicleDTO {
@@ -12,8 +12,8 @@ export class ThirdPartyVehicleDTO {
      model: string;
 
      @IsNotEmpty()
-     @IsString()
-     year: string;
+     @IsNumber()
+     year: number;
 
      @IsNotEmpty()
      @IsString()

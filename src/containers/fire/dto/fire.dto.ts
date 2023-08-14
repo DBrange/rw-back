@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsBoolean } from "class-validator";
+import { IsNotEmpty, IsString, IsBoolean, IsOptional } from "class-validator";
 
 export class FireDTO {
 
@@ -18,7 +18,7 @@ export class FireDTO {
      @IsBoolean()
      ambulance: boolean;
 
-     @IsNotEmpty()
+     @IsOptional()
      @IsString()
      ambulanceTo: string;
 

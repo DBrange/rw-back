@@ -1,8 +1,8 @@
-import { Vehicle } from "../../../containers/vehicle/entities/vehicle.entity";
+// import { Vehicle } from "../../../containers/vehicle/entities/vehicle.entity";
 import { BaseEntity } from "../../../config/base.entity";
 import { CarBrands } from "../../../containers/car-brands/entities/carBrands.entity";
 import { ICarModel } from "../../../interfaces/carModels.interface";
-import { Entity, Column, ManyToOne, OneToMany } from "typeorm";
+import { Entity, Column, ManyToOne, } from "typeorm";
 
 @Entity()
 export class CarModel extends BaseEntity implements ICarModel {
@@ -13,6 +13,6 @@ export class CarModel extends BaseEntity implements ICarModel {
      @ManyToOne(() => CarBrands, (carBrands) => carBrands.carModel)
      carBrands: CarBrands;
 
-     @OneToMany(() => Vehicle, (vehicle) => vehicle.carModel)
-     vehicle: Vehicle[];
+     // @OneToMany(() => Vehicle, (vehicle) => vehicle.carModel)
+     // vehicle: Vehicle[];
 };

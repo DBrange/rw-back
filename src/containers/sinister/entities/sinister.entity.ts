@@ -3,13 +3,15 @@ import { Asset } from "../../../containers/asset/entities/asset.entity";
 import { ISinister } from "../../../interfaces/sinister.interface";
 import { ThirdPartyVehicle } from "../../../containers/third-party-vehicle/entities/thirdPartyVehicle.entity";
 import { Injured } from "../../../containers/injured/entities/injured.entity";
-import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
+import {   Column, Entity, ManyToOne, OneToMany } from "typeorm";
+
 
 @Entity()
 export class Sinister extends BaseEntity implements ISinister {
 
+
      @Column()
-     time: Date;
+     time: string;
 
      @Column()
      date: Date;
@@ -25,4 +27,8 @@ export class Sinister extends BaseEntity implements ISinister {
 
      @OneToMany(() => Injured, (injuredd) => injuredd.sinister)
      injuredd: Injured[]
+
+
+
+
 };
