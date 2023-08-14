@@ -1,6 +1,6 @@
 export interface ISinister {
      
-     time: Date;
+     time: string;
      date: Date;
      location: string;
 
