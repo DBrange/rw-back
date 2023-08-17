@@ -12,13 +12,13 @@ export class VehicleService {
           private readonly vehicleRepository: Repository<Vehicle>
      ){}
 
-     public async createVehicle(body: VehicleDTO) : Promise<Vehicle> {
-          try {
-              return  await this.vehicleRepository.save(body);
-          } catch (error) {
-               throw new Error(error);
-          }
-     };
+     // public async createVehicle(body: VehicleDTO) : Promise<Vehicle> {
+     //      try {
+     //          return  await this.vehicleRepository.save(body);
+     //      } catch (error) {
+     //           throw new Error(error);
+     //      }
+     // };
 
      public async fetchVehicleInfo(plateNumber: string): Promise<any> {
           const username = 'martin2';
@@ -44,7 +44,18 @@ export class VehicleService {
           } catch (error) {
                throw new Error(error);
           }
-     }
+     };
+
+
+
+
+       public async createVehicle(body: VehicleDTO) : Promise<Vehicle> {
+          try {
+              return  await this.vehicleRepository.save(body);
+          } catch (error) {
+               throw new Error(error);
+          }
+     };
 };
 
 

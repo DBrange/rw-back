@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { LegalUsersService } from './legal-users.service';
-import { LegalUsersDto } from './dto/legalUsers.dto';
+import { LegalUsersDTO, } from './dto/legalUsers.dto';
 
 @Controller('legal-users')
 export class LegalUsersController {
@@ -9,7 +9,7 @@ export class LegalUsersController {
      ){}
 
      @Post('create')
-     public async createLegalUser(@Body() body: LegalUsersDto){
+     public async createLegalUser(@Body() body: LegalUsersDTO){
           return await this.legalUsersService.createLegalUsers(body);
      }
 };

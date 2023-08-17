@@ -24,6 +24,7 @@ import { ThirdPartyVehicleModule } from './containers/third-party-vehicle/third-
 import { UsersModule } from './containers/users/users.module';
 import { VehicleModule } from './containers/vehicle/vehicle.module';
 import { GncModule } from './containers/gnc/gnc.module';
+import { VehicleGncModule } from './containers/vehicle-gnc/vehicle-gnc.module';
 
 
 @Module({
@@ -56,6 +57,7 @@ import { GncModule } from './containers/gnc/gnc.module';
     UsersModule,
     VehicleModule,
     GncModule,
+    VehicleGncModule
   ],
 })
 export class AppModule {}

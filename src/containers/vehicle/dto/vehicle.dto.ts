@@ -1,6 +1,5 @@
-import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
+import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 import { FUEL, TYPE } from "src/constants/enums";
-import { CarModel } from "src/containers/car-models/entities/carModel.entity";
 import { IVehicle } from "src/interfaces/vehicle.interface";
 
 
@@ -66,7 +65,4 @@ export class VehicleDTO implements IVehicle {
      @IsBoolean()
      okm: boolean;
 
-     @IsOptional()
-     @IsUUID()
-     carModel: CarModel;
 };
