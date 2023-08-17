@@ -19,7 +19,6 @@ export class Vehicle extends BaseEntity implements IVehicle {
      @Column()
      model: string;
 
-     
      @Column()
      tireBrand: string;
 
