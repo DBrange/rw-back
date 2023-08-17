@@ -17,5 +17,5 @@ export class GncDTO {
 
      @IsNotEmpty()
      @IsUUID()
-     vehicle: Vehicle
+     vehicleId: Vehicle
 };
