@@ -1,4 +1,4 @@
-import { IsDate, IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsDate, IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { GENDER } from "src/constants/enums";
 import { IUser } from "src/interfaces/users.interface";
 
@@ -29,8 +29,8 @@ export class UserDTO implements IUser {
      address: string;
 
      @IsNotEmpty()
-     @IsNumber()
-     phoneNumber: number;
+     @IsString()
+     phoneNumber: string;
 
      @IsNotEmpty()
      @IsEnum(GENDER)
@@ -69,8 +69,8 @@ export class UserUpdateDTO implements IUser {
      address: string;
 
      @IsOptional()
-     @IsNumber()
-     phoneNumber: number;
+     @IsString()
+     phoneNumber: string;
 
      @IsOptional()
      @IsEnum(GENDER)

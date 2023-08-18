@@ -1,7 +1,7 @@
 export interface ISmartphone {
     
      imei: string;
-     phoneNumber: number;
+     phoneNumber: string;
      phoneService: string;
  
 };
