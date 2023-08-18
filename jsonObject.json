@@ -1,3 +1,4 @@
+[
 {
      "vehicleDTO": {
        "year": 2023,
@@ -31,12 +32,7 @@
    },
      "assetDTO": {
      }
-   }
-   
-   
-   
-   
-   
+   },
    {
      "vehicleDTO": {
        "year": 2023,
@@ -74,4 +70,4 @@
      "assetDTO": {
      }
    }
-   
+]
