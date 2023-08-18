@@ -31,7 +31,7 @@ export class Vehicle extends BaseEntity implements IVehicle {
      @Column()
      damage: boolean;
 
-     @Column()
+     @Column({nullable : true})
      damageLocation: string;
 
      @Column({array: true})
