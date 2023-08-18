@@ -13,6 +13,8 @@ import { UserDTO } from '../users/dto/user.dto';
 import { VehicleDTO } from '../vehicle/dto/vehicle.dto';
 import { GncDTO } from '../gnc/dto/gnc.dto';
 import { LegalUsersDTO  } from '../legal-users/dto/legalUsers.dto';
+import { ElectronicsDTO } from '../electronics/dto/electronics.dto';
+import { SmartphoneDTO } from '../smartphones/dto/smartphone.dto';
 // import { ElectronicsDTO } from '../electronics/dto/electronics.dto';
 // import { SmartphoneDTO } from '../smartphones/dto/smartphone.dto';
 
@@ -122,14 +124,78 @@ export class AssetService {
           }
       };
 
-     //    //Ruta Electronics + user
-     // public async CreateUserElectronic(electronicDTO: ElectronicsDTO, smartphoneDTO: SmartphoneDTO, userDTO: UserDTO,  assetDTO: AssetDTO){
+        //Ruta Electronics + user
+     public async CreateUserElectronic(electronicDTO: ElectronicsDTO, smartphoneDTO: SmartphoneDTO, userDTO: UserDTO,  assetDTO: AssetDTO){
+          
+          try {
+               const newElectronic = await this.electronicService.createElectronics(electronicDTO)
+               
+               let newSmartphone;
+               if( newElectronic.type === 'CELULAR'){
+                    
+                    const relatedSmartphone = {
+                         ...smartphoneDTO,
+                         electronics: newElectronic.id,
+                    }
+                    
+                    newSmartphone = await this.smartphoneService.createSmartphone(relatedSmartphone)
+               }
+               
+               const newUser = await this.userService.createUser(userDTO)
+               
+               let newAsset
+               if( newUser && newElectronic){
 
-     //      try {
+                    const fullAsset = {
+                         ...assetDTO,
+                         users : newUser,
+                         electronics: newElectronic
+                    }
+                    newAsset = await this.assetRepository.save(fullAsset);
+               }
                
-     //      } catch (error) {
+               return { newElectronic, newSmartphone , newAsset}
                
-     //      }
-     // }
+          } catch (error) {
+               throw new Error(error)
+          }
+     };
+
+     //Ruta Electronic + legalUser
+     public async CreateLegalUserElectronic(electronicDTO: ElectronicsDTO, smartphoneDTO: SmartphoneDTO, legalUserDTO: LegalUsersDTO,  assetDTO: AssetDTO){
+          
+          try {
+               const newElectronic = await this.electronicService.createElectronics(electronicDTO)
+               
+               let newSmartphone;
+               if( newElectronic.type === 'CELULAR'){
+                    
+                    const relatedSmartphone = {
+                         ...smartphoneDTO,
+                         electronics: newElectronic.id,
+                    }
+                    
+                    newSmartphone = await this.smartphoneService.createSmartphone(relatedSmartphone)
+               }
+               
+               const newLegalUser = await this.legalUserService.createLegalUsers(legalUserDTO);
+               
+               let newAsset
+               if( newLegalUser && newElectronic){
+
+                    const fullAsset = {
+                         ...assetDTO,
+                         legalUsers : newLegalUser,
+                         electronics: newElectronic
+                    }
+                    newAsset = await this.assetRepository.save(fullAsset);
+               }
+               
+               return { newElectronic, newSmartphone , newAsset}
+               
+          } catch (error) {
+               throw new Error(error)
+          }
+     }
   
 };

@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AssetService } from './asset.service';
 import { AssetDTO } from './dto/asset.dto';
-import { AssetVehicleLegalUserGncDTO, AssetVehicleUserGncDTO } from './dto/vehicle.user.dto';
+import { AssetElectronicLegalUser, AssetElectronicUser, AssetVehicleLegalUserGncDTO, AssetVehicleUserGncDTO } from './dto/vehicle.user.dto';
 
 @Controller('asset')
 export class AssetController {
@@ -26,5 +26,17 @@ export class AssetController {
           return result;
      };
      
+     @Post('electronicAsset')
+     public async CreateUserElectronic(@Body() requestData:AssetElectronicUser){
+          const result = await this.assetService.CreateUserElectronic
+          (requestData.electronicDTO, requestData.smartphoneDTO, requestData.userDTO, requestData.assetDTO);
+          return result;
+     }
 
+     @Post('electronicAssetL')
+     public async CreateLegalUserElectronic(@Body() requestData: AssetElectronicLegalUser){
+          const result = await this.assetService.CreateLegalUserElectronic
+          (requestData.electronicDTO, requestData.smartphoneDTO, requestData.legalUserDTO, requestData.assetDTO);
+          return result;
+     }
 };

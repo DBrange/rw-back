@@ -1,9 +1,8 @@
-import { Gnc } from "src/containers/gnc/entities/gnc.entity";
 import { BaseEntity } from "../../../config/base.entity";
 import { FUEL, TYPE } from "../../../constants/enums";
 // import { CarModel } from "../../../containers/car-models/entities/carModel.entity";
 import { IVehicle } from "../../../interfaces/vehicle.interface";
-import { Entity, Column, OneToOne, JoinColumn, } from "typeorm";
+import { Entity, Column } from "typeorm";
 
 @Entity()
 export class Vehicle extends BaseEntity implements IVehicle {
@@ -19,7 +18,6 @@ export class Vehicle extends BaseEntity implements IVehicle {
 
      @Column()
      model: string;
-
      
      @Column()
      tireBrand: string;
@@ -36,7 +34,7 @@ export class Vehicle extends BaseEntity implements IVehicle {
      @Column()
      damageLocation: string;
 
-     @Column()
+     @Column({array: true})
      images: string;
 
      @Column()

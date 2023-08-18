@@ -1,0 +1,77 @@
+{
+     "vehicleDTO": {
+       "year": 2023,
+       "color": "Blue",
+       "brand": "Toyota",
+       "model": "Corolla",
+       "tireBrand": "Michelin",
+       "tireSize": "205/55R16",
+       "tireWear": 5,
+       "damage": false,
+       "damageLocation":"c",
+       "images": "image_url.jpg",
+       "plate": "ABC123",
+       "gnc": false,
+       "fuel": "DIESEL",
+       "type": "CAMIONETA",
+       "okm": true
+     },
+     "gncDTO": {
+       "expireDate": "2024-08-15",
+       "oblea": "ABC123",
+       "plate": "ABC123"
+     },
+     "legalUserDTO":{
+       "companyName":"Nestle",
+       "cuit":"21103811",
+       "phoneNumber":"115522555",
+       "email":"juan@gmail.com",
+       "altEmail":"juan2@gmail.com",
+       "address":"paso 349"
+   },
+     "assetDTO": {
+     }
+   }
+   
+   
+   
+   
+   
+   {
+     "vehicleDTO": {
+       "year": 2023,
+       "color": "Blue",
+       "brand": "Toyota",
+       "model": "Corolla",
+       "tireBrand": "Michelin",
+       "tireSize": "205/55R16",
+       "tireWear": 5,
+       "damage": false,
+       "damageLocation":"c",
+       "images": "image_url.jpg",
+       "plate": "ABC123",
+       "gnc": true,
+       "fuel": "DIESEL",
+       "type": "CAMIONETA",
+       "okm": true
+     },
+     "gncDTO": {
+       "expireDate": "2024-08-15",
+       "oblea": "ABC123",
+       "plate": "ABC123"
+     },
+     "userDTO": {
+       "name": "John",
+       "lastName": "Doe",
+       "birthDate": "1990-01-01",
+       "email": "john@example.com",
+       "altEmail":"john@example.com",
+       "address": "123 Main Street",
+       "phoneNumber": 123456789,
+       "gender": "MUJER",
+       "dni": "12345678"
+     },
+     "assetDTO": {
+     }
+   }
+   

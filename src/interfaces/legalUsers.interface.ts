@@ -2,7 +2,7 @@ export interface ILegalUser {
      
      companyName: string;
      cuit: string;
-     phoneNumber: string;
+     phoneNumber: number;
      email: string;
      altEmail: string;
      address: string;

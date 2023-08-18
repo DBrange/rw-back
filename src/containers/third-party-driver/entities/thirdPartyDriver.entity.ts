@@ -21,7 +21,7 @@ export class ThirdPartyDriver extends BaseEntity implements IThirdPartyDriver {
      @Column()
      phoneNumber: string;   
 
-     @Column()
+     @Column({ array: true})
      licensePhoto: string;
 
      @Column()

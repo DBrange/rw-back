@@ -13,12 +13,12 @@ export class LegalUsers extends BaseEntity implements ILegalUser {
      cuit: string;
 
      @Column()
-     phoneNumber: string;
+     phoneNumber: number;
 
      @Column()
      email: string;
 
-     @Column()
+     @Column({nullable: true})
      altEmail: string;
 
      @Column()

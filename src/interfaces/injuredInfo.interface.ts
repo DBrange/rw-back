@@ -3,7 +3,7 @@ export interface IInjuredInfo {
      name: string;
      lastName: string;
      birthDate: Date;
-     phoneNumber: string;
+     phoneNumber: number;
      email: string;
      gender: string;
      dni: string;
