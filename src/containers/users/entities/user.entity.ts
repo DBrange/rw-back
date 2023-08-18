@@ -22,7 +22,7 @@ export class User extends BaseEntity implements IUser {
      @Column()
      email: string;
 
-     @Column()
+     @Column({nullable: true})
      altEmail: string;
 
      @Column({type: "enum" , enum: GENDER})

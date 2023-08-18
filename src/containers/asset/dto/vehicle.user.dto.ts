@@ -32,3 +32,11 @@ export class AssetElectronicUser {
      electronicDTO: ElectronicsDTO;
      smartphoneDTO: SmartphoneDTO
 };
+
+export class AssetElectronicLegalUser {
+
+     legalUserDTO: LegalUsersDTO;
+     assetDTO: AssetDTO;
+     electronicDTO: ElectronicsDTO;
+     smartphoneDTO: SmartphoneDTO
+};
