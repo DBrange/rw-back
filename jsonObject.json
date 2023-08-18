@@ -1,5 +1,4 @@
-[
-{
+[{
      "vehicleDTO": {
        "year": 2023,
        "color": "Blue",
@@ -33,6 +32,10 @@
      "assetDTO": {
      }
    },
+   
+   
+   
+   
    {
      "vehicleDTO": {
        "year": 2023,
@@ -69,5 +72,52 @@
      },
      "assetDTO": {
      }
-   }
-]
+   },
+   {
+    "electronicDTO":{
+        "type":"CELULAR",
+        "brand":"nokia",
+        "model":"1100"
+    },
+    "smartphoneDTO":{
+        "imei":"25523652",
+        "phoneNumber":123456789,
+        "phoneService":"movistar"
+    },
+    "legalUserDTO": {
+    "companyName": "John",
+    "cuit":"20151255",
+    "phoneNumber": 123456789,
+    "email": "john@example.com",
+    "altEmail":"john@example.com",
+    "address": "123 Main Street"
+  },
+  "assetDTO": {
+  }
+},
+{
+  "electronicDTO":{
+      "type":"CELULAR",
+      "brand":"nokia",
+      "model":"1100"
+  },
+  "smartphoneDTO":{
+      "imei":"25523652",
+      "phoneNumber":123456789,
+      "phoneService":"movistar"
+  },
+  "userDTO": {
+  "name": "John",
+  "lastName": "Doe",
+  "birthDate": "1990-01-01",
+  "email": "john@example.com",
+  "altEmail":"john@example.com",
+  "address": "123 Main Street",
+  "phoneNumber": 123456789,
+  "gender": "MUJER",
+  "dni": "12345678"
+},
+"assetDTO": {
+}
+}
+  ]
