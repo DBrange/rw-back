@@ -10,7 +10,7 @@ export class Smartphone extends BaseEntity implements ISmartphone {
      imei: string;
 
      @Column()
-     phoneNumber: string;
+     phoneNumber: number;
 
      @Column()
      phoneService: string;

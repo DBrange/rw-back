@@ -8,7 +8,7 @@ export class Damage extends BaseEntity implements IDamage {
      @Column()
      details: string;
 
-     @Column()
+     @Column({array: true})
      photo: string;
      
 };
