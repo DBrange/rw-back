@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class LegalUsersDTO{
 
@@ -11,8 +11,8 @@ export class LegalUsersDTO{
      cuit : string;
 
      @IsNotEmpty()
-     @IsNumber()
-     phoneNumber : number;
+     @IsString()
+     phoneNumber : string;
 
      @IsNotEmpty()
      @IsEmail()

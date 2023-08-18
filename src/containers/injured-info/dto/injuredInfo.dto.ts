@@ -17,8 +17,8 @@ export class InjuredInfoDTO {
      birthDate: Date;
      
      @IsNotEmpty()
-     @IsNumber()
-     phoneNumber: number;
+     @IsString()
+     phoneNumber: string;
 
      @IsOptional()
      @IsEmail()

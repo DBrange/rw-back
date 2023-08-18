@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString, IsUUID } from "class-validator";
+import { IsNotEmpty, IsString, IsUUID } from "class-validator";
 import { Electronics } from "src/containers/electronics/entities/electronics.entity";
 
 export class SmartphoneDTO {
@@ -8,8 +8,8 @@ export class SmartphoneDTO {
      imei: string;
 
      @IsNotEmpty()
-     @IsNumber()
-     phoneNumber: number;
+     @IsString()
+     phoneNumber: string;
 
      @IsNotEmpty()
      @IsString()

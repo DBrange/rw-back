@@ -17,7 +17,7 @@ export class User extends BaseEntity implements IUser {
      birthDate: Date;
 
      @Column()
-     phoneNumber: number;
+     phoneNumber: string;
 
      @Column()
      email: string;
