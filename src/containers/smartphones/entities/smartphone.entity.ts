@@ -15,7 +15,6 @@ export class Smartphone extends BaseEntity implements ISmartphone {
      @Column()
      phoneService: string;
 
-       
      @OneToOne(() => Electronics)
      @JoinColumn()
      electronics: Electronics;
