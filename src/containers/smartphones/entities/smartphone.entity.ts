@@ -3,7 +3,7 @@ import { BaseEntity } from "../../../config/base.entity";
 import { ISmartphone } from "../../../interfaces/smartphone.interface";
 import { Entity, Column, JoinColumn, OneToOne } from "typeorm";
 
-@Entity()
+@Entity({name: 'smartphones'})
 export class Smartphone extends BaseEntity implements ISmartphone {
 
      @Column()

@@ -26,6 +26,7 @@ import { VehicleModule } from './containers/vehicle/vehicle.module';
 import { GncModule } from './containers/gnc/gnc.module';
 import { VehicleGncModule } from './containers/vehicle-gnc/vehicle-gnc.module';
 import { TheftTireModule } from './containers/theft-tire/theft-tire.module';
+import { TheftTheftTireModule } from './containers/theft-theft-tire/theft-theft-tire.module';
 
 
 @Module({
@@ -59,7 +60,8 @@ import { TheftTireModule } from './containers/theft-tire/theft-tire.module';
     UsersModule,
     VehicleModule,
     GncModule,
-    VehicleGncModule
+    VehicleGncModule,
+    TheftTheftTireModule
   ],
 })
 export class AppModule {}

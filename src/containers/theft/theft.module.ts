@@ -5,8 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Theft } from './entities/theft.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Theft])],
+  imports: [TypeOrmModule.forFeature([Theft])],
   controllers: [TheftController],
-  providers: [TheftService]
+  providers: [TheftService],
+  exports: [TheftService],
 })
 export class TheftModule {}

@@ -4,7 +4,7 @@ import { BaseEntity } from "../../../config/base.entity";
 import { IElectronicsModel } from "../../../interfaces/electronicsModels.interface";
 import { Column, Entity, ManyToOne } from "typeorm";
 
-@Entity()
+@Entity({name: 'electronics_models'})
 export class ElectronicsModels extends BaseEntity implements IElectronicsModel {
 
      @Column()

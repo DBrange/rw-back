@@ -6,7 +6,7 @@ import { Injured } from "../../../containers/injured/entities/injured.entity";
 import {   Column, Entity, ManyToOne, OneToMany } from "typeorm";
 
 
-@Entity()
+@Entity({name: 'sinister'})
 export class Sinister extends BaseEntity implements ISinister {
 
 

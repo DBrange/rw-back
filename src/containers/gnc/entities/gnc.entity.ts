@@ -1,9 +1,9 @@
-import { BaseEntity } from "src/config/base.entity";
+import { BaseEntity } from "../../../config/base.entity";
 import { Vehicle } from "src/containers/vehicle/entities/vehicle.entity";
 import { IGnc } from "src/interfaces/gnc.interface";
 import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
 
-@Entity()
+@Entity({name: 'gnc'})
 export class Gnc extends BaseEntity implements IGnc {
 
      @Column()

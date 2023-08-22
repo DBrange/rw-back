@@ -3,7 +3,7 @@ import { Vehicle } from "../../../containers/vehicle/entities/vehicle.entity";
 import { INewCarData } from "../../../interfaces/newCarData.interface";
 import { Entity, Column, OneToOne, JoinColumn } from "typeorm";
 
-@Entity()
+@Entity({name: 'new_car_data'})
 export class NewCarData extends BaseEntity implements INewCarData {
 
      @Column()

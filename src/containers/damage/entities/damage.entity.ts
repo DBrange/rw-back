@@ -2,7 +2,7 @@ import { BaseEntity } from "../../../config/base.entity";
 import { IDamage } from "../../../interfaces/damage.interface";
 import { Column, Entity } from "typeorm";
 
-@Entity()
+@Entity({name: 'damage'})
 export class Damage extends BaseEntity implements IDamage {
 
      @Column()

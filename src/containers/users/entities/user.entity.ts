@@ -4,7 +4,7 @@ import { Asset } from "../../../containers/asset/entities/asset.entity";
 import { IUser } from "../../../interfaces/users.interface";
 import { Entity, Column, OneToMany } from "typeorm";
 
-@Entity()
+@Entity({name: 'users'})
 export class User extends BaseEntity implements IUser {
 
      @Column()

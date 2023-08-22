@@ -3,7 +3,7 @@ import { ThirdPartyVehicle } from "../../../containers/third-party-vehicle/entit
 import { IThirdPartyDriver } from "../../../interfaces/thirdPartyDriver.interface";
 import { Entity, Column, JoinColumn, OneToOne } from "typeorm";
 
-@Entity()
+@Entity({name: 'third_party_driver'})
 export class ThirdPartyDriver extends BaseEntity implements IThirdPartyDriver {
 
      @Column()

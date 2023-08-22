@@ -3,7 +3,7 @@ import { Sinister } from "../../../containers/sinister/entities/sinister.entity"
 import { IThirdPartyVehicle } from "../../../interfaces/thirdPartyVehicle.interface";
 import { Entity, Column, ManyToOne } from "typeorm";
 
-@Entity()
+@Entity({name: 'third_party_vehicle'})
 export class ThirdPartyVehicle extends BaseEntity implements IThirdPartyVehicle {
 
      @Column()

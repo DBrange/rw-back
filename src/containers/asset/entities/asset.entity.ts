@@ -6,7 +6,7 @@ import { User } from "../../../containers/users/entities/user.entity";
 import { Vehicle } from "../../../containers/vehicle/entities/vehicle.entity";
 import { Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 
-@Entity()
+@Entity({name: 'asset'})
 export class Asset extends BaseEntity {
 
      @ManyToOne(() => User , (users) => users.asset)

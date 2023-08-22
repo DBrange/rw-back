@@ -3,7 +3,7 @@ import { ElectronicsModels } from "../../../containers/electronics-models/entiti
 import { IElectronicsBrands } from "../../../interfaces/electronicsBrands.interface";
 import { Column, Entity, OneToMany } from "typeorm";
 
-@Entity()
+@Entity({name: 'electronics_brands'})
 export class ElectronicsBrands extends BaseEntity implements IElectronicsBrands {
      
      @Column()

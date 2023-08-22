@@ -7,9 +7,8 @@ import { Gnc } from '../gnc/entities/gnc.entity';
 import { GncService } from '../gnc/gnc.service';
 import { VehicleService } from '../vehicle/vehicle.service';
 
-
 @Module({
-  imports:[TypeOrmModule.forFeature([Vehicle, Gnc ])],
+  imports:[TypeOrmModule.forFeature([Vehicle, Gnc])],
   controllers: [VehicleGncController],
   providers: [VehicleGncService, GncService, VehicleService]
 })

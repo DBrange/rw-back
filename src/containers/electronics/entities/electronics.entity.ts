@@ -5,7 +5,7 @@ import { ETYPE } from "../../../constants/enums";
 import { IElectronics } from "../../../interfaces/electronics.interface";
 import { Column, Entity } from "typeorm";
 
-@Entity()
+@Entity({name: 'electronics'})
 export class Electronics extends BaseEntity implements IElectronics {
 
      @Column({type: "enum" , enum: ETYPE })

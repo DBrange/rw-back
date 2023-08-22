@@ -3,7 +3,7 @@ import { Asset } from "../../../containers/asset/entities/asset.entity";
 import { ILegalUser } from "../../../interfaces/legalUsers.interface";
 import { Entity, Column, OneToMany } from "typeorm";
 
-@Entity()
+@Entity({name: 'legal_users'})
 export class LegalUsers extends BaseEntity implements ILegalUser {
 
      @Column()

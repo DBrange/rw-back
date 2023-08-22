@@ -2,7 +2,7 @@ import { BaseEntity } from "../../../config/base.entity";
 import { IFire } from "../../../interfaces/fire.interface";
 import { Column, Entity } from "typeorm";
 
-@Entity()
+@Entity({name: 'fire'})
 export class Fire extends BaseEntity implements IFire {
 
      @Column()

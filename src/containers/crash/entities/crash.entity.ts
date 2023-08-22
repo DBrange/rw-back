@@ -2,7 +2,7 @@ import { BaseEntity } from "../../../config/base.entity";
 import { ICrash } from "../../../interfaces/crash.interface";
 import { Column, Entity } from "typeorm";
 
-@Entity()
+@Entity({name: 'crash'})
 export class Crash extends BaseEntity implements ICrash {
   @Column()
   details: string;

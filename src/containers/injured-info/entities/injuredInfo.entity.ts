@@ -4,7 +4,7 @@ import { Injured } from "../../../containers/injured/entities/injured.entity";
 import { IInjuredInfo } from "../../../interfaces/injuredInfo.interface";
 import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
 
-@Entity()
+@Entity({name: 'injured_info'})
 export class InjuredInfo extends BaseEntity implements IInjuredInfo {
 
      @Column()

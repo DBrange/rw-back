@@ -6,7 +6,7 @@ import { Damage } from "../../../containers/damage/entities/damage.entity";
 import { Theft } from "../../../containers/theft/entities/theft.entity";
 import { Sinister } from "../../../containers/sinister/entities/sinister.entity";
 
-@Entity()
+@Entity('sinister_type')
 export class SinisterType extends BaseEntity {
 
      @OneToOne(() => Crash)

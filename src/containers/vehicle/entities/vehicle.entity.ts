@@ -4,7 +4,7 @@ import { FUEL, TYPE } from "../../../constants/enums";
 import { IVehicle } from "../../../interfaces/vehicle.interface";
 import { Entity, Column } from "typeorm";
 
-@Entity()
+@Entity({name: 'vehicle'})
 export class Vehicle extends BaseEntity implements IVehicle {
 
      @Column()

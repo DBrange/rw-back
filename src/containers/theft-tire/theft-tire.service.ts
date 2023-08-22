@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { TheftTireDTO } from "./dto/theft-tire.dto";
-import { TheftTire } from "./entities/theft-tire.entity";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { TheftTireDTO } from './dto/theftTire.dto';
+import { TheftTire } from './entities/theftTire.entity';
 
 @Injectable()
 export class TheftTireService {

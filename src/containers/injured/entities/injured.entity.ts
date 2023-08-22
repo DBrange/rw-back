@@ -3,7 +3,7 @@ import { IInjured } from "../../../interfaces/injured.interface";
 import { Entity, Column, ManyToOne } from "typeorm";
 import { Sinister } from "../../../containers/sinister/entities/sinister.entity";
 
-@Entity()
+@Entity({name: 'injured'})
 export class Injured extends BaseEntity implements IInjured{
 
      @Column()
