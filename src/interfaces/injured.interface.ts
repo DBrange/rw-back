@@ -1,6 +1,6 @@
 export interface IInjured {
    
-     quantity: number;
+     amount: number;
  
 };
  

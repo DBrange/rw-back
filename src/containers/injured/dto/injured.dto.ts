@@ -5,7 +5,7 @@ export class InjuredDTO {
 
      @IsNotEmpty()
      @IsNumber()
-     quantity: number;
+     amount: number;
 
      @IsOptional()
      @IsUUID()

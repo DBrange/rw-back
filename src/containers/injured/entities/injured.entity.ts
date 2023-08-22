@@ -7,7 +7,7 @@ import { Sinister } from "../../../containers/sinister/entities/sinister.entity"
 export class Injured extends BaseEntity implements IInjured{
 
      @Column()
-     quantity: number;
+     amount: number;
 
      @ManyToOne(() => Sinister, (sinister) => sinister.injuredd)
      sinister: Sinister;

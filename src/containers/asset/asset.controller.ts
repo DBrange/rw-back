@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AssetService } from './asset.service';
 import { AssetDTO } from './dto/asset.dto';
-import { AssetElectronicLegalUser, AssetElectronicUser, AssetVehicleLegalUserGncDTO, AssetVehicleUserGncDTO } from './dto/vehicle.user.dto';
+import { AssetElectronicLegalUser, AssetElectronicUser, AssetVehicleLegalUserGncDTO, AssetVehicleUserGncDTO } from './dto/allAsset.dto';
 
 @Controller('asset')
 export class AssetController {

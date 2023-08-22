@@ -1,6 +1,6 @@
 export interface ITheft {
-     
-     reportPhoto: string;
-
-};
- 
+  time: string;
+  date: Date;
+  location: string;
+  reportPhoto: string;
+}

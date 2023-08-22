@@ -1,11 +1,18 @@
-import { BaseEntity } from "../../../config/base.entity";
-import { ITheft } from "../../../interfaces/theft.interface";
-import { Entity, Column } from "typeorm";
+import { BaseEntity } from '../../../config/base.entity';
+import { ITheft } from '../../../interfaces/theft.interface';
+import { Entity, Column } from 'typeorm';
 
 @Entity()
 export class Theft extends BaseEntity implements ITheft {
+  @Column()
+  time: string;
 
-     @Column()
-     reportPhoto: string;
-     
-};
+  @Column()
+  date: Date;
+
+  @Column()
+  location: string;
+
+  @Column()
+  reportPhoto: string;
+}

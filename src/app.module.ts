@@ -25,6 +25,7 @@ import { UsersModule } from './containers/users/users.module';
 import { VehicleModule } from './containers/vehicle/vehicle.module';
 import { GncModule } from './containers/gnc/gnc.module';
 import { VehicleGncModule } from './containers/vehicle-gnc/vehicle-gnc.module';
+import { TheftTireModule } from './containers/theft-tire/theft-tire.module';
 
 
 @Module({
@@ -52,6 +53,7 @@ import { VehicleGncModule } from './containers/vehicle-gnc/vehicle-gnc.module';
     SinisterTypeModule,
     SmartphonesModule,
     TheftModule,
+    TheftTireModule,
     ThirdPartyDriverModule,
     ThirdPartyVehicleModule,
     UsersModule,

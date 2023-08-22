@@ -4,24 +4,24 @@ import { Column, Entity } from "typeorm";
 
 @Entity()
 export class Crash extends BaseEntity implements ICrash {
+  @Column()
+  details: string;
 
-     @Column()
-     details: string;
+  @Column()
+  injured: boolean;
 
-     @Column()
-     injured: boolean;
+  @Column()
+  injuries: string;
 
-     @Column()
-     injuries: string;
+  @Column()
+  ambulance: boolean;
 
-     @Column()
-     ambulance: boolean;
+  @Column()
+  ambulanceTo: string;
 
-     @Column()
-     ambulanceTo: string;
+  @Column()
+  thirdInjured: boolean;
 
-     @Column()
-     thirdInjured: boolean;
-
-  
+  @Column()
+  amountVehicles: number;
 };
