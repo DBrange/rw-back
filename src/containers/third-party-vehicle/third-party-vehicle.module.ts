@@ -8,6 +8,7 @@ import { Sinister } from '../sinister/entities/sinister.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([ThirdPartyVehicle, Sinister])],
   controllers: [ThirdPartyVehicleController],
-  providers: [ThirdPartyVehicleService]
+  providers: [ThirdPartyVehicleService],
+  exports: [ThirdPartyVehicleService],
 })
 export class ThirdPartyVehicleModule {}

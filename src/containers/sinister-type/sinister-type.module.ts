@@ -11,6 +11,7 @@ import { LegalUsers } from '../legal-users/entities/legalUsers.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([SinisterType, Crash, Electronics, User, LegalUsers])],
   controllers: [SinisterTypeController],
-  providers: [SinisterTypeService]
+  providers: [SinisterTypeService],
+  exports: [SinisterTypeService]
 })
 export class SinisterTypeModule {}

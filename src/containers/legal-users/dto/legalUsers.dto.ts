@@ -1,28 +1,27 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-export class LegalUsersDTO{
+export class LegalUsersDTO {
+  @IsNotEmpty()
+  @IsString()
+  companyName: string;
 
-     @IsNotEmpty()
-     @IsString()
-     companyName: string;
+  @IsNotEmpty()
+  @IsString()
+  cuit: string;
 
-     @IsNotEmpty()
-     @IsString()
-     cuit : string;
+  @IsNotEmpty()
+  @IsString()
+  phoneNumber: string;
 
-     @IsNotEmpty()
-     @IsString()
-     phoneNumber : string;
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
 
-     @IsNotEmpty()
-     @IsEmail()
-     email : string;
+  @IsOptional()
+  @IsEmail()
+  altEmail: string;
 
-     @IsOptional()
-     @IsEmail()
-     altEmail : string;
-
-     @IsNotEmpty()
-     @IsString()
-     address : string;
+  @IsNotEmpty()
+  @IsString()
+  address: string;
 }

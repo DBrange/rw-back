@@ -10,7 +10,7 @@ export class FireDTO {
      @IsBoolean()
      injured: boolean;
 
-     @IsNotEmpty()
+     @IsOptional()
      @IsString()
      injuries: string;
 

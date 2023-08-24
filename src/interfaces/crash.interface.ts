@@ -5,7 +5,7 @@ export interface ICrash {
   ambulance: boolean;
   ambulanceTo: string;
   thirdInjured: boolean;
-  amountVehicles: number;
+  friendlyStatement: boolean;
 };
 
  

@@ -19,13 +19,13 @@ export class Vehicle extends BaseEntity implements IVehicle {
      @Column()
      model: string;
      
-     @Column()
+     @Column({nullable : true})
      tireBrand: string;
 
-     @Column()
+     @Column({nullable : true})
      tireSize: string;
 
-     @Column()
+     @Column({nullable : true})
      tireWear: number;
 
      @Column()

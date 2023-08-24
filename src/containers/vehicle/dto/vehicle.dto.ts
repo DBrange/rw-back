@@ -21,15 +21,15 @@ export class VehicleDTO implements IVehicle {
      @IsString()
      model: string;
 
-     @IsNotEmpty()
+     @IsOptional()
      @IsString()
      tireBrand: string;
 
-     @IsNotEmpty()
+     @IsOptional()
      @IsString()
      tireSize: string;
 
-     @IsNotEmpty()
+     @IsOptional()
      @IsNumber()
      tireWear: number;
 

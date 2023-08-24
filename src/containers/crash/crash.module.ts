@@ -7,6 +7,7 @@ import { Crash } from './entities/crash.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Crash])],
   controllers: [CrashController],
-  providers: [CrashService]
+  providers: [CrashService],
+  exports: [CrashService],
 })
 export class CrashModule {}

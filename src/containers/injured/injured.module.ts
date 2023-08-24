@@ -8,6 +8,7 @@ import { Sinister } from '../sinister/entities/sinister.entity';
 @Module({
   imports:[TypeOrmModule.forFeature([Injured, Sinister])],
   controllers: [InjuredController],
-  providers: [InjuredService]
+  providers: [InjuredService],
+  exports: [InjuredService]
 })
 export class InjuredModule {}

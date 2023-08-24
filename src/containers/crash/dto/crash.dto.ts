@@ -9,7 +9,7 @@ export class CrashDTO {
   @IsBoolean()
   injured: boolean;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   injuries: string;
 
@@ -26,6 +26,6 @@ export class CrashDTO {
   thirdInjured: boolean;
 
   @IsNotEmpty()
-  @IsNumber()
-  amountVehicles: number;
+  @IsBoolean()
+  friendlyStatement: boolean;
 };

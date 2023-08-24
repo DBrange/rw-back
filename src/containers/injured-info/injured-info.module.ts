@@ -8,6 +8,7 @@ import { Injured } from '../injured/entities/injured.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([InjuredInfo, Injured])],
   controllers: [InjuredInfoController],
-  providers: [InjuredInfoService]
+  providers: [InjuredInfoService],
+  exports: [InjuredInfoService]
 })
 export class InjuredInfoModule {}

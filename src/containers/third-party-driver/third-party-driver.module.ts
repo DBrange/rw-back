@@ -6,8 +6,9 @@ import { ThirdPartyDriver } from './entities/thirdPartyDriver.entity';
 import { ThirdPartyVehicle } from '../third-party-vehicle/entities/thirdPartyVehicle.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([ThirdPartyDriver, ThirdPartyVehicle])],
+  imports: [TypeOrmModule.forFeature([ThirdPartyDriver, ThirdPartyVehicle])],
   controllers: [ThirdPartyDriverController],
-  providers: [ThirdPartyDriverService]
+  providers: [ThirdPartyDriverService],
+  exports: [ThirdPartyDriverService],
 })
 export class ThirdPartyDriverModule {}

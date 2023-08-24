@@ -7,7 +7,6 @@ export class ThirdPartyDriverDTO {
      @IsString()
      name: string;
 
-
      @IsNotEmpty()
      @IsString()
      lastName: string;
