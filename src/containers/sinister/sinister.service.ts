@@ -125,7 +125,7 @@ export class SinisterService {
         <h4>CUIT: ${legalUserDTO.cuit}</h4>
         <h4>Numero telefonico: ${legalUserDTO.phoneNumber}</h4>
         <h4>Email: ${legalUserDTO.email}</h4>
-        <h4>EWmail alternativo: ${legalUserDTO.altEmail}</h4>
+        <h4>Email alternativo: ${legalUserDTO.altEmail}</h4>
         <h4>Direccion: ${legalUserDTO.address}</h4>
         <div style="page-break-after: always;"></div>
         `;
@@ -162,7 +162,7 @@ export class SinisterService {
         <h3>Neumaticos:</h3>
         <h4>Marca: ${vehicleDTO.tireBrand}</h4>
         <h4>Tamaño: ${vehicleDTO.tireSize}</h4>
-        <h4>Desgaste: ${vehicleDTO.tireWear}</h4>
+        <h4>Desgaste: ${vehicleDTO.tireWear}%</h4>
         `
         }
         <h4>${vehicleDTO.gnc ? 'Si' : 'No'}</h4>
@@ -173,7 +173,7 @@ export class SinisterService {
         <h4>Fecha de expiracion: ${gncDTO.expireDate}</h4>
         `
             : ''
-        }}
+        }
         <div style="page-break-after: always;"></div>
         `;
       }
@@ -213,12 +213,12 @@ export class SinisterService {
           </div>
         </div>
         ${
-          theftTireDTO
+          theftTireDTO && theftDTO.isTire
             ? `
         <h4>Neumaticos robados: ${theftTireDTO.tireAmount}</h4>
         ${
           theftTireDTO.tireAmount > 0
-            ? `<h4>Desgaste de los neumaticos: ${theftTireDTO.tireWear}</h4>`
+            ? `<h4>Desgaste de los neumaticos: ${theftTireDTO.tireWear}%</h4>`
             : ''
         }
         `
@@ -254,7 +254,7 @@ export class SinisterService {
 
       if (crashDTO) {
         pdfContent += `
-         <h1>Denuncia: Incendio</h1>
+         <h1>Denuncia: Choque</h1>
         <h4>Horario del suceso: ${crashDTO.time}</h4>
         <h4>Fecha del suceso: ${crashDTO.date}</h4>
         <h4>Ubicacion del suceso: ${crashDTO.location}</h4>

@@ -79,5 +79,6 @@ import { ThirdPartyDriver } from '../third-party-driver/entities/thirdPartyDrive
     ThirdPartyVehicleService,
     ThirdPartyDriverService,
   ],
+  exports: [SinisterService]
 })
 export class SinisterModule {}

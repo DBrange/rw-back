@@ -17,9 +17,27 @@ import { Gnc } from '../gnc/entities/gnc.entity';
 import { Smartphone } from '../smartphones/entities/smartphone.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Asset, Vehicle, Gnc, User, Smartphone, LegalUsers, Electronics])],
+  imports: [
+    TypeOrmModule.forFeature([
+      Asset,
+      Vehicle,
+      Gnc,
+      User,
+      Smartphone,
+      LegalUsers,
+      Electronics,
+    ]),
+  ],
   controllers: [AssetController],
-  providers: [AssetService, GncService, VehicleService, ElectronicsService,
-              SmartphonesService,UsersService, LegalUsersService]
+  providers: [
+    AssetService,
+    GncService,
+    VehicleService,
+    ElectronicsService,
+    SmartphonesService,
+    UsersService,
+    LegalUsersService,
+    
+  ],
 })
 export class AssetModule {}
