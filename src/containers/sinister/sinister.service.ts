@@ -44,6 +44,7 @@ import { SmartphoneDTO } from '../smartphones/dto/smartphone.dto';
 import { ElectronicsDTO } from '../electronics/dto/electronics.dto';
 import * as nodemailer from 'nodemailer';
 import * as puppeteer from 'puppeteer';
+import { ConfigService } from '@nestjs/config';
 interface PDF {
   userDTO: UserDTO;
   legalUserDTO: LegalUsersDTO;
@@ -365,25 +366,30 @@ export class SinisterService {
     recipients: string[],
   ): Promise<void> {
     try {
-      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+      // process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+      const configService = new ConfigService();
       const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
+        port: 587,
+        secure: false,
         auth: {
-          user: 'asesincreedaltairr@gmail.com',
-          pass: 'ptbymyytsctdnlid',
+          user: `${configService.get('EMAIL_USER')}`,
+          pass: `${configService.get('EMAIL_PASSWORD')}`,
         },
+        tls: {
+          rejectUnauthorized: false,
+        },
+        requireTLS: true,
       });
 
       const mailOptions = {
-        from: 'Aqui esta su denuncia <asesincreedaltairr@gmail.com>',
+        from: `Aqui esta su denuncia <${configService.get('EMAIL_USER')}>`,
         to: recipients.join(', '),
-        subject: 'PDF Report',
-        text: 'Here is the PDF report you requested.',
+        subject: 'PDF Denuncia',
+        text: 'Aqui esta la denuncia que solicito.',
         attachments: [
           {
-            filename: 'report.pdf',
+            filename: 'Denuncia.pdf',
             content: pdfBuffer,
           },
         ],
@@ -391,7 +397,7 @@ export class SinisterService {
 
       await transporter.sendMail(mailOptions);
 
-      delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+      // delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
     } catch (err) {
       console.error('Error sending PDF by email:', err);
     }
@@ -436,11 +442,14 @@ export class SinisterService {
 
       const newAsset = await this.assetService.createAsset(fullAsset);
 
-      const currentDate = new Date('1998-03-03');
+      const theftDate = theftDTO.date;
+      const theftLocation = theftDTO.location;
+      const theftTime = theftDTO.time;
+
       const bodySinister: SinisterDTO = {
-        date: currentDate,
-        location: 'algun lugar del mas alla',
-        time: '12:12',
+        date: theftDate,
+        location: theftLocation,
+        time: theftTime,
         asset: newAsset,
       };
 
@@ -482,7 +491,7 @@ export class SinisterService {
         assetDTO,
       });
 
-      this.sendPdfEmail(generatePdf, ['asesincreedaltairr@hotmail.com']);
+      this.sendPdfEmail(generatePdf, [userDTO.email]);
 
       return response;
     } catch (error) {
@@ -520,11 +529,14 @@ export class SinisterService {
 
       const newAsset = await this.assetService.createAsset(fullAsset);
 
-      const currentDate = new Date('1998-03-03');
+      const fireDate = fireDTO.date;
+      const fireLocation = fireDTO.location;
+      const fireTime = fireDTO.time;
+
       const bodySinister: SinisterDTO = {
-        date: currentDate,
-        location: 'algun lugar del mas alla',
-        time: '12:12',
+        date: fireDate,
+        location: fireLocation,
+        time: fireTime,
         asset: newAsset,
       };
 
@@ -576,10 +588,10 @@ export class SinisterService {
         injuredDTO,
       });
 
-      this.sendPdfEmail(generatePdf, ['asesincreedaltairr@hotmail.com']);
+      this.sendPdfEmail(generatePdf, [userDTO.email]);
 
       const response = {
-        injured: newInjured,
+        injured: newSinister,
       };
 
       return response;
@@ -619,11 +631,14 @@ export class SinisterService {
 
       const newAsset = await this.assetService.createAsset(fullAsset);
 
-      const currentDate = new Date('1998-03-03');
+      const crashDate = crashDTO.date;
+      const crashLocation = crashDTO.location;
+      const crashTime = crashDTO.time;
+
       const bodySinister: SinisterDTO = {
-        date: currentDate,
-        location: 'algun lugar del mas alla',
-        time: '12:12',
+        date: crashDate,
+        location: crashLocation,
+        time: crashTime,
         asset: newAsset,
       };
 
@@ -667,14 +682,14 @@ export class SinisterService {
       }
 
       let newThirdPartyVehicle: ThirdPartyVehicle;
+      const thirdPartyVehicleEmails: string[] = [];
 
-      if (crashDTO.friendlyStatement) {
-        const allThirdParty: ThirdParty =
-          thirdPartyVehicleDTO.thirdPartyVehicleInfo;
-
+      const allThirdParty: ThirdParty =
+      thirdPartyVehicleDTO.thirdPartyVehicleInfo;
+      if (allThirdParty) {
         for (let i = 0; i < allThirdParty.length; i++) {
           const el = allThirdParty[i];
-
+          thirdPartyVehicleEmails.push(el.email);
           const bodyThirdPartyVehicle: ThirdPartyVehicleDTO = {
             brand: el.brand,
             model: el.model,
@@ -721,10 +736,12 @@ export class SinisterService {
         thirdPartyVehicleDTO,
       });
 
-      this.sendPdfEmail(generatePdf, ['asesincreedaltairr@hotmail.com']);
+      const emails = crashDTO.friendlyStatement ? [userDTO.email, ...thirdPartyVehicleEmails] : [userDTO.email];
+
+      this.sendPdfEmail(generatePdf, [...emails]);
 
       const response = {
-        thirdParty: newThirdPartyVehicle,
+        thirdParty: newSinister,
       };
 
       return response;
@@ -765,11 +782,14 @@ export class SinisterService {
 
       const newAsset = await this.assetService.createAsset(fullAsset);
 
-      const currentDate = new Date('1998-03-03');
+      const theftDate = theftDTO.date;
+      const theftLocation = theftDTO.location;
+      const theftTime = theftDTO.time;
+
       const bodySinister: SinisterDTO = {
-        date: currentDate,
-        location: 'algun lugar del mas alla',
-        time: '12:12',
+        date: theftDate,
+        location: theftLocation,
+        time: theftTime,
         asset: newAsset,
       };
 
@@ -810,7 +830,7 @@ export class SinisterService {
         theftTireDTO,
       });
 
-      this.sendPdfEmail(generatePdf, ['asesincreedaltairr@hotmail.com']);
+      this.sendPdfEmail(generatePdf, [userDTO.email]);
 
       return response;
     } catch (error) {
@@ -851,11 +871,14 @@ export class SinisterService {
 
       const newAsset = await this.assetService.createAsset(fullAsset);
 
-      const currentDate = new Date('1998-03-03');
+      const theftDate = theftDTO.date;
+      const theftLocation = theftDTO.location;
+      const theftTime = theftDTO.time;
+
       const bodySinister: SinisterDTO = {
-        date: currentDate,
-        location: 'algun lugar del mas alla',
-        time: '12:12',
+        date: theftDate,
+        location: theftLocation,
+        time: theftTime,
         asset: newAsset,
       };
 
@@ -896,7 +919,7 @@ export class SinisterService {
         theftTireDTO,
       });
 
-      this.sendPdfEmail(generatePdf, ['asesincreedaltairr@hotmail.com']);
+      this.sendPdfEmail(generatePdf, [legalUserDTO.email]);
 
       return response;
     } catch (error) {
@@ -936,11 +959,14 @@ export class SinisterService {
 
       const newAsset = await this.assetService.createAsset(fullAsset);
 
-      const currentDate = new Date('1998-03-03');
+      const fireDate = fireDTO.date;
+      const fireLocation = fireDTO.location;
+      const fireTime = fireDTO.time;
+
       const bodySinister: SinisterDTO = {
-        date: currentDate,
-        location: 'algun lugar del mas alla',
-        time: '12:12',
+        date: fireDate,
+        location: fireLocation,
+        time: fireTime,
         asset: newAsset,
       };
 
@@ -984,7 +1010,7 @@ export class SinisterService {
       }
 
       const response = {
-        injured: newInjured,
+        injured: newSinister,
       };
 
       //Generate PDF and send Email
@@ -996,7 +1022,7 @@ export class SinisterService {
         injuredDTO,
       });
 
-      this.sendPdfEmail(generatePdf, ['asesincreedaltairr@hotmail.com']);
+      this.sendPdfEmail(generatePdf, [legalUserDTO.email]);
 
       return response;
     } catch (error) {
@@ -1037,11 +1063,14 @@ export class SinisterService {
 
       const newAsset = await this.assetService.createAsset(fullAsset);
 
-      const currentDate = new Date('1998-03-03');
+      const crashDate = crashDTO.date;
+      const crashLocation = crashDTO.location;
+      const crashTime = crashDTO.time;
+
       const bodySinister: SinisterDTO = {
-        date: currentDate,
-        location: 'algun lugar del mas alla',
-        time: '12:12',
+        date: crashDate,
+        location: crashLocation,
+        time: crashTime,
         asset: newAsset,
       };
 
@@ -1085,6 +1114,7 @@ export class SinisterService {
       }
 
       let newThirdPartyVehicle: ThirdPartyVehicle;
+      const thirdPartyVehicleMails: string[] = [];
 
       if (crashDTO.friendlyStatement) {
         const allThirdParty: ThirdParty =
@@ -1092,7 +1122,7 @@ export class SinisterService {
 
         for (let i = 0; i < allThirdParty.length; i++) {
           const el = allThirdParty[i];
-
+          thirdPartyVehicleMails.push(el.email);
           const bodyThirdPartyVehicle: ThirdPartyVehicleDTO = {
             brand: el.brand,
             model: el.model,
@@ -1130,7 +1160,7 @@ export class SinisterService {
       }
 
       const response = {
-        thirdParty: newThirdPartyVehicle,
+        thirdParty: newSinister,
       };
 
       //Generate PDF and send Email
@@ -1143,7 +1173,11 @@ export class SinisterService {
         thirdPartyVehicleDTO,
       });
 
-      this.sendPdfEmail(generatePdf, ['asesincreedaltairr@hotmail.com']);
+      const emails = crashDTO.friendlyStatement
+        ? [legalUserDTO.email, ...thirdPartyVehicleMails]
+        : [legalUserDTO.email];
+
+      this.sendPdfEmail(generatePdf, [...emails]);
 
       return response;
     } catch (error) {
@@ -1185,11 +1219,14 @@ export class SinisterService {
 
       const newAsset = await this.assetService.createAsset(fullAsset);
 
-      const currentDate = new Date('1998-03-03');
+      const theftDate = theftDTO.date;
+      const theftLocation = theftDTO.location;
+      const theftTime = theftDTO.time;
+
       const bodySinister: SinisterDTO = {
-        date: currentDate,
-        location: 'algun lugar del mas alla',
-        time: '12:12',
+        date: theftDate,
+        location: theftLocation,
+        time: theftTime,
         asset: newAsset,
       };
 
@@ -1230,7 +1267,7 @@ export class SinisterService {
         theftTireDTO,
       });
 
-      this.sendPdfEmail(generatePdf, ['asesincreedaltairr@hotmail.com']);
+      this.sendPdfEmail(generatePdf, [legalUserDTO.email]);
 
       return response;
     } catch (error) {
