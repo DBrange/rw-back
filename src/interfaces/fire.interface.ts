@@ -1,6 +1,9 @@
 export interface IFire {
 
 
+     time: string;
+     date: Date;
+     location: string;
      details: string;
      injured: boolean;
      injuries: string;

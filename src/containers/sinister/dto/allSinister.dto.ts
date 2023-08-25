@@ -98,4 +98,3 @@ export class SinisterLegalUserElectronicTheftDTO {
   theftTireDTO: TheftTireDTO;
   assetDTO: AssetDTO;
 }
-

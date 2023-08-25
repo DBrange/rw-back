@@ -1,26 +1,33 @@
-import { BaseEntity } from "../../../config/base.entity";
-import { IFire } from "../../../interfaces/fire.interface";
-import { Column, Entity } from "typeorm";
+import { BaseEntity } from '../../../config/base.entity';
+import { IFire } from '../../../interfaces/fire.interface';
+import { Column, Entity } from 'typeorm';
 
-@Entity({name: 'fire'})
+@Entity({ name: 'fire' })
 export class Fire extends BaseEntity implements IFire {
+  @Column()
+  time: string;
 
-     @Column()
-     details: string;
+  @Column()
+  date: Date;
 
-     @Column()
-     injured: boolean;
+  @Column()
+  location: string;
 
-     @Column()
-     injuries: string;
+  @Column()
+  details: string;
 
-     @Column()
-     ambulance: boolean;
+  @Column()
+  injured: boolean;
 
-     @Column()
-     ambulanceTo: string;
+  @Column()
+  injuries: string;
 
-     @Column()
-     thirdInjured: boolean;
+  @Column()
+  ambulance: boolean;
 
-};
+  @Column()
+  ambulanceTo: string;
+
+  @Column()
+  thirdInjured: boolean;
+}

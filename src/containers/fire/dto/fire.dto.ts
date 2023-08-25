@@ -1,28 +1,45 @@
-import { IsNotEmpty, IsString, IsBoolean, IsOptional } from "class-validator";
+import {
+  IsNotEmpty,
+  IsString,
+  IsBoolean,
+  IsOptional,
+  IsDate,
+} from 'class-validator';
 
 export class FireDTO {
+  @IsNotEmpty()
+  @IsString()
+  time: string;
 
-     @IsNotEmpty()
-     @IsString()
-     details: string;
+  @IsNotEmpty()
+  @IsDate()
+  date: Date;
 
-     @IsNotEmpty()
-     @IsBoolean()
-     injured: boolean;
+  @IsNotEmpty()
+  @IsString()
+  location: string;
 
-     @IsOptional()
-     @IsString()
-     injuries: string;
+  @IsNotEmpty()
+  @IsString()
+  details: string;
 
-     @IsNotEmpty()
-     @IsBoolean()
-     ambulance: boolean;
+  @IsNotEmpty()
+  @IsBoolean()
+  injured: boolean;
 
-     @IsOptional()
-     @IsString()
-     ambulanceTo: string;
+  @IsOptional()
+  @IsString()
+  injuries: string;
 
-     @IsNotEmpty()
-     @IsBoolean()
-     thirdInjured: boolean;
-};
+  @IsNotEmpty()
+  @IsBoolean()
+  ambulance: boolean;
+
+  @IsOptional()
+  @IsString()
+  ambulanceTo: string;
+
+  @IsNotEmpty()
+  @IsBoolean()
+  thirdInjured: boolean;
+}

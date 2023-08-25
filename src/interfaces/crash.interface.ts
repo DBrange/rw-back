@@ -1,4 +1,7 @@
 export interface ICrash {
+  time: string;
+  date: Date;
+  location: string;
   details: string;
   injured: boolean;
   injuries: string;

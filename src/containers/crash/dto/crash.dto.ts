@@ -1,6 +1,18 @@
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CrashDTO {
+  @IsNotEmpty()
+  @IsString()
+  time: string;
+
+  @IsNotEmpty()
+  @IsDate()
+  date: Date;
+
+  @IsNotEmpty()
+  @IsString()
+  location: string;
+
   @IsNotEmpty()
   @IsString()
   details: string;

@@ -5,6 +5,15 @@ import { Column, Entity } from "typeorm";
 @Entity({ name: 'crash' })
 export class Crash extends BaseEntity implements ICrash {
   @Column()
+  time: string;
+
+  @Column()
+  date: Date;
+
+  @Column()
+  location: string;
+
+  @Column()
   details: string;
 
   @Column()
