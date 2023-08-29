@@ -53,95 +53,161 @@ export class AssetService {
       const page = await browser.newPage();
 
       let pdfContent = '';
-
+      // <footer style='width: 100%; position: absolute; bottom: 5vh; right: 5vw; text-align: right; font-family: sans-serif;'>3</footer>
       if (userDTO) {
         pdfContent += `
-        <h1>Persona particular</h1>
-        <h4>Nombre: ${userDTO.name}</h4>
-        <h4>Apellido: ${userDTO.lastName}</h4>
-        <h4>DNI: ${userDTO.dni}</h4>
-        <h4>Fecha de nacimiento: ${userDTO.birthDate}</h4>
-        <h4>Genero: ${userDTO.gender}</h4>
-        <h4>Numero telefonico: ${userDTO.phoneNumber}</h4>
-        <h4>Email: ${userDTO.email}</h4>
-        <h4>Email alternativo: ${userDTO.altEmail}</h4>
-        <h4>Direccion: ${userDTO.address}</h4>
+      <section style='font-family: sans-serif; margin: 0 20px; height: 100vh;'>
+        <header style='border-bottom: 1px solid #000; margin-bottom: 20px; width: 100%; color: #8B5CF6;'>
+          <div style='width: 100%; display: flex; justify-content: flex-end;'>
+            <h2 style='margin-left: auto; padding-right: 20px;' >ReclamoWeb</h2>
+          </div>
+        </header>
+        <div>
+          <h2 style='padding: 20px 0; color: #8B5CF6;'>Persona particular</h2>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Nombre: <span style='font-weight: 200;'>${userDTO.name}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Apellido: <span style='font-weight: 200;'>${userDTO.lastName}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>DNI: <span style='font-weight: 200;'>${userDTO.dni}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Fecha de nacimiento: <span style='font-weight: 200;'>${userDTO.birthDate}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Genero: <span style='font-weight: 200;'>${userDTO.gender}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Numero telefonico: <span style='font-weight: 200;'>${userDTO.phoneNumber}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Email: <span style='font-weight: 200;'>${userDTO.email}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Email alternativo: <span style='font-weight: 200;'>${userDTO.altEmail}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Direccion: <span style='font-weight: 200;'>${userDTO.address}</span></h4>
+        </div>
         <div style="page-break-after: always;"></div>
+        </section>
         `;
       }
 
       if (legalUserDTO) {
         pdfContent += `
-        <h1>Persona juridica</h1>
-        <h4>Nombre de la compañia: ${legalUserDTO.companyName}</h4>
-        <h4>CUIT: ${legalUserDTO.cuit}</h4>
-        <h4>Numero telefonico: ${legalUserDTO.phoneNumber}</h4>
-        <h4>Email: ${legalUserDTO.email}</h4>
-        <h4>Email alternativo: ${legalUserDTO.altEmail}</h4>
-        <h4>Direccion: ${legalUserDTO.address}</h4>
+       <section style='font-family: sans-serif; margin: 0 20px; height: 100vh;'>
+        <header style='border-bottom: 1px solid #000; margin-bottom: 20px; width: 100%; color: #8B5CF6;'>
+          <div style='width: 100%; display: flex; justify-content: flex-end;'>
+            <h2 style='margin-left: auto; padding-right: 20px;' >ReclamoWeb</h2>
+          </div>
+        </header>
+        <div>
+          <h2 style='padding: 20px 0; color: #8B5CF6;'>Persona juridica</h2>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Nombre de la compañia: <span style='font-weight: 200;'>${legalUserDTO.companyName}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>CUIT: <span style='font-weight: 200;'>${legalUserDTO.cuit}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Numero telefonico: <span style='font-weight: 200;'>${legalUserDTO.email}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Email: <span style='font-weight: 200;'>${legalUserDTO.altEmail}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Email alternativo: <span style='font-weight: 200;'>${legalUserDTO.altEmail}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Direccion <span style='font-weight: 200;'>${legalUserDTO.address}</span></h4>
+        </div>
         <div style="page-break-after: always;"></div>
+        </section>
         `;
       }
 
       if (vehicleDTO) {
         pdfContent += `
-        <h1>Vehiculo</h1>
-        <h4>Vehiculo tipo: ${vehicleDTO.type}</h4>
-        <h4>Patente: ${vehicleDTO.plate}</h4>
-        <h4>Año: ${vehicleDTO.year}</h4>
-        <h4>Marca: ${vehicleDTO.brand}</h4>
-        <h4>Modelo: ${vehicleDTO.model}</h4>
-        <h4>Color: ${vehicleDTO.color}</h4>
-        <h4>Daño: ${vehicleDTO.damage ? 'Si' : 'No'}</h4>
-        <h4>Lugar dañado: ${vehicleDTO.damageLocation}</h4>
-        <div style="display: flex; flex-direction: column">
-          <p>Fotos del vehiculo</p>
-          <div style="display: flex; flex-wrap: wrap ; gap: 5px">
-          ${(vehicleDTO.images as unknown as string[]).map(
-            (el: string) =>
-              `
-            <img src="${el}" style="max-width: 30%; height: auto; object-fit: cover;"/>
-            `,
-          )}
+        <section style='font-family: sans-serif; margin: 0 20px; height: 100vh;'>
+        <header style='border-bottom: 1px solid #000; margin-bottom: 20px; width: 100%; color: #8B5CF6;'>
+          <div style='width: 100%; display: flex; justify-content: flex-end;'>
+            <h2 style='margin-left: auto; padding-right: 20px;' >ReclamoWeb</h2>
           </div>
-        </div>
-        <h4>Es 0km: ${vehicleDTO.okm ? 'Si' : 'No'}</h4>
-        <h4>Combustible: ${vehicleDTO.fuel}</h4>
-       
-        <h3>Neumaticos:</h3>
-        <h4>Marca: ${vehicleDTO.tireBrand}</h4>
-        <h4>Tamaño: ${vehicleDTO.tireSize}</h4>
-        <h4>Desgaste: ${vehicleDTO.tireWear}%</h4>
-
-        <h4>${vehicleDTO.gnc ? 'Si' : 'No'}</h4>
-        ${
-          gncDTO
-            ? `
-        <h4>Numero de oblea: ${gncDTO.oblea}</h4>
-        <h4>Fecha de expiracion: ${gncDTO.expireDate}</h4>
+        </header>
+        <div>
+          <h2 style='padding: 20px 0; color: #8B5CF6;'>Vehiculo</h2>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Vehiculo tipo: <span style='font-weight: 200;'>${
+            vehicleDTO.type
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Patente: <span style='font-weight: 200;'>${
+            vehicleDTO.plate
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Año: <span style='font-weight: 200;'>${
+            vehicleDTO.year
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Marca: <span style='font-weight: 200;'>${
+            vehicleDTO.brand
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Modelo: <span style='font-weight: 200;'>${
+            vehicleDTO.model
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Color: <span style='font-weight: 200;'>${
+            vehicleDTO.color
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Daño: <span style='font-weight: 200;'>${
+            vehicleDTO.damage ? 'Si' : 'No'
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Lugar dañado: <span style='font-weight: 200;'>${
+            vehicleDTO.damageLocation
+          }</span></h4>
+          <div style="display: flex; flex-direction: column">
+            <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Fotos del vehiculo:</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 5px">
+              ${(vehicleDTO.images as unknown as string[]).map(
+                (el: string) =>
+                  `
+                <img src="${el}" style="max-width: 30%; max-height: 300px; object-fit: contain;"/>
+                `,
+              )}
+            </div>
+          </div>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Es 0km: <span style='font-weight: 200;'>${
+            vehicleDTO.okm ? 'Si' : 'No'
+          }</span></h4>
+                  <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Es GNC: <span style='font-weight: 200;'>${
+                    vehicleDTO.gnc ? 'Si' : 'No'
+                  }</span></h4>
+                  ${
+                    gncDTO
+                      ? `
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Numero de oblea: <span style='font-weight: 200;'>${gncDTO.oblea}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Patente: <span style='font-weight: 200;'>${gncDTO.plate}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Fecha de expiracion: <span style='font-weight: 200;'>${gncDTO.expireDate}</span></h4>
+          `
+                      : ''
+                  }
+          ${
+            !vehicleDTO
+              ? ''
+              : `
+        <h4 style='padding: 20px 0 10px 0; text-decoration: underline;'>Neumaticos:</h4>
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Marca: <span style='font-weight: 200;'>${vehicleDTO.tireBrand}</span></h4>
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Tamaño: <span style='font-weight: 200;'>${vehicleDTO.tireSize}</span></h4>
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Desgaste: <span style='font-weight: 200;'>${vehicleDTO.tireWear}</span></h4>
         `
-            : ''
-        }
+          }
         <div style="page-break-after: always;"></div>
+        </section>
+        </div>
         `;
       }
 
       if (electronicDTO) {
         pdfContent += `
-        <h1>Electrodomestico</h1>
-        <h4>Electrodomestico tipo: ${electronicDTO.type}</h4>
-        ${
-          smartphoneDTO
-            ? `
-        <h4>Numero del movil: ${smartphoneDTO.phoneNumber}</h4>
-        <h4>Servicio del movil: ${smartphoneDTO.phoneService}</h4>
-        <h4>IMEI: ${smartphoneDTO.imei}</h4>
+        <section style='font-family: sans-serif; margin: 0 20px; height: 100vh;'>
+        <header style='border-bottom: 1px solid #000; margin-bottom: 20px; width: 100%; color: #8B5CF6;'>
+          <div style='width: 100%; display: flex; justify-content: flex-end;'>
+            <h2 style='margin-left: auto; padding-right: 20px;' >ReclamoWeb</h2>
+          </div>
+        </header>
+        <div>
+          <h2 style='padding: 20px 0; color: #8B5CF6;'>Electrodomestico</h2>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Electrodomestico tipo: <span style='font-weight: 200;'>${
+            electronicDTO.type
+          }</span></h4>
+          ${
+            smartphoneDTO
+              ? `
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Numero del movil: <span style='font-weight: 200;'>${smartphoneDTO.phoneNumber}</span></h4>
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Servicio del movil: <span style='font-weight: 200;'>${smartphoneDTO.phoneService}</span></h4>
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>IMEI: <span style='font-weight: 200;'>${smartphoneDTO.imei}</span></h4>
         `
-            : ''
-        }
-        <h4>Marca: : ${electronicDTO.brand}</h4>
-        <h4>Modelo: ${electronicDTO.model}</h4>
+              : ''
+          }
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Marca: <span style='font-weight: 200;'>${
+          electronicDTO.brand
+        }</span></h4>
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Modelo: <span style='font-weight: 200;'>${
+          electronicDTO.model
+        }</span></h4>
+        </div>
         <div style="page-break-after: always;"></div>
+        </section>
         `;
       }
 
@@ -245,7 +311,7 @@ export class AssetService {
         userDTO,
       });
 
-      await this.sendPdfEmail(generatePdf, ['asesincreedaltairr@hotmail.com']);
+      await this.sendPdfEmail(generatePdf, [userDTO.email]);
 
       return response;
     } catch (error) {
@@ -300,7 +366,7 @@ export class AssetService {
         legalUserDTO,
       });
 
-      await this.sendPdfEmail(generatePdf, ['asesincreedaltairr@hotmail.com']);
+      await this.sendPdfEmail(generatePdf, [legalUserDTO.email]);
 
       return response;
     } catch (error) {
@@ -350,7 +416,7 @@ export class AssetService {
         userDTO,
       });
 
-      await this.sendPdfEmail(generatePdf, ['asesincreedaltairr@hotmail.com']);
+      await this.sendPdfEmail(generatePdf, [userDTO.email]);
 
       return { newElectronic, newSmartphone, newAsset };
     } catch (error) {
@@ -402,7 +468,7 @@ export class AssetService {
         legalUserDTO,
       });
 
-      await this.sendPdfEmail(generatePdf, ['asesincreedaltairr@hotmail.com']);
+      await this.sendPdfEmail(generatePdf, [legalUserDTO.email]);
 
       return { newElectronic, newSmartphone, newAsset };
     } catch (error) {

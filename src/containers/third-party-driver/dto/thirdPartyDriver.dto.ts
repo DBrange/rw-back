@@ -1,17 +1,17 @@
-import { IsEmail, IsNotEmpty, IsString, IsUUID } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
 import { ThirdPartyVehicle } from "src/containers/third-party-vehicle/entities/thirdPartyVehicle.entity";
 
 export class ThirdPartyDriverDTO {
 
-     @IsNotEmpty()
+     @IsOptional()
      @IsString()
      name: string;
 
-     @IsNotEmpty()
+     @IsOptional()
      @IsString()
      lastName: string;
 
-     @IsNotEmpty()
+     @IsOptional()
      @IsString()
      dni: string;
 

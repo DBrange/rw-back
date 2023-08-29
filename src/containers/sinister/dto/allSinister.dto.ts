@@ -49,7 +49,6 @@ export class SinisterUserVehicleCrashDTO {
 export type ThirdParty = (ThirdPartyVehicleDTO & ThirdPartyDriverDTO)[];
 
 export interface ThirdPartyVehicleData {
-  amountVehicles: number;
   thirdPartyVehicleInfo: any;
 }
 

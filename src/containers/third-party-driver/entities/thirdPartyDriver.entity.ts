@@ -6,13 +6,13 @@ import { Entity, Column, JoinColumn, OneToOne } from "typeorm";
 @Entity({name: 'third_party_driver'})
 export class ThirdPartyDriver extends BaseEntity implements IThirdPartyDriver {
 
-     @Column()
+     @Column({nullable: true})
      name: string;
 
-     @Column()
+     @Column({nullable: true})
      lastName: string;
 
-     @Column()
+     @Column({nullable: true})
      dni: string;
 
      @Column()
