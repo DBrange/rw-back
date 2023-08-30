@@ -18,6 +18,7 @@ import { SmartphoneDTO } from '../smartphones/dto/smartphone.dto';
 import * as nodemailer from 'nodemailer';
 import * as puppeteer from 'puppeteer';
 import { ConfigService } from '@nestjs/config';
+import { ErrorManager } from 'src/utils/error.manager';
 
 interface PDF {
   userDTO: UserDTO;
@@ -267,9 +268,17 @@ export class AssetService {
 
   public async createAsset(body: AssetDTO): Promise<Asset> {
     try {
-      return await this.assetRepository.save(body);
+      const asset = await this.assetRepository.save(body);
+
+      if (!asset) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No asset found',
+        });
+      }
+      return asset;
     } catch (error) {
-      throw new Error(error);
+      throw ErrorManager.createSignaturError(error.message);
     }
   }
 
@@ -279,8 +288,15 @@ export class AssetService {
     gncDTO: GncDTO,
     userDTO: UserDTO,
     assetDTO: AssetDTO,
+    swornDeclaration: boolean,
   ) {
     try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
       const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
 
       if (newVehicle.gnc) {
@@ -315,7 +331,7 @@ export class AssetService {
 
       return response;
     } catch (error) {
-      throw new Error(error);
+      throw ErrorManager.createSignaturError(error.message);
     }
   }
 
@@ -325,8 +341,15 @@ export class AssetService {
     gncDTO: GncDTO,
     legalUserDTO: LegalUsersDTO,
     assetDTO: AssetDTO,
+    swornDeclaration: boolean,
   ) {
     try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
       const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
 
       let newGnc;
@@ -370,7 +393,7 @@ export class AssetService {
 
       return response;
     } catch (error) {
-      throw new Error(error);
+      throw ErrorManager.createSignaturError(error.message);
     }
   }
 
@@ -380,8 +403,15 @@ export class AssetService {
     smartphoneDTO: SmartphoneDTO,
     userDTO: UserDTO,
     assetDTO: AssetDTO,
+    swornDeclaration: boolean,
   ) {
     try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
       const newElectronic = await this.electronicService.createElectronics(
         electronicDTO,
       );
@@ -420,7 +450,7 @@ export class AssetService {
 
       return { newElectronic, newSmartphone, newAsset };
     } catch (error) {
-      throw new Error(error);
+      throw ErrorManager.createSignaturError(error.message);
     }
   }
 
@@ -430,8 +460,15 @@ export class AssetService {
     smartphoneDTO: SmartphoneDTO,
     legalUserDTO: LegalUsersDTO,
     assetDTO: AssetDTO,
+    swornDeclaration: boolean,
   ) {
     try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
       const newElectronic = await this.electronicService.createElectronics(
         electronicDTO,
       );
@@ -472,7 +509,7 @@ export class AssetService {
 
       return { newElectronic, newSmartphone, newAsset };
     } catch (error) {
-      throw new Error(error);
+      throw ErrorManager.createSignaturError(error.message);
     }
   }
 }

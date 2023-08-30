@@ -1,7 +1,16 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { SinisterService } from './sinister.service';
 import { SinisterDTO } from './dto/sinister.dto';
-import {  SinisterLegalUserElectronicTheftDTO, SinisterLegalUserVehicleCrashDTO, SinisterLegalUserVehicleFireDTO, SinisterUserElectronicTheftDTO, SinisterUserVehicleCrashDTO, SinisterUserVehicleFireDTO, SinisterUserVehicleTheftDTO, SinisterlegalUserVehicleTheftDTO } from './dto/allSinister.dto';
+import {
+  SinisterLegalUserElectronicTheftDTO,
+  SinisterLegalUserVehicleCrashDTO,
+  SinisterLegalUserVehicleFireDTO,
+  SinisterUserElectronicTheftDTO,
+  SinisterUserVehicleCrashDTO,
+  SinisterUserVehicleFireDTO,
+  SinisterUserVehicleTheftDTO,
+  SinisterlegalUserVehicleTheftDTO,
+} from './dto/allSinister.dto';
 
 @Controller('sinister')
 export class SinisterController {
@@ -23,6 +32,7 @@ export class SinisterController {
       requestData.theftDTO,
       requestData.theftTireDTO,
       requestData.assetDTO,
+      requestData.swornDeclaration,
     );
     return result;
   }
@@ -38,6 +48,7 @@ export class SinisterController {
       requestData.fireDTO,
       requestData.injuredDTO,
       requestData.assetDTO,
+      requestData.swornDeclaration,
     );
     return result;
   }
@@ -54,6 +65,7 @@ export class SinisterController {
       requestData.injuredDTO,
       requestData.thirdPartyVehicleDTO,
       requestData.assetDTO,
+      requestData.swornDeclaration,
     );
     return result;
   }
@@ -69,6 +81,7 @@ export class SinisterController {
       requestData.theftDTO,
       requestData.theftTireDTO,
       requestData.assetDTO,
+      requestData.swornDeclaration,
     );
     return result;
   }
@@ -84,6 +97,7 @@ export class SinisterController {
       requestData.fireDTO,
       requestData.injuredDTO,
       requestData.assetDTO,
+      requestData.swornDeclaration,
     );
     return result;
   }
@@ -100,6 +114,7 @@ export class SinisterController {
       requestData.injuredDTO,
       requestData.thirdPartyVehicleDTO,
       requestData.assetDTO,
+      requestData.swornDeclaration,
     );
     return result;
   }
@@ -115,6 +130,7 @@ export class SinisterController {
       requestData.theftDTO,
       requestData.theftTireDTO,
       requestData.assetDTO,
+      requestData.swornDeclaration,
     );
     return result;
   }
@@ -130,6 +146,7 @@ export class SinisterController {
       requestData.theftDTO,
       requestData.theftTireDTO,
       requestData.assetDTO,
+      requestData.swornDeclaration,
     );
     return result;
   }

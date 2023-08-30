@@ -48,6 +48,7 @@ import fs from 'fs';
 import PDFDocument from 'pdfkit-table';
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
+import { ErrorManager } from 'src/utils/error.manager';
 interface PDF {
   userDTO: UserDTO;
   legalUserDTO: LegalUsersDTO;
@@ -307,7 +308,25 @@ export class SinisterService {
           ${
             theftTireDTO.tireAmount > 0
               ? `
-              <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Desgaste de los neumaticos: <span style='font-weight: 200;'>${theftTireDTO.tireWear}%</span></h4>`
+              <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Desgaste de los neumaticos: <span style='font-weight: 200;'>${
+                theftTireDTO.tireWear
+              }%</span></h4>
+              <div style="display: flex; flex-direction: column">
+                <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Fotos de la denuncia:</h4>
+                <div style="display: flex; flex-wrap: wrap ; gap: 5px">
+                  <div style="display: flex; flex-wrap: wrap; gap: 5px">
+                  ${(theftTireDTO.tirePhoto as unknown as string[]).map(
+                    (el: string) =>
+                      `
+                    <img src="${el}" style="max-width: 30%; max-height: 300px; object-fit: contain;"/>
+                    `,
+                  )}
+                </div>
+              </div>
+              <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Localidad de reposicion: <span style='font-weight: 200;'>${
+                theftTireDTO.replacementLocation
+              }%</span></h4>
+              `
               : ''
           }
           `
@@ -488,7 +507,6 @@ export class SinisterService {
             el.injuries
           }</span></h4> 
           </div>`);
-            console.log(text.join(','), 'mmmmmmmmmmmmm');
             return text.join(',');
           },
         );
@@ -511,7 +529,7 @@ export class SinisterService {
       if (thirdPartyVehicleDTO) {
         const algo2 = thirdPartyVehicleDTO.thirdPartyVehicleInfo.map(
           (el: ThirdPartyVehicleDTO & ThirdPartyDriverDTO, i: number) => {
-            const text = []
+            const text = [];
             !(i === 0)
               ? text.push(`
         <section style='font-family: sans-serif; margin: 0 20px; min-height: 100vh;'>
@@ -650,8 +668,8 @@ export class SinisterService {
         }</span></h4> 
         </div>
         `);
-            
-            return text.join(',')
+
+            return text.join(',');
           },
         );
         pdfContent += `
@@ -674,11 +692,15 @@ export class SinisterService {
       const pdfBuffer = await page.pdf({ format: 'A4' });
 
       await browser.close();
-
+      if (!pdfBuffer) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Error generatin PDF',
+        });
+      }
       return pdfBuffer;
     } catch (err) {
-      console.log(err);
-      throw new Error('Error generating PDF');
+      throw ErrorManager.createSignaturError(err.message);
     }
   }
 
@@ -718,17 +740,26 @@ export class SinisterService {
 
       await transporter.sendMail(mailOptions);
 
+      
+
       // delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
     } catch (err) {
-      console.error('Error sending PDF by email:', err);
+      throw ErrorManager.createSignaturError(err.message);
     }
   }
 
   public async createSinister(body: SinisterDTO): Promise<Sinister> {
     try {
-      return await this.sinisterRepository.save(body);
+      const sinister = await this.sinisterRepository.save(body);
+      if (!sinister) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Sinister not found',
+        });
+      }
+      return sinister;
     } catch (error) {
-      throw new Error(error);
+      throw ErrorManager.createSignaturError(error.message);
     }
   }
 
@@ -740,8 +771,15 @@ export class SinisterService {
     theftDTO: TheftDTO,
     theftTireDTO: TheftTireDTO,
     assetDTO: AssetDTO,
+    swornDeclaration: boolean,
   ) {
     try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
       const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
 
       if (newVehicle.gnc) {
@@ -816,7 +854,7 @@ export class SinisterService {
 
       return response;
     } catch (error) {
-      throw new Error(error);
+      throw ErrorManager.createSignaturError(error.message);
     }
   }
 
@@ -827,8 +865,15 @@ export class SinisterService {
     fireDTO: FireDTO,
     injuredDTO: InjuredData,
     assetDTO: AssetDTO,
+    swornDeclaration: boolean,
   ) {
     try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
       const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
 
       if (newVehicle.gnc) {
@@ -877,23 +922,22 @@ export class SinisterService {
       await this.sinisterTypeService.createSinisterType(bodySinisterType);
 
       if (injuredDTO) {
-        
         let newInjured: InjuredDTO & Injured;
-        
+
         if (newFire.thirdInjured && injuredDTO.amount) {
           const bodyInjured: InjuredDTO = {
             amount: injuredDTO.amount,
             injuredInfo: injuredDTO.injuredInfo,
             sinister: newSinister,
           };
-          
+
           newInjured = await this.injuredService.createInjured(bodyInjured);
-          
+
           const allPeopleInjured = injuredDTO.injuredInfo;
-          
+
           for (let i = 0; i < allPeopleInjured.length; i++) {
             const el = allPeopleInjured[i];
-            
+
             const bodyInjuredInfo: InjuredInfoDTO = {
               ...el,
               injured: newInjured,
@@ -920,7 +964,7 @@ export class SinisterService {
 
       return response;
     } catch (error) {
-      throw new Error(error);
+      throw ErrorManager.createSignaturError(error.message);
     }
   }
 
@@ -932,18 +976,15 @@ export class SinisterService {
     injuredDTO: InjuredData,
     thirdPartyVehicleDTO: ThirdPartyVehicleData,
     assetDTO: AssetDTO,
+    swornDeclaration: boolean,
   ) {
-    console.log(
-      userDTO,
-      vehicleDTO,
-      gncDTO,
-      crashDTO,
-      injuredDTO,
-      thirdPartyVehicleDTO,
-      assetDTO,
-      'mmmm',
-    );
     try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
       const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
 
       if (newVehicle.gnc) {
@@ -1085,7 +1126,7 @@ export class SinisterService {
 
       return response;
     } catch (error) {
-      throw new Error(error);
+      throw ErrorManager.createSignaturError(error.message);
     }
   }
 
@@ -1096,8 +1137,15 @@ export class SinisterService {
     theftDTO: TheftDTO,
     theftTireDTO: TheftTireDTO,
     assetDTO: AssetDTO,
+    swornDeclaration: boolean,
   ) {
     try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
       const newElectronic = await this.electronicService.createElectronics(
         electronicDTO,
       );
@@ -1173,7 +1221,7 @@ export class SinisterService {
 
       return response;
     } catch (error) {
-      throw new Error(error);
+      throw ErrorManager.createSignaturError(error.message);
     }
   }
 
@@ -1185,8 +1233,15 @@ export class SinisterService {
     theftDTO: TheftDTO,
     theftTireDTO: TheftTireDTO,
     assetDTO: AssetDTO,
+    swornDeclaration: boolean,
   ) {
     try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
       const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
 
       if (newVehicle.gnc) {
@@ -1262,7 +1317,7 @@ export class SinisterService {
 
       return response;
     } catch (error) {
-      throw new Error(error);
+      throw ErrorManager.createSignaturError(error.message);
     }
   }
 
@@ -1273,8 +1328,15 @@ export class SinisterService {
     fireDTO: FireDTO,
     injuredDTO: InjuredData,
     assetDTO: AssetDTO,
+    swornDeclaration: boolean,
   ) {
     try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
       const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
 
       if (newVehicle.gnc) {
@@ -1325,23 +1387,22 @@ export class SinisterService {
       await this.sinisterTypeService.createSinisterType(bodySinisterType);
 
       if (injuredDTO) {
-        
         let newInjured: InjuredDTO & Injured;
-        
+
         if (newFire.thirdInjured && injuredDTO.amount) {
           const bodyInjured: InjuredDTO = {
             amount: injuredDTO.amount,
             injuredInfo: injuredDTO.injuredInfo,
             sinister: newSinister,
           };
-          
+
           newInjured = await this.injuredService.createInjured(bodyInjured);
-          
+
           const allPeopleInjured = injuredDTO.injuredInfo;
-          
+
           for (let i = 0; i < allPeopleInjured.length; i++) {
             const el = allPeopleInjured[i];
-            
+
             const bodyInjuredInfo: InjuredInfoDTO = {
               ...el,
               injured: newInjured,
@@ -1368,7 +1429,7 @@ export class SinisterService {
 
       return response;
     } catch (error) {
-      throw new Error(error);
+      throw ErrorManager.createSignaturError(error.message);
     }
   }
 
@@ -1380,19 +1441,17 @@ export class SinisterService {
     injuredDTO: InjuredData,
     thirdPartyVehicleDTO: ThirdPartyVehicleData,
     assetDTO: AssetDTO,
+    swornDeclaration: boolean,
   ) {
     try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
       const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
-      console.log(
-        legalUserDTO,
-        vehicleDTO,
-        gncDTO,
-        crashDTO,
-        injuredDTO,
-        thirdPartyVehicleDTO,
-        assetDTO,
-        'mmmm',
-      );
+
       if (newVehicle.gnc) {
         const vehicleGnc = {
           ...gncDTO,
@@ -1441,35 +1500,34 @@ export class SinisterService {
       await this.sinisterTypeService.createSinisterType(bodySinisterType);
 
       if (injuredDTO) {
-        
         let newInjured: InjuredDTO & Injured;
-        
-      if (newCrash.thirdInjured && injuredDTO.amount) {
-        const bodyInjured: InjuredDTO = {
-          amount: injuredDTO.amount,
-          injuredInfo: injuredDTO.injuredInfo,
-          sinister: newSinister,
-        };
-        
-        newInjured = await this.injuredService.createInjured(bodyInjured);
-        
-        const allPeopleInjured = injuredDTO.injuredInfo;
-        
-        for (let i = 0; i < allPeopleInjured.length; i++) {
-          const el = allPeopleInjured[i];
-          
-          const bodyInjuredInfo: InjuredInfoDTO = {
-            ...el,
-            injured: newInjured,
+
+        if (newCrash.thirdInjured && injuredDTO.amount) {
+          const bodyInjured: InjuredDTO = {
+            amount: injuredDTO.amount,
+            injuredInfo: injuredDTO.injuredInfo,
+            sinister: newSinister,
           };
-          await this.injuredInfoService.createInjuredInfo(bodyInjuredInfo);
+
+          newInjured = await this.injuredService.createInjured(bodyInjured);
+
+          const allPeopleInjured = injuredDTO.injuredInfo;
+
+          for (let i = 0; i < allPeopleInjured.length; i++) {
+            const el = allPeopleInjured[i];
+
+            const bodyInjuredInfo: InjuredInfoDTO = {
+              ...el,
+              injured: newInjured,
+            };
+            await this.injuredInfoService.createInjuredInfo(bodyInjuredInfo);
+          }
         }
       }
-    }
 
       let newThirdPartyVehicle: ThirdPartyVehicle;
       const thirdPartyVehicleMails: string[] = [];
-      
+
       if (crashDTO.friendlyStatement) {
         const allThirdParty: ThirdParty =
           thirdPartyVehicleDTO.thirdPartyVehicleInfo;
@@ -1535,7 +1593,7 @@ export class SinisterService {
 
       return response;
     } catch (error) {
-      throw new Error(error);
+      throw ErrorManager.createSignaturError(error.message);
     }
   }
 
@@ -1546,8 +1604,15 @@ export class SinisterService {
     theftDTO: TheftDTO,
     theftTireDTO: TheftTireDTO,
     assetDTO: AssetDTO,
+    swornDeclaration: boolean,
   ) {
     try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
       const newElectronic = await this.electronicService.createElectronics(
         electronicDTO,
       );
@@ -1625,7 +1690,7 @@ export class SinisterService {
 
       return response;
     } catch (error) {
-      throw new Error(error);
+      throw ErrorManager.createSignaturError(error.message);
     }
   }
 }

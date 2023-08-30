@@ -11,6 +11,7 @@ export class AssetVehicleUserGncDTO {
   gncDTO: GncDTO;
   userDTO: UserDTO;
   assetDTO: AssetDTO;
+  swornDeclaration: boolean
 }
 
 export class AssetVehicleLegalUserGncDTO {
@@ -18,6 +19,7 @@ export class AssetVehicleLegalUserGncDTO {
   gncDTO: GncDTO;
   legalUserDTO: LegalUsersDTO;
   assetDTO: AssetDTO;
+  swornDeclaration: boolean;
 }
 
 export class AssetElectronicUser {
@@ -25,6 +27,7 @@ export class AssetElectronicUser {
   assetDTO: AssetDTO;
   electronicDTO: ElectronicsDTO;
   smartphoneDTO: SmartphoneDTO;
+  swornDeclaration: boolean;
 }
 
 export class AssetElectronicLegalUser {
@@ -32,4 +35,5 @@ export class AssetElectronicLegalUser {
   assetDTO: AssetDTO;
   electronicDTO: ElectronicsDTO;
   smartphoneDTO: SmartphoneDTO;
+  swornDeclaration: boolean;
 }

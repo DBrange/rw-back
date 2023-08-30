@@ -11,6 +11,12 @@ export class TheftTire extends BaseEntity implements ITheftTire {
   @Column()
   tireWear: number;
 
+  @Column({ array: true })
+  tirePhoto: string;
+
+  @Column()
+  replacementLocation: string;
+
   @OneToOne(() => Theft)
   @JoinColumn()
   theft: Theft;

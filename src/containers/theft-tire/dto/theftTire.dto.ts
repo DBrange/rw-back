@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsUUID, IsString } from 'class-validator';
 import { Theft } from 'src/containers/theft/entities/theft.entity';
 
 export class TheftTireDTO {
@@ -9,6 +9,14 @@ export class TheftTireDTO {
   @IsNotEmpty()
   @IsNumber()
   tireWear: number;
+
+  @IsNotEmpty()
+  @IsString()
+  tirePhoto: string;
+
+  @IsNotEmpty()
+  @IsString()
+  replacementLocation: string;
 
   @IsNotEmpty()
   @IsUUID()

@@ -20,6 +20,7 @@ export class SinisterUserVehicleTheftDTO {
   theftDTO: TheftDTO;
   theftTireDTO: TheftTireDTO;
   assetDTO: AssetDTO;
+  swornDeclaration: boolean;
 }
 
 export class SinisterUserVehicleFireDTO {
@@ -29,6 +30,7 @@ export class SinisterUserVehicleFireDTO {
   fireDTO: FireDTO;
   injuredDTO: InjuredData;
   assetDTO: AssetDTO;
+  swornDeclaration: boolean;
 }
 
 export interface InjuredData {
@@ -44,6 +46,7 @@ export class SinisterUserVehicleCrashDTO {
   injuredDTO: InjuredData;
   thirdPartyVehicleDTO: ThirdPartyVehicleData;
   assetDTO: AssetDTO;
+  swornDeclaration: boolean;
 }
 
 export type ThirdParty = (ThirdPartyVehicleDTO & ThirdPartyDriverDTO)[];
@@ -59,6 +62,7 @@ export class SinisterlegalUserVehicleTheftDTO {
   theftDTO: TheftDTO;
   theftTireDTO: TheftTireDTO;
   assetDTO: AssetDTO;
+  swornDeclaration: boolean;
 }
 
 export class SinisterLegalUserVehicleFireDTO {
@@ -68,6 +72,7 @@ export class SinisterLegalUserVehicleFireDTO {
   fireDTO: FireDTO;
   injuredDTO: InjuredData;
   assetDTO: AssetDTO;
+  swornDeclaration: boolean;
 }
 
 export class SinisterLegalUserVehicleCrashDTO {
@@ -78,6 +83,7 @@ export class SinisterLegalUserVehicleCrashDTO {
   injuredDTO: InjuredData;
   thirdPartyVehicleDTO: ThirdPartyVehicleData;
   assetDTO: AssetDTO;
+  swornDeclaration: boolean;
 }
 
 export class SinisterUserElectronicTheftDTO {
@@ -87,6 +93,7 @@ export class SinisterUserElectronicTheftDTO {
   theftDTO: TheftDTO;
   theftTireDTO: TheftTireDTO;
   assetDTO: AssetDTO;
+  swornDeclaration: boolean;
 }
 
 export class SinisterLegalUserElectronicTheftDTO {
@@ -96,4 +103,5 @@ export class SinisterLegalUserElectronicTheftDTO {
   theftDTO: TheftDTO;
   theftTireDTO: TheftTireDTO;
   assetDTO: AssetDTO;
+  swornDeclaration: boolean;
 }
