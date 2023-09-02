@@ -312,7 +312,7 @@ export class SinisterService {
                 theftTireDTO.tireWear
               }%</span></h4>
               <div style="display: flex; flex-direction: column">
-                <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Fotos de la denuncia:</h4>
+                <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Fotos de rueda:</h4>
                 <div style="display: flex; flex-wrap: wrap ; gap: 5px">
                   <div style="display: flex; flex-wrap: wrap; gap: 5px">
                   ${(theftTireDTO.tirePhoto as unknown as string[]).map(
