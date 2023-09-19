@@ -4,6 +4,7 @@ import { Vehicle } from './entities/vehicle.entity';
 import {  Repository } from 'typeorm';
 import { VehicleDTO } from './dto/vehicle.dto';
 import axios from 'axios';
+import { ErrorManager } from 'src/utils/error.manager';
 
 @Injectable()
 export class VehicleService {
@@ -53,7 +54,8 @@ export class VehicleService {
           try {
               return  await this.vehicleRepository.save(body);
           } catch (error) {
-               throw new Error(error);
+            console.log(error.message, 'errrrrr')
+               throw ErrorManager.createSignaturError(error.message);
           }
      };
 };

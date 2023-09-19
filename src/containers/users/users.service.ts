@@ -17,12 +17,10 @@ export class UsersService {
           try {
                return await this.userRepository.save(body);
           } catch (error) {
-               throw new Error(error);
+               throw new ErrorManager.createSignaturError(error.message);
           }
      };
      
-
-
      public async getUsers(): Promise<User[]> {
           try {
                const users:User[]  =  await this.userRepository.find()

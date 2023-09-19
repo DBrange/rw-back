@@ -13,6 +13,7 @@ export class ErrorManager extends Error {
   public static createSignaturError(message: string) {
     const name = message.split(' :: ')[0];
 
+    throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     if (name) {
       throw new HttpException(message, HttpStatus[name]);
     } else {

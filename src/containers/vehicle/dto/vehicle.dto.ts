@@ -46,8 +46,8 @@ export class VehicleDTO implements IVehicle {
   @IsString()
   damageLocation: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ each: true })
+  @IsString({ each: true })
   images: string;
 
   @IsNotEmpty()

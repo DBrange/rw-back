@@ -13,7 +13,8 @@ export class AssetController {
      };
 
      @Post('user')
-       public async createVehicleAndGnc(@Body() requestData: AssetVehicleUserGncDTO) {
+     public async createVehicleAndGnc(@Body() requestData: AssetVehicleUserGncDTO) {
+
           const result = await this.assetService.CreateUserVehicle(
             requestData.vehicleDTO,
             requestData.gncDTO,

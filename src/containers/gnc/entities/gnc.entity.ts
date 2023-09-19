@@ -1,6 +1,6 @@
 import { BaseEntity } from "../../../config/base.entity";
-import { Vehicle } from "src/containers/vehicle/entities/vehicle.entity";
-import { IGnc } from "src/interfaces/gnc.interface";
+import { Vehicle } from "../../../containers/vehicle/entities/vehicle.entity";
+import { IGnc } from "../../../interfaces/gnc.interface";
 import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
 
 @Entity({name: 'gnc'})

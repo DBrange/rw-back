@@ -297,8 +297,15 @@ export class AssetService {
           message: 'Without sworn declaration',
         });
       }
+      
       const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
 
+            if (!newVehicle) {
+              throw new ErrorManager({
+                type: 'BAD_REQUEST',
+                message: 'malll',
+              });
+            }
       if (newVehicle.gnc) {
         const vehicleGnc = {
           ...gncDTO,

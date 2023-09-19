@@ -740,8 +740,6 @@ export class SinisterService {
 
       await transporter.sendMail(mailOptions);
 
-      
-
       // delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
     } catch (err) {
       throw ErrorManager.createSignaturError(err.message);

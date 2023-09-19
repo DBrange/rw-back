@@ -1,6 +1,6 @@
 import { BaseEntity } from '../../../config/base.entity';
-import { Theft } from 'src/containers/theft/entities/theft.entity';
-import { ITheftTire } from 'src/interfaces/theftTire';
+import { Theft } from '../../../containers/theft/entities/theft.entity';
+import { ITheftTire } from '../../../interfaces/theftTire';
 import { Entity, Column, OneToOne, JoinColumn } from 'typeorm';
 
 @Entity({ name: 'theft_tire' })
