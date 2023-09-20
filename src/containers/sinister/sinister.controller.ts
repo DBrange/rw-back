@@ -20,11 +20,11 @@ export class SinisterController {
   public async createSinister(@Body() body: SinisterDTO) {
     return await this.sinisterService.createSinister(body);
   }
-  
+
   @Post('user-vehicle-theft')
   public async createUserVehicleTheft(
     @Body() requestData: SinisterUserVehicleTheftDTO,
-    ) {
+  ) {
     const result = await this.sinisterService.createUserVehicleTheft(
       requestData.userDTO,
       requestData.vehicleDTO,
@@ -106,6 +106,7 @@ export class SinisterController {
   public async createLegalUserVehicleCrash(
     @Body() requestData: SinisterLegalUserVehicleCrashDTO,
   ) {
+    console.log(requestData);
     const result = await this.sinisterService.createLegalUserVehicleCrash(
       requestData.legalUserDTO,
       requestData.vehicleDTO,
