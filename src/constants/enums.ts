@@ -20,4 +20,6 @@ export enum FUEL {
      SMARTPHONE = "CELULAR",
      NOTEBOOK = "NOTEBOOK"
  };
+
+
     

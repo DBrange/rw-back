@@ -1,9 +1,9 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config/dist';
 import * as morgan from 'morgan';
 import { CORS } from './constants/cors';
-import { ValidationPipe } from '@nestjs/common';
+import {ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 
 
 
@@ -20,7 +20,12 @@ async function bootstrap() {
         enableImplicitConversion: true,
       }
     })
-  )
+  );
+
+  const reflector = app.get(Reflector);
+
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
+
   app.setGlobalPrefix('v1');
 
   await app.listen(configService.get('PORT'));
