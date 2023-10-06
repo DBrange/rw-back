@@ -15,7 +15,7 @@ export class UsersController {
      @PublicAccess()
      @Post('register')
      public async registerUser(@Body() body: UserDTO){
-          console.log(this.registerUser);
+          console.log(body);
           return await this.usersService.createUser(body)
      };
 

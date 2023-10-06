@@ -21,7 +21,7 @@ export const DataSourceConfig: DataSourceOptions = {
      migrations: [__dirname + '/../migrations/*{.ts,.js}'],
      //migrationsRun: true,
      namingStrategy: new SnakeNamingStrategy(),
-     synchronize: false,
+     synchronize: true,
      logging: false,
 };
 
