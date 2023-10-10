@@ -27,6 +27,11 @@ import { GncModule } from './containers/gnc/gnc.module';
 import { VehicleGncModule } from './containers/vehicle-gnc/vehicle-gnc.module';
 import { TheftTireModule } from './containers/theft-tire/theft-tire.module';
 import { TheftTheftTireModule } from './containers/theft-theft-tire/theft-theft-tire.module';
+import { AuthModule } from './auth/auth.module';
+import { BrokerRegisterModule } from './containers/broker-register/broker-register.module';
+import { ClientModule } from './containers/client/client.module';
+import { BrokerModule } from './containers/broker/broker.module';
+import { BrokerClientRelationsModule } from './containers/broker-client-relations/broker-client-relations.module';
 
 
 @Module({
@@ -61,7 +66,12 @@ import { TheftTheftTireModule } from './containers/theft-theft-tire/theft-theft-
     VehicleModule,
     GncModule,
     VehicleGncModule,
-    TheftTheftTireModule
+    TheftTheftTireModule,
+    AuthModule,
+    BrokerRegisterModule,
+    ClientModule,
+    BrokerModule,
+    BrokerClientRelationsModule
   ],
 })
 export class AppModule {}

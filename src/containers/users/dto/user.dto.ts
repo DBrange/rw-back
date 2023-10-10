@@ -1,83 +1,131 @@
-import { IsDate, IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { GENDER } from "src/constants/enums";
-import { IUser } from "src/interfaces/users.interface";
+import {
+  IsDate,
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString
+} from 'class-validator';
+import { GENDER } from 'src/constants/enums';
+import { IUser } from 'src/interfaces/users.interface';
+import { ROLES } from '../../../constants/roles';
+import { AssetEntity } from 'src/containers/asset/entities/asset.entity';
+import { BrokerRegister } from 'src/interfaces/broker-register.interface';
+import { Client } from 'src/interfaces/client.interface';
 
 export class UserDTO implements IUser {
-    
-     @IsNotEmpty()
-     @IsString()
-     name: string;
+  clients: Client[];
+  brokerRegisters: BrokerRegister[];
+  asset: AssetEntity[];
 
-     @IsNotEmpty()
-     @IsString()
-     lastName: string;
+  @IsNotEmpty()
+  @IsString()
+  name: string;
 
-     @IsNotEmpty()
-     @IsDate()
-     birthDate: Date;
+  @IsNotEmpty()
+  @IsString()
+  lastName: string;
 
-     @IsNotEmpty()
-     @IsEmail()
-     email: string;
+  @IsNotEmpty()
+  @IsDate()
+  birthDate: Date;
 
-     @IsOptional()
-     @IsEmail()
-     altEmail: string;
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
 
-     @IsNotEmpty()
-     @IsString()
-     address: string;
+  @IsOptional()
+  @IsEmail()
+  altEmail: string;
 
-     @IsNotEmpty()
-     @IsString()
-     phoneNumber: string;
+  @IsNotEmpty()
+  @IsString()
+  password: string;
 
-     @IsNotEmpty()
-     @IsEnum(GENDER)
-     gender: GENDER;
+  @IsNotEmpty()
+  @IsString()
+  address: string;
 
-     @IsNotEmpty()
-     @IsString()
-     dni: string;
-          
-};
+  @IsNotEmpty()
+  @IsString()
+  phoneNumber: string;
+
+  @IsNotEmpty()
+  @IsEnum(GENDER)
+  gender: GENDER;
+
+  @IsNotEmpty()
+  @IsString()
+  dni: string;
+
+  @IsNotEmpty()
+  @IsEnum(ROLES)
+  role: ROLES;
+}
 
 export class UserUpdateDTO implements IUser {
-    
-     @IsOptional()
-     @IsString()
-     name: string;
+  clients: Client[];
+  brokerRegisters: BrokerRegister[];
+  asset: AssetEntity[];
 
-     @IsOptional()
-     @IsString()
-     lastName: string;
+  @IsOptional()
+  @IsString()
+  name: string;
 
-     @IsOptional()
-     @IsDate()
-     birthDate: Date;
+  @IsOptional()
+  @IsString()
+  lastName: string;
 
-     @IsOptional()
-     @IsEmail()
-     email: string;
+  @IsOptional()
+  @IsDate()
+  birthDate: Date;
 
-     @IsOptional()
-     @IsEmail()
-     altEmail: string;
+  @IsOptional()
+  @IsEmail()
+  email: string;
 
-     @IsOptional()
-     @IsString()
-     address: string;
+  @IsOptional()
+  @IsEmail()
+  altEmail: string;
 
-     @IsOptional()
-     @IsString()
-     phoneNumber: string;
+  @IsOptional()
+  @IsString()
+  password: string;
 
-     @IsOptional()
-     @IsEnum(GENDER)
-     gender: GENDER;
+  @IsOptional()
+  @IsString()
+  address: string;
 
-     @IsOptional()
-     @IsString()
-     dni: string;
-          
-};
+  @IsOptional()
+  @IsString()
+  phoneNumber: string;
+
+  @IsOptional()
+  @IsEnum(GENDER)
+  gender: GENDER;
+
+  @IsOptional()
+  @IsString()
+  dni: string;
+
+  @IsOptional()
+  @IsEnum(ROLES)
+  role: ROLES;
+}
+
+// export class UserToAssetDTO {
+  
+//   @IsNotEmpty()
+//   @IsUUID()
+//   user: UserEntity;
+
+ 
+//   @IsOptional()
+//   @IsUUID()
+//   asset: AssetEntity;
+
+  
+//   @IsNotEmpty()
+//   @IsEnum(ACCESS_LEVEL)
+//   accessLevel: ACCESS_LEVEL;
+// }

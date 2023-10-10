@@ -1,11 +1,15 @@
 import { BaseEntity } from "../../../config/base.entity";
 import { GENDER } from "../../../constants/enums";
-import { Asset } from "../../../containers/asset/entities/asset.entity";
+import { AssetEntity } from "../../../containers/asset/entities/asset.entity";
 import { IUser } from "../../../interfaces/users.interface";
 import { Entity, Column, OneToMany } from "typeorm";
+import { ROLES } from "../../../constants/roles"
+import { Exclude } from 'class-transformer';
+import { Client } from "src/containers/client/entities/client.entity";
+import { BrokerRegister } from "src/containers/broker-register/entities/broker-register.entity";
 
 @Entity({name: 'users'})
-export class User extends BaseEntity implements IUser {
+export class UserEntity extends BaseEntity implements IUser {
 
      @Column()
      name: string;
@@ -25,6 +29,10 @@ export class User extends BaseEntity implements IUser {
      @Column({nullable: true})
      altEmail: string;
 
+     @Exclude()
+     @Column()
+     password: string;
+
      @Column({type: "enum" , enum: GENDER})
      gender: GENDER;
 
@@ -34,6 +42,17 @@ export class User extends BaseEntity implements IUser {
      @Column()
      address: string;
 
-     @OneToMany(() => Asset, (asset) => asset.users)
-     asset: Asset[];
+     @Column({ type: 'enum', enum: ROLES })
+     role: ROLES;
+
+     @OneToMany(() => Client, (client) => client.user)
+     clients: Client[];
+   
+     @OneToMany(() => BrokerRegister, (brokerRegister) => brokerRegister.user)
+     brokerRegisters: BrokerRegister[];
+   
+     @OneToMany(() => AssetEntity, (asset) => asset.users)
+     asset: AssetEntity[];
+    //  brokers: any;
+
 };

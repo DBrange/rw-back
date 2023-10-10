@@ -1,3 +1,7 @@
+import { AssetEntity } from "src/containers/asset/entities/asset.entity";
+import { BrokerRegister } from "./broker-register.interface";
+import { Client } from "./client.interface";
+
 export interface IUser {
     
      name: string;
@@ -6,9 +10,13 @@ export interface IUser {
      phoneNumber: string;
      email: string;
      altEmail: string;
+     password: string;
      gender: string;
      dni: string;
      address: string;
- 
+     role: string;
+     clients: Client[];
+     brokerRegisters: BrokerRegister[];
+     asset: AssetEntity[];
 };
  

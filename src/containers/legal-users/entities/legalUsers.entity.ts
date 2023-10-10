@@ -1,5 +1,5 @@
 import { BaseEntity } from "../../../config/base.entity";
-import { Asset } from "../../../containers/asset/entities/asset.entity";
+import { AssetEntity } from "../../../containers/asset/entities/asset.entity";
 import { ILegalUser } from "../../../interfaces/legalUsers.interface";
 import { Entity, Column, OneToMany } from "typeorm";
 
@@ -24,6 +24,6 @@ export class LegalUsers extends BaseEntity implements ILegalUser {
      @Column()
      address: string;
 
-     @OneToMany(() => Asset, (asset) => asset.legalUsers)
-     asset: Asset[];
+     @OneToMany(() => AssetEntity, (asset) => asset.legalUsers)
+     asset: AssetEntity[];
 };

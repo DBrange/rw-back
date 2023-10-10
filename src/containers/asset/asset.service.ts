@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Asset } from './entities/asset.entity';
+import { AssetEntity } from './entities/asset.entity';
 import { Repository } from 'typeorm';
 import { AssetDTO } from './dto/asset.dto';
 import { GncService } from '../gnc/gnc.service';
@@ -31,8 +31,8 @@ interface PDF {
 @Injectable()
 export class AssetService {
   constructor(
-    @InjectRepository(Asset)
-    private readonly assetRepository: Repository<Asset>,
+    @InjectRepository(AssetEntity)
+    private readonly assetRepository: Repository<AssetEntity>,
     private readonly vehicleService: VehicleService,
     private readonly gncService: GncService,
     private readonly smartphoneService: SmartphonesService,
@@ -266,7 +266,65 @@ export class AssetService {
     }
   }
 
-  public async createAsset(body: AssetDTO): Promise<Asset> {
+  public async getAllAssets(): Promise<AssetEntity[]> {
+    try {
+      const assets: AssetEntity[] = await this.assetRepository.find();
+      if (assets.length === 0) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+      return assets;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async getAssetVehicleById(id: string): Promise<AssetEntity> {
+    try {
+      const asset = await this.assetRepository
+        .createQueryBuilder('asset')
+        .where({ id })
+        .leftJoinAndSelect('asset.users', 'users')
+        .leftJoinAndSelect('asset.vehicle', 'vehicle')
+        //  .leftJoinAndSelect('asset.electronics', 'electronics')
+        .getOne();
+
+      if (!asset) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+      return asset;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async getAssetElectronicById(id: string): Promise<AssetEntity> {
+    try {
+      const asset = await this.assetRepository
+        .createQueryBuilder('asset')
+        .where({ id })
+        .leftJoinAndSelect('asset.users', 'users')
+        .leftJoinAndSelect('asset.electronics', 'electronics')
+        .getOne();
+
+      if (!asset) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+      return asset;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async createAsset(body: AssetDTO): Promise<AssetEntity> {
     try {
       const asset = await this.assetRepository.save(body);
 
@@ -297,15 +355,15 @@ export class AssetService {
           message: 'Without sworn declaration',
         });
       }
-      
+
       const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
 
-            if (!newVehicle) {
-              throw new ErrorManager({
-                type: 'BAD_REQUEST',
-                message: 'malll',
-              });
-            }
+      if (!newVehicle) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'malll',
+        });
+      }
       if (newVehicle.gnc) {
         const vehicleGnc = {
           ...gncDTO,

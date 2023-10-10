@@ -5,7 +5,7 @@ import {
   IsString,
   IsUUID,
 } from 'class-validator';
-import { Asset } from 'src/containers/asset/entities/asset.entity';
+import { AssetEntity } from 'src/containers/asset/entities/asset.entity';
 
 export class SinisterDTO {
   @IsNotEmpty()
@@ -22,5 +22,5 @@ export class SinisterDTO {
 
   @IsOptional()
   @IsUUID()
-  asset: Asset;
+  asset: AssetEntity;
 }
