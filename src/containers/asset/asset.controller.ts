@@ -1,48 +1,93 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Get, Param } from '@nestjs/common';
 import { AssetService } from './asset.service';
 import { AssetDTO } from './dto/asset.dto';
-import { AssetElectronicLegalUser, AssetElectronicUser, AssetVehicleLegalUserGncDTO, AssetVehicleUserGncDTO } from './dto/allAsset.dto';
+import {
+  AssetElectronicLegalUser,
+  AssetElectronicUser,
+  AssetVehicleLegalUserGncDTO,
+  AssetVehicleUserGncDTO,
+} from './dto/allAsset.dto';
+import { AssetEntity } from './entities/asset.entity';
 
 @Controller('asset')
 export class AssetController {
-     constructor(private readonly assetService: AssetService){}
+  constructor(private readonly assetService: AssetService) {}
 
-     @Post('create')
-     public async createaAsset(@Body() body: AssetDTO){
-          return await this.assetService.createAsset(body)
-     };
+  @Get('all')
+  public async getAllAssets(): Promise<AssetEntity[]> {
+    return this.assetService.getAllAssets();
+  }
 
-     @Post('user')
-     public async createVehicleAndGnc(@Body() requestData: AssetVehicleUserGncDTO) {
+  @Get(':id/vehicle')
+  public async getAssetVehicleById(
+    @Param('id') id: string,
+  ): Promise<AssetEntity> {
+    return this.assetService.getAssetVehicleById(id);
+  }
 
-          const result = await this.assetService.CreateUserVehicle(
-            requestData.vehicleDTO,
-            requestData.gncDTO,
-            requestData.userDTO,
-            requestData.assetDTO,
-            requestData.swornDeclaration,
-          );
-          return result;
-        };
+  @Get(':id/electronics')
+  public async getAssetElectronicById(
+    @Param('id') id: string,
+  ): Promise<AssetEntity> {
+    return this.assetService.getAssetElectronicById(id);
+  }
 
-     @Post('legalAsset')
-     public async CreateLegalUserVehicle(@Body() requestData: AssetVehicleLegalUserGncDTO){
-          const result = await this.assetService.CreateLegalUserVehicle
-          (requestData.vehicleDTO, requestData.gncDTO, requestData.legalUserDTO, requestData.assetDTO,requestData.swornDeclaration );
-          return result;
-     };
-     
-     @Post('electronicAsset')
-     public async CreateUserElectronic(@Body() requestData:AssetElectronicUser){
-          const result = await this.assetService.CreateUserElectronic
-          (requestData.electronicDTO, requestData.smartphoneDTO, requestData.userDTO, requestData.assetDTO,requestData.swornDeclaration);
-          return result;
-     }
+  @Post('create')
+  public async createaAsset(@Body() body: AssetDTO) {
+    return await this.assetService.createAsset(body);
+  }
 
-     @Post('electronicAssetL')
-     public async CreateLegalUserElectronic(@Body() requestData: AssetElectronicLegalUser){
-          const result = await this.assetService.CreateLegalUserElectronic
-          (requestData.electronicDTO, requestData.smartphoneDTO, requestData.legalUserDTO, requestData.assetDTO,requestData.swornDeclaration);
-          return result;
-     }
-};
+  @Post('user')
+  public async createVehicleAndGnc(
+    @Body() requestData: AssetVehicleUserGncDTO,
+  ) {
+    const result = await this.assetService.CreateUserVehicle(
+      requestData.vehicleDTO,
+      requestData.gncDTO,
+      requestData.userDTO,
+      requestData.assetDTO,
+      requestData.swornDeclaration,
+    );
+    return result;
+  }
+
+  @Post('legalAsset')
+  public async CreateLegalUserVehicle(
+    @Body() requestData: AssetVehicleLegalUserGncDTO,
+  ) {
+    const result = await this.assetService.CreateLegalUserVehicle(
+      requestData.vehicleDTO,
+      requestData.gncDTO,
+      requestData.legalUserDTO,
+      requestData.assetDTO,
+      requestData.swornDeclaration,
+    );
+    return result;
+  }
+
+  @Post('electronicAsset')
+  public async CreateUserElectronic(@Body() requestData: AssetElectronicUser) {
+    const result = await this.assetService.CreateUserElectronic(
+      requestData.electronicDTO,
+      requestData.smartphoneDTO,
+      requestData.userDTO,
+      requestData.assetDTO,
+      requestData.swornDeclaration,
+    );
+    return result;
+  }
+
+  @Post('electronicAssetL')
+  public async CreateLegalUserElectronic(
+    @Body() requestData: AssetElectronicLegalUser,
+  ) {
+    const result = await this.assetService.CreateLegalUserElectronic(
+      requestData.electronicDTO,
+      requestData.smartphoneDTO,
+      requestData.legalUserDTO,
+      requestData.assetDTO,
+      requestData.swornDeclaration,
+    );
+    return result;
+  }
+}

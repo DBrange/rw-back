@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Get, Param } from '@nestjs/common';
 import { SinisterService } from './sinister.service';
 import { SinisterDTO } from './dto/sinister.dto';
 import {
@@ -11,13 +11,25 @@ import {
   SinisterUserVehicleTheftDTO,
   SinisterlegalUserVehicleTheftDTO,
 } from './dto/allSinister.dto';
+import { Sinister } from './entities/sinister.entity';
 
 @Controller('sinister')
 export class SinisterController {
   constructor(private readonly sinisterService: SinisterService) {}
 
+  @Get('all')
+  public async getAllVehicles(): Promise<Sinister[]> {
+    return this.sinisterService.getAllVehicles();
+  }
+
+  @Get(':id')
+  public async getVehicleById(@Param('id') id: string): Promise<Sinister> {
+    return this.sinisterService.getVehicleById(id);
+  }
+
   @Post('create')
   public async createSinister(@Body() body: SinisterDTO) {
+    //body.date = new Date(body.date);
     return await this.sinisterService.createSinister(body);
   }
 

@@ -2,15 +2,15 @@ import { Sinister } from "../../../containers/sinister/entities/sinister.entity"
 import { BaseEntity } from "../../../config/base.entity";
 import { Electronics } from "../../../containers/electronics/entities/electronics.entity";
 import { LegalUsers } from "../../../containers/legal-users/entities/legalUsers.entity";
-import { User } from "../../../containers/users/entities/user.entity";
+import { UserEntity } from "../../../containers/users/entities/user.entity";
 import { Vehicle } from "../../../containers/vehicle/entities/vehicle.entity";
 import { Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 
 @Entity({name: 'asset'})
-export class Asset extends BaseEntity {
+export class AssetEntity extends BaseEntity {
 
-     @ManyToOne(() => User , (users) => users.asset)
-     users: User;
+     @ManyToOne(() => UserEntity , (users) => users.asset)
+     users: UserEntity;
 
      @ManyToOne(() => LegalUsers , (legalUsers) => legalUsers.asset)
      legalUsers: LegalUsers;

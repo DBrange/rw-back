@@ -1,5 +1,5 @@
 import { ROLES } from '../../constants/roles';
-import { User } from '../../containers/users/entities/user.entity';
+import { UserEntity } from '../../containers/users/entities/user.entity';
 
 export interface PayloadToken {
   sub: string;
@@ -13,7 +13,7 @@ export interface AuthBody {
 
 export interface AuthResponse {
   accessToken: string;
-  user: User;
+  user: UserEntity;
 }
 
 export interface AuthTokenResult {

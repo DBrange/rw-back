@@ -1,7 +1,7 @@
 import { IsOptional, IsUUID } from "class-validator";
 import { Electronics } from "src/containers/electronics/entities/electronics.entity";
 import { LegalUsers } from "src/containers/legal-users/entities/legalUsers.entity";
-import { User } from "src/containers/users/entities/user.entity";
+import { UserEntity } from "src/containers/users/entities/user.entity";
 import { Vehicle } from "src/containers/vehicle/entities/vehicle.entity";
 
 export class AssetDTO {
@@ -12,7 +12,7 @@ export class AssetDTO {
 
      @IsOptional()
      @IsUUID()
-     users: User;
+     users: UserEntity;
 
      @IsOptional()
      @IsUUID()

@@ -4,19 +4,19 @@ import {
   IsEnum,
   IsNotEmpty,
   IsOptional,
-  IsString,
+  IsString
 } from 'class-validator';
 import { GENDER } from 'src/constants/enums';
 import { IUser } from 'src/interfaces/users.interface';
 import { ROLES } from '../../../constants/roles';
-import { Asset } from 'src/containers/asset/entities/asset.entity';
+import { AssetEntity } from 'src/containers/asset/entities/asset.entity';
 import { BrokerRegister } from 'src/interfaces/broker-register.interface';
 import { Client } from 'src/interfaces/client.interface';
 
 export class UserDTO implements IUser {
   clients: Client[];
   brokerRegisters: BrokerRegister[];
-  asset: Asset[];
+  asset: AssetEntity[];
 
   @IsNotEmpty()
   @IsString()
@@ -37,10 +37,6 @@ export class UserDTO implements IUser {
   @IsOptional()
   @IsEmail()
   altEmail: string;
-
-  @IsNotEmpty()
-  @IsString()
-  username: string;
 
   @IsNotEmpty()
   @IsString()
@@ -70,7 +66,7 @@ export class UserDTO implements IUser {
 export class UserUpdateDTO implements IUser {
   clients: Client[];
   brokerRegisters: BrokerRegister[];
-  asset: Asset[];
+  asset: AssetEntity[];
 
   @IsOptional()
   @IsString()
@@ -91,10 +87,6 @@ export class UserUpdateDTO implements IUser {
   @IsOptional()
   @IsEmail()
   altEmail: string;
-
-  @IsNotEmpty()
-  @IsString()
-  username: string;
 
   @IsOptional()
   @IsString()
@@ -120,3 +112,20 @@ export class UserUpdateDTO implements IUser {
   @IsEnum(ROLES)
   role: ROLES;
 }
+
+// export class UserToAssetDTO {
+  
+//   @IsNotEmpty()
+//   @IsUUID()
+//   user: UserEntity;
+
+ 
+//   @IsOptional()
+//   @IsUUID()
+//   asset: AssetEntity;
+
+  
+//   @IsNotEmpty()
+//   @IsEnum(ACCESS_LEVEL)
+//   accessLevel: ACCESS_LEVEL;
+// }

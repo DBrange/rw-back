@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserDTO, UserUpdateDTO } from './dto/user.dto';
 import { PublicAccess } from '../../auth/decorators/public.decorator';
@@ -10,34 +19,36 @@ import { AdminAccess } from '../../auth/decorators/admin.decorator';
 @Controller('users')
 @UseGuards(AuthGuard, RolesGuard)
 export class UsersController {
-     constructor(private readonly usersService: UsersService){}
+  assetService: any;
+  constructor(private readonly usersService: UsersService) {}
 
-     @PublicAccess()
-     @Post('register')
-     public async registerUser(@Body() body: UserDTO){
-          console.log(body);
-          return await this.usersService.createUser(body)
-     };
+  @PublicAccess()
+  @Post('register')
+  public async registerUser(@Body() body: UserDTO) {
+    return await this.usersService.createUser(body);
+  }
 
-     @AdminAccess()
-     @Get('all')
-     public async getAllUsers(){
-          return await this.usersService.getUsers();
-     };
+  @AdminAccess()
+  @Get('all')
+  public async getAllUsers() {
+    return await this.usersService.getUsers();
+  }
 
-     @Get(':id')
-     public async getUserById(@Param('id') id: string){
-          return await this.usersService.getUsersById(id);
-     };
+  @Get(':id')
+  public async getUserById(@Param('id') id: string) {
+    return await this.usersService.getUsersById(id);
+  }
 
-     @Put('edit/:id')
-     public async updateUser(@Param('id') id: string, @Body() body: UserUpdateDTO){
-          return await this.usersService.updateUser(id, body);
-     };
+  @Put('edit/:id')
+  public async updateUser(
+    @Param('id') id: string,
+    @Body() body: UserUpdateDTO,
+  ) {
+    return await this.usersService.updateUser(id, body);
+  }
 
-     @Delete('delete/:id')
-          public async deleteUser(@Param('id') id: string) {
-               return await this.usersService.deleteUser(id);
-          }
-
-};
+  @Delete('delete/:id')
+  public async deleteUser(@Param('id') id: string) {
+    return await this.usersService.deleteUser(id);
+  }
+}

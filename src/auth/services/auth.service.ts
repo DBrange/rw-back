@@ -1,30 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { User } from '../../containers/users/entities/user.entity';
+import { UserEntity } from '../../containers/users/entities/user.entity';
 import { UsersService } from '../../containers/users/users.service';
 import { AuthResponse, PayloadToken } from '../interfaces/auth.interface';
 
 @Injectable()
 export class AuthService {
   constructor(private readonly userService: UsersService) {}
+
   public async validateUser(
     username: string,
     password: string,
-  ): Promise<User | null> {
-    const userByUsername = await this.userService.findBy({
-      key: 'username',
-      value: username,
-    });
+  ): Promise<UserEntity | null> {
+    // const userByUsername = await this.userService.findBy({
+    //   key: 'username',
+    //   value: username,
+    // });
     const userByEmail = await this.userService.findBy({
       key: 'email',
       value: username,
     });
 
-    if (userByUsername) {
-      const match = await bcrypt.compare(password, userByUsername.password);
-      if (match) return userByUsername;
-    }
+    // if (userByUsername) {
+    //   const match = await bcrypt.compare(password, userByUsername.password);
+    //   if (match) return userByUsername;
+    // }
 
     if (userByEmail) {
       const match = await bcrypt.compare(password, userByEmail.password);
@@ -46,7 +47,7 @@ export class AuthService {
     return jwt.sign(payload, secret, { expiresIn: expires });
   }
 
-  public async generateJWT(user: User): Promise<AuthResponse> {
+  public async generateJWT(user: UserEntity): Promise<AuthResponse> {
     const getUser = await this.userService.getUsersById(user.id);
 
     const payload: PayloadToken = {

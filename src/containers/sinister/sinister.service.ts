@@ -746,6 +746,42 @@ export class SinisterService {
     }
   }
 
+  public async getAllVehicles(): Promise<Sinister[]> {
+    try {
+      const sinisters: Sinister[] = await this.sinisterRepository.find();
+      if (sinisters.length === 0) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+      return sinisters;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async getVehicleById(id: string): Promise<Sinister> {
+    try {
+      const sinister = await this.sinisterRepository
+        .createQueryBuilder('asset')
+        .where({ id })
+        //  .leftJoinAndSelect('asset.asset', 'users')
+        //  .leftJoinAndSelect('user.users', 'asset')
+        .getOne();
+
+      if (!sinister) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+      return sinister;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+
   public async createSinister(body: SinisterDTO): Promise<Sinister> {
     try {
       const sinister = await this.sinisterRepository.save(body);

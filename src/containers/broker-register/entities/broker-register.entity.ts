@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne} from 'typeorm';
-import { User } from '../../users/entities/user.entity';
+import { UserEntity } from '../../users/entities/user.entity';
 import { Broker } from 'src/containers/broker/entities/broker.entity';
 
 @Entity('broker_registers')
@@ -16,8 +16,8 @@ export class BrokerRegister {
   @Column()
   tarjeta: string;
 
-  @ManyToOne(() => User, (user) => user.brokerRegisters)
-  user: User;
+  @ManyToOne(() => UserEntity, (user) => user.brokerRegisters)
+  user: UserEntity;
 
   @ManyToOne(() => Broker, (broker) => broker.brokerRegisters)
   broker: Broker;

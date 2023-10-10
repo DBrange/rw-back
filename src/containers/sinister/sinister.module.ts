@@ -3,12 +3,12 @@ import { SinisterController } from './sinister.controller';
 import { SinisterService } from './sinister.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Sinister } from './entities/sinister.entity';
-import { Asset } from '../asset/entities/asset.entity';
+import { AssetEntity } from '../asset/entities/asset.entity';
 import { Electronics } from '../electronics/entities/electronics.entity';
 import { Gnc } from '../gnc/entities/gnc.entity';
 import { LegalUsers } from '../legal-users/entities/legalUsers.entity';
 import { Smartphone } from '../smartphones/entities/smartphone.entity';
-import { User } from '../users/entities/user.entity';
+import { UserEntity } from '../users/entities/user.entity';
 import { Vehicle } from '../vehicle/entities/vehicle.entity';
 import { SinisterType } from '../sinister-type/entities/sinisterType.entity';
 import { Theft } from '../theft/entities/theft.entity';
@@ -41,10 +41,10 @@ import { ThirdPartyDriver } from '../third-party-driver/entities/thirdPartyDrive
   imports: [
     TypeOrmModule.forFeature([
       Sinister,
-      Asset,
+      AssetEntity,
       Vehicle,
       Gnc,
-      User,
+      UserEntity,
       LegalUsers,
       Smartphone,
       Electronics,

@@ -1,4 +1,4 @@
-import { User } from "src/containers/users/entities/user.entity";
+import { UserEntity } from "src/containers/users/entities/user.entity";
 
 
 export interface BrokerRegister {
@@ -6,5 +6,5 @@ export interface BrokerRegister {
     razonSocial: string;
     matricula: string;
     tarjeta: string;
-    user: User;
+    user: UserEntity;
 }

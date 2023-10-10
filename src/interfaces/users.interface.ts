@@ -1,4 +1,4 @@
-import { Asset } from "src/containers/asset/entities/asset.entity";
+import { AssetEntity } from "src/containers/asset/entities/asset.entity";
 import { BrokerRegister } from "./broker-register.interface";
 import { Client } from "./client.interface";
 
@@ -17,6 +17,6 @@ export interface IUser {
      role: string;
      clients: Client[];
      brokerRegisters: BrokerRegister[];
-     asset: Asset[];
+     asset: AssetEntity[];
 };
  

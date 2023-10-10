@@ -1,7 +1,6 @@
-import { Body, Controller, Post, Res, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { AuthDTO } from '../dto/auth.dto';
-import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -10,7 +9,6 @@ export class AuthController {
   @Post('login')
   async login(
     @Body() { username, password }: AuthDTO,
-    // @Res({ passthrough: true }) res: Response,
   ) {
     const userValidate = await this.authService.validateUser(
       username,
@@ -22,7 +20,6 @@ export class AuthController {
     }
 
     const jwt = await this.authService.generateJWT(userValidate);
-// res.cookie('accessToken', jwt.accessToken);
     return jwt;
   }
 };

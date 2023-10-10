@@ -1,19 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { User } from './entities/user.entity';
+import { UserEntity } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { UserDTO, UserUpdateDTO } from './dto/user.dto';
 import { ErrorManager } from 'src/utils/error.manager';
 import * as bcrypt from 'bcrypt';
+import { AssetEntity } from '../asset/entities/asset.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(AssetEntity)
+    private readonly assetRepository: Repository<AssetEntity>,
   ) {}
 
-  public async createUser(body: UserDTO): Promise<User> {
+  public async createUser(body: UserDTO): Promise<UserEntity> {
     try {
       body.password = await bcrypt.hash(body.password, +process.env.HASH_SALT);
       return await this.userRepository.save(body);
@@ -22,9 +25,9 @@ export class UsersService {
     }
   }
 
-  public async getUsers(): Promise<User[]> {
+  public async getUsers(): Promise<UserEntity[]> {
     try {
-      const users: User[] = await this.userRepository.find();
+      const users: UserEntity[] = await this.userRepository.find();
       if (users.length === 0) {
         throw new ErrorManager({
           type: 'BAD_REQUEST',
@@ -37,11 +40,13 @@ export class UsersService {
     }
   }
 
-  public async getUsersById(id: string): Promise<User> {
+  public async getUsersById(id: string): Promise<UserEntity> {
     try {
       const user = await this.userRepository
         .createQueryBuilder('user')
         .where({ id })
+        .leftJoinAndSelect('user.asset', 'asset')
+       // .leftJoinAndSelect('asset.users', 'users')
         .getOne();
 
       if (!user) {
@@ -55,10 +60,11 @@ export class UsersService {
       throw new ErrorManager.createSignaturError(error.message);
     }
   }
+
 //* parte de auth (autienticacion)
   public async findBy({ key, value }: { key: keyof UserDTO; value: any }) {
     try {
-      const user: User = await this.userRepository
+      const user: UserEntity = await this.userRepository
         .createQueryBuilder('user')
         .addSelect('user.password')
         .where({ [key]: value })
