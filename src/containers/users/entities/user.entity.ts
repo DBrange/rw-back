@@ -1,12 +1,13 @@
 import { BaseEntity } from "../../../config/base.entity";
 import { GENDER } from "../../../constants/enums";
-import { AssetEntity } from "../../../containers/asset/entities/asset.entity";
 import { IUser } from "../../../interfaces/users.interface";
 import { Entity, Column, OneToMany } from "typeorm";
 import { ROLES } from "../../../constants/roles"
 import { Exclude } from 'class-transformer';
 import { Client } from "src/containers/client/entities/client.entity";
 import { BrokerRegister } from "src/containers/broker-register/entities/broker-register.entity";
+//import { UsersAssetsEntity } from "./userAsset.entity";
+import { AssetEntity } from "src/containers/asset/entities/asset.entity";
 
 @Entity({name: 'users'})
 export class UserEntity extends BaseEntity implements IUser {
@@ -53,6 +54,5 @@ export class UserEntity extends BaseEntity implements IUser {
    
      @OneToMany(() => AssetEntity, (asset) => asset.users)
      asset: AssetEntity[];
-    //  brokers: any;
 
 };

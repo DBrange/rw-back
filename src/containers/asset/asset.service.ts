@@ -268,14 +268,39 @@ export class AssetService {
 
   public async getAllAssets(): Promise<AssetEntity[]> {
     try {
-      const assets: AssetEntity[] = await this.assetRepository.find();
+      const assets: AssetEntity[] = await this.assetRepository.find({
+        relations: ['users', 'legalUsers', 'vehicle', 'electronics'],
+      });
       if (assets.length === 0) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No assets found',
+        });
+      }
+      return assets;
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async getAssetsById(id: string): Promise<AssetEntity> {
+    try {
+      const result = await this.assetRepository
+        .createQueryBuilder('assets')
+        .where({ id })
+        .leftJoinAndSelect('assets.users', 'users')
+        .leftJoinAndSelect('assets.legalUsers', 'legalUsers')
+        .leftJoinAndSelect('assets.vehicle', 'vehicle')
+        .leftJoinAndSelect('assets.electronics', 'electronics')
+        .getOne();
+
+      if (!result) {
         throw new ErrorManager({
           type: 'BAD_REQUEST',
           message: 'No users found',
         });
       }
-      return assets;
+      return result;
     } catch (error) {
       throw new ErrorManager.createSignaturError(error.message);
     }
@@ -288,7 +313,7 @@ export class AssetService {
         .where({ id })
         .leftJoinAndSelect('asset.users', 'users')
         .leftJoinAndSelect('asset.vehicle', 'vehicle')
-        //  .leftJoinAndSelect('asset.electronics', 'electronics')
+        .leftJoinAndSelect('asset.electronics', 'electronics')
         .getOne();
 
       if (!asset) {
@@ -573,6 +598,187 @@ export class AssetService {
       await this.sendPdfEmail(generatePdf, [legalUserDTO.email]);
 
       return { newElectronic, newSmartphone, newAsset };
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  //* ===========>>>create assets inspections<<<============//
+  public async createaAssetInspections(body: AssetDTO): Promise<AssetEntity> {
+    try {
+      const asset = await this.assetRepository.save(body);
+      if (!asset) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No asset found',
+        });
+      }
+      return asset;
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  //* ===========>>>users inspections<<<============//
+  public async createInspectionsUserNewAssets(
+    userDTO: UserDTO,
+    vehicleDTO: VehicleDTO,
+    gncDTO: GncDTO,
+    electronicDTO: ElectronicsDTO,
+    smartphoneDTO: SmartphoneDTO,
+    assetDTO: AssetDTO,
+    swornDeclaration: boolean,
+  ) {
+    try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
+
+      const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
+
+      if (newVehicle.gnc) {
+        const vehicleGnc = {
+          ...gncDTO,
+          vehicle: newVehicle.id,
+        };
+        await this.gncService.createGnc(vehicleGnc);
+      }
+
+      const newElectronic = await this.electronicService.createElectronics(
+        electronicDTO,
+      );
+
+      let newSmartphone;
+      if (newElectronic.type === 'CELULAR') {
+        const relatedSmartphone = {
+          ...smartphoneDTO,
+          electronics: newElectronic.id,
+        };
+
+        newSmartphone = await this.smartphoneService.createSmartphone(
+          relatedSmartphone,
+        );
+      }
+
+      // const newElectronic = await this.electronicService.createElectronics(
+      //   electronicDTO,
+      // );
+
+      // let newSmartphone;
+      // if (newElectronic.type === 'CELULAR') {
+      //   newSmartphone = await this.smartphoneService.createSmartphone(
+      //     smartphoneDTO,
+      //   );
+      // }
+
+      const newUser = await this.userService.createUser(userDTO);
+
+      const fullAsset = {
+        ...assetDTO,
+        vehicle: newVehicle,
+        users: newUser,
+        electronic: newElectronic,
+        smartphone: newSmartphone,
+      };
+
+      const newAsset = await this.assetRepository.save(fullAsset);
+
+      const response = {
+        userAsset: newAsset,
+      };
+
+      const generatePdf = await this.generarPDF({
+        vehicleDTO,
+        gncDTO,
+        electronicDTO,
+        smartphoneDTO,
+        userDTO,
+      });
+
+      await this.sendPdfEmail(generatePdf, [userDTO.email]);
+
+      return response;
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+   //* ===========>>>Legal users inspections<<<============//
+   public async createInspectionsLegalUserNewAssets(
+    legalUserDTO: LegalUsersDTO,
+    vehicleDTO: VehicleDTO,
+    gncDTO: GncDTO,
+    electronicDTO: ElectronicsDTO,
+    smartphoneDTO: SmartphoneDTO,
+    assetDTO: AssetDTO,
+    swornDeclaration: boolean,
+  ) {
+    try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
+
+      const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
+
+      if (newVehicle.gnc) {
+        const vehicleGnc = {
+          ...gncDTO,
+          vehicle: newVehicle.id,
+        };
+        await this.gncService.createGnc(vehicleGnc);
+      }
+
+      const newElectronic = await this.electronicService.createElectronics(
+        electronicDTO,
+      );
+
+      let newSmartphone;
+      if (newElectronic.type === 'CELULAR') {
+        const relatedSmartphone = {
+          ...smartphoneDTO,
+          electronics: newElectronic.id,
+        };
+
+        newSmartphone = await this.smartphoneService.createSmartphone(
+          relatedSmartphone,
+        );
+      }
+
+      const newLegalUser = await this.legalUserService.createLegalUsers(
+        legalUserDTO,
+      );
+
+      const fullAsset = {
+        ...assetDTO,
+        vehicle: newVehicle,
+        legalUsers: newLegalUser,
+        electronic: newElectronic,
+        smartphone: newSmartphone,
+      };
+
+      const newAsset = await this.assetRepository.save(fullAsset);
+
+      const response = {
+        userAsset: newAsset,
+      };
+
+      const generatePdf = await this.generarPDF({
+        vehicleDTO,
+        gncDTO,
+        electronicDTO,
+        smartphoneDTO,
+        legalUserDTO,
+      });
+
+      await this.sendPdfEmail(generatePdf, [ legalUserDTO.email]);
+
+      return response;
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
     }

@@ -8,10 +8,11 @@ import {
 } from 'class-validator';
 import { GENDER } from 'src/constants/enums';
 import { IUser } from 'src/interfaces/users.interface';
-import { ROLES } from '../../../constants/roles';
+import {  ROLES } from '../../../constants/roles';
 import { AssetEntity } from 'src/containers/asset/entities/asset.entity';
 import { BrokerRegister } from 'src/interfaces/broker-register.interface';
 import { Client } from 'src/interfaces/client.interface';
+//import { UserEntity } from '../entities/user.entity';
 
 export class UserDTO implements IUser {
   clients: Client[];
@@ -122,10 +123,10 @@ export class UserUpdateDTO implements IUser {
  
 //   @IsOptional()
 //   @IsUUID()
-//   asset: AssetEntity;
+//   asset: AssetEntity[];
 
   
-//   @IsNotEmpty()
-//   @IsEnum(ACCESS_LEVEL)
-//   accessLevel: ACCESS_LEVEL;
-// }
+  // @IsNotEmpty()
+  // @IsEnum(ACCESS_LEVEL)
+  // accessLevel: ACCESS_LEVEL;
+//}

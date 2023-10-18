@@ -28,13 +28,13 @@ export class VehicleService {
     }
   }
 
-  public async getVehicleById(id: string): Promise<Vehicle> {
+  public async getVehicleById(id: string): Promise<Vehicle[]> {
     try {
       const vehicle = await this.vehicleRepository
         .createQueryBuilder('vehicle')
         .where({ id })
         //.leftJoinAndSelect('vehicle.gnc', 'gnc')
-        .getOne();
+        .getMany();
 
       if (!vehicle) {
         throw new ErrorManager({
