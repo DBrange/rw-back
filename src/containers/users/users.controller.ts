@@ -12,7 +12,6 @@ import { UsersService } from './users.service';
 import { UserDTO, UserUpdateDTO } from './dto/user.dto';
 import { PublicAccess } from '../../auth/decorators/public.decorator';
 import { AuthGuard } from '../../auth/guards/auth.guard';
-import { Roles } from '../../auth/decorators/roles.decorator';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { AdminAccess } from '../../auth/decorators/admin.decorator';
 import { UserUserBrokerDTO } from './dto/allUser.dto';
@@ -24,7 +23,7 @@ export class UsersController {
 
   // @PublicAccess()
   @Post('register')
-  public async registerUser(@Body() body: UserDTO) {
+  public async registerUser(@Body() body: UserDTO){
     return await this.usersService.createUser(body);
   }
 
@@ -40,8 +39,9 @@ export class UsersController {
   }
 
   @Get(':id')
-  public async getUserById(@Param('id') id: string) {
-    return await this.usersService.getUsersById(id);
+  public async getUserById(@Param('id') id: string){
+  const user = await this.usersService.getUsersById(id);
+  return user;
   }
 
   @Put('edit/:id')
@@ -53,7 +53,7 @@ export class UsersController {
   }
 
   @Delete('delete/:id')
-  public async deleteUser(@Param('id') id: string) {
+  public async deleteUser(@Param('id') id: string){
     return await this.usersService.deleteUser(id);
   }
 }

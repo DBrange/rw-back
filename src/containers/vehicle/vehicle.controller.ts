@@ -13,7 +13,7 @@ export class VehicleController {
      }
    
      @Get(':id')
-     public async getVehicleById(@Param('id') id: string): Promise<Vehicle> {
+     public async getVehicleById(@Param('id') id: string): Promise<Vehicle[]> {
        return this.vehicleService.getVehicleById(id);
      }
 
@@ -27,7 +27,7 @@ export class VehicleController {
   async getVehicleInfo(@Param('plateNumber') plateNumber: string): Promise<any> {
     try {
       const vehicleInfo = await this.vehicleService.fetchVehicleInfo(plateNumber);
-      return  vehicleInfo ; // You can customize the response structure as needed
+      return  vehicleInfo ; 
     } catch (error) {
       throw new Error (error);
     }

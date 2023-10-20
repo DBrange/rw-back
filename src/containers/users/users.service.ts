@@ -5,15 +5,21 @@ import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { UserDTO, UserUpdateDTO } from './dto/user.dto';
 import { ErrorManager } from 'src/utils/error.manager';
 import * as bcrypt from 'bcrypt';
+<<<<<<< HEAD
 import { UserUserBrokerDTO } from './dto/allUser.dto';
 import { UserBrokerService } from '../user-broker/services/user-broker.service';
+=======
+>>>>>>> 6e5a738fea9708e8e6308d9700ae7db071f9287f
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+<<<<<<< HEAD
     private readonly userBrokerService: UserBrokerService
+=======
+>>>>>>> 6e5a738fea9708e8e6308d9700ae7db071f9287f
   ) {}
 
   public async createUser(body: UserDTO): Promise<UserEntity> {
@@ -59,6 +65,11 @@ export class UsersService {
         .createQueryBuilder('user')
         .where({ id })
         .leftJoinAndSelect('user.asset', 'asset')
+<<<<<<< HEAD
+=======
+        .leftJoinAndSelect('asset.vehicle', 'vehicle')
+        .leftJoinAndSelect('asset.electronics', 'electronics')
+>>>>>>> 6e5a738fea9708e8e6308d9700ae7db071f9287f
         .getOne();
 
       if (!user) {

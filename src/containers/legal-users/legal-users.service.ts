@@ -33,6 +33,8 @@ export class LegalUsersService {
               .createQueryBuilder('legal_users')
               .where({ id })
               .leftJoinAndSelect('legal_users.asset', 'asset')
+              .leftJoinAndSelect('asset.vehicle', 'vehicle')
+              .leftJoinAndSelect('asset.electronics', 'electronics')
               .getOne();
       
             if (!resultado) {

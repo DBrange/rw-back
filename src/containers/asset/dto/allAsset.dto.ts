@@ -37,3 +37,23 @@ export class AssetElectronicLegalUser {
   smartphoneDTO: SmartphoneDTO;
   swornDeclaration: boolean;
 }
+
+export class AssetsInspectionsUserDTO{
+  userDTO: UserDTO;
+  vehicleDTO: VehicleDTO;
+  gncDTO: GncDTO;
+  electronicDTO: ElectronicsDTO;
+  smartphoneDTO: SmartphoneDTO;
+  assetDTO: AssetDTO;
+  swornDeclaration: boolean;
+}
+
+export class AssetsInspectionsLegalUserDTO{
+  legalUserDTO: LegalUsersDTO;
+  vehicleDTO: VehicleDTO;
+  gncDTO: GncDTO;
+  electronicDTO: ElectronicsDTO;
+  smartphoneDTO: SmartphoneDTO;
+  assetDTO: AssetDTO;
+  swornDeclaration: boolean;
+}

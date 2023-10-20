@@ -6,6 +6,8 @@ import {
   AssetElectronicUser,
   AssetVehicleLegalUserGncDTO,
   AssetVehicleUserGncDTO,
+  AssetsInspectionsLegalUserDTO,
+  AssetsInspectionsUserDTO,
 } from './dto/allAsset.dto';
 import { AssetEntity } from './entities/asset.entity';
 
@@ -16,6 +18,11 @@ export class AssetController {
   @Get('all')
   public async getAllAssets(): Promise<AssetEntity[]> {
     return this.assetService.getAllAssets();
+  }
+
+  @Get(':id')
+  public async getAssetsById(@Param('id') id: string): Promise<AssetEntity> {
+    return this.assetService.getAssetsById(id);
   }
 
   @Get(':id/vehicle')
@@ -95,4 +102,42 @@ export class AssetController {
     );
     return result;
   }
+
+  @Post('inspection/create')
+  public async createaAssetInspections(@Body() body: AssetDTO) {
+    return await this.assetService.createaAssetInspections(body);
+  }
+
+  @Post('inspection-user/create')
+  public async createInspectionsUserNewAssets(
+    @Body() requestData: AssetsInspectionsUserDTO,
+  ) {
+    const result = await this.assetService.createInspectionsUserNewAssets(
+      requestData.userDTO, 
+      requestData.vehicleDTO,
+      requestData.gncDTO,
+      requestData.electronicDTO,
+      requestData.smartphoneDTO,
+      requestData.assetDTO,
+      requestData.swornDeclaration,
+    );
+    return result;
+  }
+
+  @Post('inspection-legal-user/create')
+  public async createInspectionsLegalUserNewAssets(
+    @Body() requestData: AssetsInspectionsLegalUserDTO,
+  ) {
+    const result = await this.assetService.createInspectionsLegalUserNewAssets(
+      requestData.legalUserDTO, 
+      requestData.vehicleDTO,
+      requestData.gncDTO,
+      requestData.electronicDTO,
+      requestData.smartphoneDTO,
+      requestData.assetDTO,
+      requestData.swornDeclaration,
+    );
+    return result;
+  }
+
 }

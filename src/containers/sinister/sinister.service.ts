@@ -764,7 +764,7 @@ export class SinisterService {
   public async getVehicleById(id: string): Promise<Sinister> {
     try {
       const sinister = await this.sinisterRepository
-        .createQueryBuilder('asset')
+        .createQueryBuilder('sinister')
         .where({ id })
         //  .leftJoinAndSelect('asset.asset', 'users')
         //  .leftJoinAndSelect('user.users', 'asset')
