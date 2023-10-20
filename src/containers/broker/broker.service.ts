@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Broker } from './entities/broker.entity';
-import { CreateBrokerDto } from './dto/broker.dto';
+import { BrokerDTO } from './dto/broker.dto';
 
 @Injectable()
 export class BrokerService {
@@ -11,9 +11,9 @@ export class BrokerService {
     private readonly brokerRepository: Repository<Broker>,
   ) {}
 
-  public async create(createBrokerDto: CreateBrokerDto): Promise<Broker> {
+  public async create(brokerDTO: BrokerDTO): Promise<Broker> {
     try {
-      const broker = this.brokerRepository.create(createBrokerDto);
+      const broker = this.brokerRepository.create(brokerDTO);
       return this.brokerRepository.save(broker);
     } catch (error) {
       throw new Error(`Error al crear un broker: ${error.message}`);

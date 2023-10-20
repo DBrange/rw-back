@@ -5,21 +5,34 @@ import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { UserDTO, UserUpdateDTO } from './dto/user.dto';
 import { ErrorManager } from 'src/utils/error.manager';
 import * as bcrypt from 'bcrypt';
-import { AssetEntity } from '../asset/entities/asset.entity';
+import { UserUserBrokerDTO } from './dto/allUser.dto';
+import { UserBrokerService } from '../user-broker/services/user-broker.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-    @InjectRepository(AssetEntity)
-    private readonly assetRepository: Repository<AssetEntity>,
+    private readonly userBrokerService: UserBrokerService
   ) {}
 
   public async createUser(body: UserDTO): Promise<UserEntity> {
     try {
       body.password = await bcrypt.hash(body.password, +process.env.HASH_SALT);
       return await this.userRepository.save(body);
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async createUserInLogin(body: UserUserBrokerDTO) {
+    try {
+      const newUser = await this.userRepository.save(body.userDTO);
+      if (newUser.role === 'BROKER') {
+        await this.userBrokerService.createUserBroker(body.userBrokerDTO)
+      }
+      // body.password = await bcrypt.hash(body.password, +process.env.HASH_SALT);
+      return { message: 'El usuario a sido creado con exito' };
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
     }
@@ -46,7 +59,6 @@ export class UsersService {
         .createQueryBuilder('user')
         .where({ id })
         .leftJoinAndSelect('user.asset', 'asset')
-       // .leftJoinAndSelect('asset.users', 'users')
         .getOne();
 
       if (!user) {
@@ -61,7 +73,7 @@ export class UsersService {
     }
   }
 
-//* parte de auth (autienticacion)
+  //* parte de auth (autienticacion)
   public async findBy({ key, value }: { key: keyof UserDTO; value: any }) {
     try {
       const user: UserEntity = await this.userRepository

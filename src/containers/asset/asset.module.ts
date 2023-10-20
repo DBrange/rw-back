@@ -15,6 +15,8 @@ import { ElectronicsService } from '../electronics/electronics.service';
 import { SmartphonesService } from '../smartphones/smartphones.service';
 import { Gnc } from '../gnc/entities/gnc.entity';
 import { Smartphone } from '../smartphones/entities/smartphone.entity';
+import { UserBrokerService } from '../user-broker/services/user-broker.service';
+import { UserBrokerEntity } from '../user-broker/entities/user-broker.entity';
 
 @Module({
   imports: [
@@ -26,6 +28,7 @@ import { Smartphone } from '../smartphones/entities/smartphone.entity';
       Smartphone,
       LegalUsers,
       Electronics,
+      UserBrokerEntity
     ]),
   ],
   controllers: [AssetController],
@@ -37,7 +40,7 @@ import { Smartphone } from '../smartphones/entities/smartphone.entity';
     SmartphonesService,
     UsersService,
     LegalUsersService,
-    
+    UserBrokerService
   ],
 })
 export class AssetModule {}

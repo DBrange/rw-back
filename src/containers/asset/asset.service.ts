@@ -340,6 +340,22 @@ export class AssetService {
     }
   }
 
+  public async getAssetByUser(id: string): Promise<AssetEntity[]> {
+    const assetsOfUser = await this.assetRepository
+      .createQueryBuilder('asset')
+      .where('asset.vehicle = :id', { id })
+      .getMany();
+
+    if (!assetsOfUser) {
+      throw new ErrorManager({
+        type: 'BAD_REQUEST',
+        message: 'No users found',
+      });
+    }
+
+    return assetsOfUser;
+  }
+
   //Ruta vehicle + user
   public async CreateUserVehicle(
     vehicleDTO: VehicleDTO,

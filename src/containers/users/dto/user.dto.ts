@@ -9,15 +9,8 @@ import {
 import { GENDER } from 'src/constants/enums';
 import { IUser } from 'src/interfaces/users.interface';
 import { ROLES } from '../../../constants/roles';
-import { AssetEntity } from 'src/containers/asset/entities/asset.entity';
-import { BrokerRegister } from 'src/interfaces/broker-register.interface';
-import { Client } from 'src/interfaces/client.interface';
 
 export class UserDTO implements IUser {
-  clients: Client[];
-  brokerRegisters: BrokerRegister[];
-  asset: AssetEntity[];
-
   @IsNotEmpty()
   @IsString()
   name: string;
@@ -63,10 +56,9 @@ export class UserDTO implements IUser {
   role: ROLES;
 }
 
-export class UserUpdateDTO implements IUser {
-  clients: Client[];
-  brokerRegisters: BrokerRegister[];
-  asset: AssetEntity[];
+export class UserUpdateDTO {
+  // clients: Client[];
+  // brokerRegisters: BrokerRegister[]
 
   @IsOptional()
   @IsString()

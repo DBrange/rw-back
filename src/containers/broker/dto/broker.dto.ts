@@ -1,9 +1,8 @@
-import { IsString, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsUUID } from 'class-validator';
+import { UserEntity } from 'src/containers/users/entities/user.entity';
 
-export class CreateBrokerDto {
-  @IsString()
-  nombre: string;
-
-  @IsNumber()
-  userId: number;
+export class BrokerDTO {
+  @IsNotEmpty()
+  @IsUUID()
+  user: UserEntity;
 }

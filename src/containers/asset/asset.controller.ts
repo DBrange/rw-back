@@ -32,6 +32,11 @@ export class AssetController {
     return this.assetService.getAssetElectronicById(id);
   }
 
+  @Get(':id')
+  public async getAssetByUser(@Param('id') id: string): Promise<AssetEntity[]> {
+    return this.assetService.getAssetByUser(id);
+  }
+
   @Post('create')
   public async createaAsset(@Body() body: AssetDTO) {
     return await this.assetService.createAsset(body);

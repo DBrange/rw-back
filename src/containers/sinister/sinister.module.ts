@@ -36,6 +36,8 @@ import { ThirdPartyDriverService } from '../third-party-driver/third-party-drive
 import { ThirdPartyVehicleService } from '../third-party-vehicle/third-party-vehicle.service';
 import { ThirdPartyVehicle } from '../third-party-vehicle/entities/thirdPartyVehicle.entity';
 import { ThirdPartyDriver } from '../third-party-driver/entities/thirdPartyDriver.entity';
+import { UserBrokerEntity } from '../user-broker/entities/user-broker.entity';
+import { UserBrokerService } from '../user-broker/services/user-broker.service';
 
 @Module({
   imports: [
@@ -57,6 +59,7 @@ import { ThirdPartyDriver } from '../third-party-driver/entities/thirdPartyDrive
       Crash,
       ThirdPartyVehicle,
       ThirdPartyDriver,
+      UserBrokerEntity
     ]),
   ],
   controllers: [SinisterController],
@@ -78,6 +81,7 @@ import { ThirdPartyDriver } from '../third-party-driver/entities/thirdPartyDrive
     CrashService,
     ThirdPartyVehicleService,
     ThirdPartyDriverService,
+    UserBrokerService
   ],
   exports: [SinisterService]
 })

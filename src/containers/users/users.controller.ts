@@ -15,20 +15,25 @@ import { AuthGuard } from '../../auth/guards/auth.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { AdminAccess } from '../../auth/decorators/admin.decorator';
+import { UserUserBrokerDTO } from './dto/allUser.dto';
 
 @Controller('users')
-@UseGuards(AuthGuard, RolesGuard)
+// @UseGuards(AuthGuard, RolesGuard)
 export class UsersController {
-  assetService: any;
   constructor(private readonly usersService: UsersService) {}
 
-  @PublicAccess()
+  // @PublicAccess()
   @Post('register')
   public async registerUser(@Body() body: UserDTO) {
     return await this.usersService.createUser(body);
   }
 
-  @AdminAccess()
+  @Post('register-login')
+  public async registerUserInLogin(@Body() body: UserUserBrokerDTO) {
+    return await this.usersService.createUserInLogin(body);
+  }
+
+  // @AdminAccess()
   @Get('all')
   public async getAllUsers() {
     return await this.usersService.getUsers();

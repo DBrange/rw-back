@@ -1,18 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, JoinColumn, OneToOne } from 'typeorm';
 import { UserEntity } from '../../users/entities/user.entity';
-import { BrokerClientRelation } from 'src/containers/broker-client-relations/entities/broker-client-relation.entity';
+import { BaseEntity } from 'src/config/base.entity';
 
 @Entity('clients')
-export class Client {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column()
-  nombre: string;
-
-  @ManyToOne(() => UserEntity, (user) => user.clients)
+export class ClientEntity extends BaseEntity {
+  @OneToOne(() => UserEntity)
+  @JoinColumn()
   user: UserEntity;
-
-  @OneToMany(() => BrokerClientRelation, (relation) => relation.client)
-  brokerClientRelations: BrokerClientRelation[];
 }

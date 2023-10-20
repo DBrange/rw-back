@@ -15,8 +15,8 @@ export interface IUser {
      dni: string;
      address: string;
      role: string;
-     clients: Client[];
-     brokerRegisters: BrokerRegister[];
-     asset: AssetEntity[];
+    //  asset: AssetEntity[];
+    //  clients: Client[];
+    //  brokerRegisters: BrokerRegister[];
 };
  
