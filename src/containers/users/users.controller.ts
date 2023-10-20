@@ -34,8 +34,13 @@ export class UsersController {
 
   // @AdminAccess()
   @Get('all')
-  public async getAllUsers() {
+  public async getUsers() {
     return await this.usersService.getUsers();
+  }
+  
+  @Get('all-users')
+  public async getAllUsers() {
+    return await this.usersService.getAllUsers();
   }
 
   @Get(':id')

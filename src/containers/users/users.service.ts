@@ -5,21 +5,20 @@ import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { UserDTO, UserUpdateDTO } from './dto/user.dto';
 import { ErrorManager } from 'src/utils/error.manager';
 import * as bcrypt from 'bcrypt';
-<<<<<<< HEAD
+
 import { UserUserBrokerDTO } from './dto/allUser.dto';
 import { UserBrokerService } from '../user-broker/services/user-broker.service';
-=======
->>>>>>> 6e5a738fea9708e8e6308d9700ae7db071f9287f
+import { LegalUsersService } from '../legal-users/legal-users.service';
+import { LegalUsersDTO } from '../legal-users/dto/legalUsers.dto';
+import { LegalUsers } from '../legal-users/entities/legalUsers.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-<<<<<<< HEAD
-    private readonly userBrokerService: UserBrokerService
-=======
->>>>>>> 6e5a738fea9708e8e6308d9700ae7db071f9287f
+    private readonly userBrokerService: UserBrokerService,
+    private readonly legalUserService: LegalUsersService,
   ) {}
 
   public async createUser(body: UserDTO): Promise<UserEntity> {
@@ -33,9 +32,20 @@ export class UsersService {
 
   public async createUserInLogin(body: UserUserBrokerDTO) {
     try {
-      const newUser = await this.userRepository.save(body.userDTO);
+      let newUser: UserDTO | LegalUsersDTO;
+
+      if (body.userDTO) {
+        // body.userDTO.password = await bcrypt.hash(body.userDTO.password, +process.env.HASH_SALT);
+        newUser = await this.userRepository.save(body.userDTO);
+      } else if (body.legalUserDTO) {
+        // body.legalUserDTO.password = await bcrypt.hash(body.legalUserDTO.password, +process.env.HASH_SALT);
+        newUser = await this.legalUserService.createLegalUsers(
+          body.legalUserDTO,
+        );
+      }
+
       if (newUser.role === 'BROKER') {
-        await this.userBrokerService.createUserBroker(body.userBrokerDTO)
+        await this.userBrokerService.createUserBroker(body.userBrokerDTO);
       }
       // body.password = await bcrypt.hash(body.password, +process.env.HASH_SALT);
       return { message: 'El usuario a sido creado con exito' };
@@ -47,6 +57,7 @@ export class UsersService {
   public async getUsers(): Promise<UserEntity[]> {
     try {
       const users: UserEntity[] = await this.userRepository.find();
+
       if (users.length === 0) {
         throw new ErrorManager({
           type: 'BAD_REQUEST',
@@ -59,17 +70,33 @@ export class UsersService {
     }
   }
 
+  public async getAllUsers(): Promise<(UserEntity | LegalUsers)[]> {
+    try {
+      const users: UserEntity[] = await this.userRepository.find();
+      const legalUsers: LegalUsers[] =
+        await this.legalUserService.getAllLegalUsers();
+
+      const allUsers = [...users, ...legalUsers];
+      if (users.length === 0) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+      return allUsers;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+
   public async getUsersById(id: string): Promise<UserEntity> {
     try {
       const user = await this.userRepository
         .createQueryBuilder('user')
         .where({ id })
         .leftJoinAndSelect('user.asset', 'asset')
-<<<<<<< HEAD
-=======
         .leftJoinAndSelect('asset.vehicle', 'vehicle')
         .leftJoinAndSelect('asset.electronics', 'electronics')
->>>>>>> 6e5a738fea9708e8e6308d9700ae7db071f9287f
         .getOne();
 
       if (!user) {

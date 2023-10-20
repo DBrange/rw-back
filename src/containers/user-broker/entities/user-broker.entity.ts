@@ -7,17 +7,17 @@ import { Column, Entity, OneToOne, JoinColumn, OneToMany } from 'typeorm';
 export class UserBrokerEntity extends BaseEntity implements IUserBroker {
   @Column()
   bussinesName: string;
-  
-  @Column()
+
+  @Column({ unique: true })
   enrollment: string;
-  
+
   @Column()
   card: string;
 
   @OneToOne(() => UserEntity)
   @JoinColumn()
   user: UserEntity;
-  
+
   @OneToMany(() => UserEntity, (user) => user.userBroker)
   @JoinColumn()
   clients: UserEntity[];

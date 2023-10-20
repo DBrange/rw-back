@@ -3,24 +3,17 @@ import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
-<<<<<<< HEAD
-import { AssetEntity } from '../asset/entities/asset.entity';
-import { UserBrokerEntity } from '../user-broker/entities/user-broker.entity';
 import { UserBrokerService } from '../user-broker/services/user-broker.service';
-=======
->>>>>>> 6e5a738fea9708e8e6308d9700ae7db071f9287f
+import { UserBrokerEntity } from '../user-broker/entities/user-broker.entity';
+import { LegalUsers } from '../legal-users/entities/legalUsers.entity';
+import { LegalUsersService } from '../legal-users/legal-users.service';
+
 
 @Global()
 @Module({
-<<<<<<< HEAD
-  imports: [
-    TypeOrmModule.forFeature([UserEntity, AssetEntity, UserBrokerEntity]),
-  ],
-=======
-  imports: [TypeOrmModule.forFeature([UserEntity])],
->>>>>>> 6e5a738fea9708e8e6308d9700ae7db071f9287f
+  imports: [TypeOrmModule.forFeature([UserEntity, UserBrokerEntity, LegalUsers])],
   controllers: [UsersController],
-  providers: [UsersService, UserBrokerService],
+  providers: [UsersService, UserBrokerService, LegalUsersService],
   exports: [UsersService, TypeOrmModule],
 })
 export class UsersModule {}

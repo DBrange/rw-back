@@ -8,15 +8,7 @@ import {
 } from 'class-validator';
 import { GENDER } from 'src/constants/enums';
 import { IUser } from 'src/interfaces/users.interface';
-<<<<<<< HEAD
 import { ROLES } from '../../../constants/roles';
-=======
-import {  ROLES } from '../../../constants/roles';
-import { AssetEntity } from 'src/containers/asset/entities/asset.entity';
-import { BrokerRegister } from 'src/interfaces/broker-register.interface';
-import { Client } from 'src/interfaces/client.interface';
-//import { UserEntity } from '../entities/user.entity';
->>>>>>> 6e5a738fea9708e8e6308d9700ae7db071f9287f
 
 export class UserDTO implements IUser {
   @IsNotEmpty()

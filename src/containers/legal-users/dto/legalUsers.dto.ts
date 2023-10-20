@@ -1,4 +1,5 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { ROLES } from 'src/constants/roles';
 
 export class LegalUsersDTO {
   @IsNotEmpty()
@@ -24,4 +25,12 @@ export class LegalUsersDTO {
   @IsNotEmpty()
   @IsString()
   address: string;
+
+  @IsNotEmpty()
+  @IsString()
+  password: string;
+  
+  @IsNotEmpty()
+  @IsEnum(ROLES)
+  role: ROLES;
 }

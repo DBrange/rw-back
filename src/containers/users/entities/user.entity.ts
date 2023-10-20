@@ -1,24 +1,13 @@
-<<<<<<< HEAD
+
 import { Exclude } from 'class-transformer';
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
-import { BaseEntity } from '../../../config/base.entity';
-import { GENDER } from '../../../constants/enums';
-import { ROLES } from '../../../constants/roles';
-import { AssetEntity } from '../../../containers/asset/entities/asset.entity';
-import { IUser } from '../../../interfaces/users.interface';
-import { UserBrokerEntity } from 'src/containers/user-broker/entities/user-broker.entity';
-=======
+import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 import { BaseEntity } from "../../../config/base.entity";
 import { GENDER } from "../../../constants/enums";
+import { ROLES } from "../../../constants/roles";
 import { IUser } from "../../../interfaces/users.interface";
-import { Entity, Column, OneToMany } from "typeorm";
-import { ROLES } from "../../../constants/roles"
-import { Exclude } from 'class-transformer';
-import { Client } from "src/containers/client/entities/client.entity";
-import { BrokerRegister } from "src/containers/broker-register/entities/broker-register.entity";
 //import { UsersAssetsEntity } from "./userAsset.entity";
 import { AssetEntity } from "src/containers/asset/entities/asset.entity";
->>>>>>> 6e5a738fea9708e8e6308d9700ae7db071f9287f
+import { UserBrokerEntity } from 'src/containers/user-broker/entities/user-broker.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity extends BaseEntity implements IUser {
@@ -34,7 +23,7 @@ export class UserEntity extends BaseEntity implements IUser {
   @Column()
   phoneNumber: string;
 
-  @Column()
+  @Column({ unique: true })
   email: string;
 
   @Column({ nullable: true })
@@ -47,7 +36,7 @@ export class UserEntity extends BaseEntity implements IUser {
   @Column({ type: 'enum', enum: GENDER })
   gender: GENDER;
 
-  @Column()
+  @Column({ unique: true })
   dni: string;
 
   @Column()
@@ -59,21 +48,6 @@ export class UserEntity extends BaseEntity implements IUser {
   @OneToMany(() => AssetEntity, (asset) => asset.users)
   asset: AssetEntity[];
 
-<<<<<<< HEAD
   @ManyToOne(() => UserBrokerEntity, { nullable: true })
   userBroker: UserBrokerEntity;
-  // @ManyToOne(() => UserBrokerEntity, (userBroker) => userBroker.clients)
-  // userBroker: UserBrokerEntity
 }
-=======
-     @OneToMany(() => Client, (client) => client.user)
-     clients: Client[];
-   
-     @OneToMany(() => BrokerRegister, (brokerRegister) => brokerRegister.user)
-     brokerRegisters: BrokerRegister[];
-   
-     @OneToMany(() => AssetEntity, (asset) => asset.users)
-     asset: AssetEntity[];
-
-};
->>>>>>> 6e5a738fea9708e8e6308d9700ae7db071f9287f
