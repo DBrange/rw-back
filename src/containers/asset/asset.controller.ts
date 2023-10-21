@@ -4,6 +4,7 @@ import { AssetDTO } from './dto/asset.dto';
 import {
   AssetElectronicLegalUser,
   AssetElectronicUser,
+  AssetInspectionsInUser,
   AssetVehicleLegalUserGncDTO,
   AssetVehicleUserGncDTO,
   AssetsInspectionsLegalUserDTO,
@@ -25,30 +26,55 @@ export class AssetController {
     return this.assetService.getAssetsById(id);
   }
 
-  @Get(':id/vehicle')
-  public async getAssetVehicleById(
-    @Param('id') id: string,
-  ): Promise<AssetEntity> {
-    return this.assetService.getAssetVehicleById(id);
-  }
-
-  @Get(':id/electronics')
-  public async getAssetElectronicById(
-    @Param('id') id: string,
-  ): Promise<AssetEntity> {
-    return this.assetService.getAssetElectronicById(id);
-  }
-
-  @Get(':id')
-  public async getAssetByUser(@Param('id') id: string): Promise<AssetEntity[]> {
-    return this.assetService.getAssetByUser(id);
-  }
-
   @Post('create')
   public async createaAsset(@Body() body: AssetDTO) {
     return await this.assetService.createAsset(body);
   }
 
+  @Post('in-legal-user/:id')
+  public async createAssetInLegalUser(
+    @Param('id') id: string,
+    @Body() requestData: AssetInspectionsInUser,
+  ) {
+    const result = await this.assetService.createAssetInLegalUser(
+      id,
+      requestData.vehicleDTO,
+      requestData.gncDTO,
+      requestData.electronicDTO,
+      requestData.smartphoneDTO,
+      requestData.assetDTO,
+      requestData.swornDeclaration,
+    );
+    return result;
+  }
+
+  @Post('in-user/:id')
+  public async createAssetInUser(
+    @Param('id') id: string,
+    @Body() requestData: AssetInspectionsInUser,
+  ) {
+    const result = await this.assetService.createAssetInUser(
+      id,
+      requestData.vehicleDTO,
+      requestData.gncDTO,
+      requestData.electronicDTO,
+      requestData.smartphoneDTO,
+      requestData.assetDTO,
+      requestData.swornDeclaration,
+    );
+    return result;
+  }
+
+  @Get('user-login/:id')
+  public getUserAssetsForId(@Param('id') id: string) {
+    return this.assetService.getUserAssetsForId(id)
+  }
+
+  @Get('legal-user-login/:id')
+  public getLegalUserAssetsForId(@Param('id') id: string) {
+    return this.assetService.getLegalUserAssetsForId(id)
+  }
+  
   @Post('user')
   public async createVehicleAndGnc(
     @Body() requestData: AssetVehicleUserGncDTO,
@@ -97,43 +123,6 @@ export class AssetController {
       requestData.electronicDTO,
       requestData.smartphoneDTO,
       requestData.legalUserDTO,
-      requestData.assetDTO,
-      requestData.swornDeclaration,
-    );
-    return result;
-  }
-
-  @Post('inspection/create')
-  public async createaAssetInspections(@Body() body: AssetDTO) {
-    return await this.assetService.createaAssetInspections(body);
-  }
-
-  @Post('inspection-user/create')
-  public async createInspectionsUserNewAssets(
-    @Body() requestData: AssetsInspectionsUserDTO,
-  ) {
-    const result = await this.assetService.createInspectionsUserNewAssets(
-      requestData.userDTO, 
-      requestData.vehicleDTO,
-      requestData.gncDTO,
-      requestData.electronicDTO,
-      requestData.smartphoneDTO,
-      requestData.assetDTO,
-      requestData.swornDeclaration,
-    );
-    return result;
-  }
-
-  @Post('inspection-legal-user/create')
-  public async createInspectionsLegalUserNewAssets(
-    @Body() requestData: AssetsInspectionsLegalUserDTO,
-  ) {
-    const result = await this.assetService.createInspectionsLegalUserNewAssets(
-      requestData.legalUserDTO, 
-      requestData.vehicleDTO,
-      requestData.gncDTO,
-      requestData.electronicDTO,
-      requestData.smartphoneDTO,
       requestData.assetDTO,
       requestData.swornDeclaration,
     );

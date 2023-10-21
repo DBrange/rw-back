@@ -57,3 +57,12 @@ export class AssetsInspectionsLegalUserDTO{
   assetDTO: AssetDTO;
   swornDeclaration: boolean;
 }
+
+export class AssetInspectionsInUser{
+  vehicleDTO: VehicleDTO;
+  gncDTO: GncDTO;
+  electronicDTO: ElectronicsDTO;
+  smartphoneDTO: SmartphoneDTO;
+  assetDTO: AssetDTO;
+  swornDeclaration: boolean;
+}

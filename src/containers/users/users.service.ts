@@ -11,6 +11,7 @@ import { UserBrokerService } from '../user-broker/services/user-broker.service';
 import { LegalUsersService } from '../legal-users/legal-users.service';
 import { LegalUsersDTO } from '../legal-users/dto/legalUsers.dto';
 import { LegalUsers } from '../legal-users/entities/legalUsers.entity';
+import { AssetEntity } from '../asset/entities/asset.entity';
 
 @Injectable()
 export class UsersService {
@@ -27,6 +28,22 @@ export class UsersService {
       return await this.userRepository.save(body);
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async getUsers(): Promise<UserEntity[]> {
+    try {
+      const users: UserEntity[] = await this.userRepository.find();
+
+      if (users.length === 0) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+      return users;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
     }
   }
 
@@ -54,22 +71,6 @@ export class UsersService {
     }
   }
 
-  public async getUsers(): Promise<UserEntity[]> {
-    try {
-      const users: UserEntity[] = await this.userRepository.find();
-
-      if (users.length === 0) {
-        throw new ErrorManager({
-          type: 'BAD_REQUEST',
-          message: 'No users found',
-        });
-      }
-      return users;
-    } catch (error) {
-      throw new ErrorManager.createSignaturError(error.message);
-    }
-  }
-
   public async getAllUsers(): Promise<(UserEntity | LegalUsers)[]> {
     try {
       const users: UserEntity[] = await this.userRepository.find();
@@ -91,6 +92,35 @@ export class UsersService {
 
   public async getUsersById(id: string): Promise<UserEntity> {
     try {
+      // const user = await this.userRepository
+      //   .createQueryBuilder('user')
+      //   .where({ id })
+      //   .leftJoinAndSelect('user.asset', 'asset')
+      //   .leftJoinAndSelect('asset.vehicle', 'vehicle')
+      //   .leftJoinAndSelect('asset.electronics', 'electronics')
+      //   .getOne();
+
+      const user = await this.userRepository
+        .createQueryBuilder('user')
+        .where({ id })
+        .select(['user', 'asset.id'])
+        .leftJoin('user.asset', 'asset')
+        .getOne();
+
+      if (!user) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+      return user;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async getAssetOfUser(id: string): Promise<AssetEntity[]> {
+    try {
       const user = await this.userRepository
         .createQueryBuilder('user')
         .where({ id })
@@ -105,7 +135,7 @@ export class UsersService {
           message: 'No users found',
         });
       }
-      return user;
+      return user.asset;
     } catch (error) {
       throw new ErrorManager.createSignaturError(error.message);
     }
