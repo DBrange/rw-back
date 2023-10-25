@@ -2,6 +2,9 @@ import { Body, Controller, Post, Get, Param } from '@nestjs/common';
 import { SinisterService } from './sinister.service';
 import { SinisterDTO } from './dto/sinister.dto';
 import {
+  SinisterInUserCrash,
+  SinisterInUserFire,
+  SinisterInUserTheft,
   SinisterLegalUserElectronicTheftDTO,
   SinisterLegalUserVehicleCrashDTO,
   SinisterLegalUserVehicleFireDTO,
@@ -31,6 +34,120 @@ export class SinisterController {
   public async createSinister(@Body() body: SinisterDTO) {
     //body.date = new Date(body.date);
     return await this.sinisterService.createSinister(body);
+  }
+
+  @Post('in-user-theft/:id')
+  public async createSinisterInUserTheft(
+    @Param('id') id: string,
+    @Body() requestData: SinisterInUserTheft,
+  ) {
+    const result = await this.sinisterService.CreateSinisterInUserTheft(
+      id,
+      requestData.vehicleDTO,
+      requestData.gncDTO,
+      requestData.electronicDTO,
+      requestData.smartphoneDTO,
+      requestData.theftDTO,
+      requestData.theftTireDTO,
+      requestData.assetDTO,
+      requestData.swornDeclaration,
+    );
+
+    return result;
+  }
+
+  @Post('in-legal-user-theft/:id')
+  public async CreateSinisterInLegalUserTheft(
+    @Param('id') id: string,
+    @Body() requestData: SinisterInUserTheft,
+  ) {
+    const result = await this.sinisterService.CreateSinisterInLegalUserTheft(
+      id,
+      requestData.vehicleDTO,
+      requestData.gncDTO,
+      requestData.electronicDTO,
+      requestData.smartphoneDTO,
+      requestData.theftDTO,
+      requestData.theftTireDTO,
+      requestData.assetDTO,
+      requestData.swornDeclaration,
+    );
+
+    return result;
+  }
+
+  @Post('in-user-fire/:id')
+  public async CreateSinisterInLegalUserFire(
+    @Param('id') id: string,
+    @Body() requestData: SinisterInUserFire,
+  ) {
+    const result = await this.sinisterService.CreateSinisterInUserFire(
+      id,
+      requestData.vehicleDTO,
+      requestData.gncDTO,
+      requestData.fireDTO,
+      requestData.injuredDTO,
+      requestData.assetDTO,
+      requestData.swornDeclaration,
+    );
+
+    return result;
+  }
+
+  @Post('in-legal-user-fire/:id')
+  public async CreateSinisterInLegalLegalUserFire(
+    @Param('id') id: string,
+    @Body() requestData: SinisterInUserFire,
+  ) {
+    const result = await this.sinisterService.CreateSinisterInLegalUserFire(
+      id,
+      requestData.vehicleDTO,
+      requestData.gncDTO,
+      requestData.fireDTO,
+      requestData.injuredDTO,
+      requestData.assetDTO,
+      requestData.swornDeclaration,
+    );
+
+    return result;
+  }
+
+  @Post('in-user-crash/:id')
+  public async CreateSinisterInUserCrash(
+    @Param('id') id: string,
+    @Body() requestData: SinisterInUserCrash,
+  ) {
+    const result = await this.sinisterService.CreateSinisterInUserCrash(
+      id,
+      requestData.vehicleDTO,
+      requestData.gncDTO,
+      requestData.crashDTO,
+      requestData.injuredDTO,
+      requestData.thirdPartyVehicleDTO,
+      requestData.assetDTO,
+      requestData.swornDeclaration,
+    );
+
+    return result;
+  }
+
+  @Post('in-legal-user-crash/:id')
+  public async CreateSinisterInLegalUserCrash(
+    @Param('id') id: string,
+    @Body() requestData: SinisterInUserCrash,
+  ) {
+    const result = await this.sinisterService.CreateSinisterInLegalUserCrash(
+      id,
+      requestData.vehicleDTO,
+      requestData.gncDTO,
+      requestData.crashDTO,
+      requestData.injuredDTO,
+      requestData.thirdPartyVehicleDTO,
+      requestData.assetDTO,
+      requestData.swornDeclaration,
+    );
+
+    return result;
   }
 
   @Post('user-vehicle-theft')

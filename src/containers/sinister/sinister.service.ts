@@ -49,6 +49,7 @@ import PDFDocument from 'pdfkit-table';
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { ErrorManager } from 'src/utils/error.manager';
+import { AssetEntity } from '../asset/entities/asset.entity';
 interface PDF {
   userDTO: UserDTO;
   legalUserDTO: LegalUsersDTO;
@@ -1723,6 +1724,759 @@ export class SinisterService {
       this.sendPdfEmail(generatePdf, [legalUserDTO.email]);
 
       return response;
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  // in login
+  public async CreateSinisterInUserTheft(
+    userId: string,
+    vehicleDTO: VehicleDTO,
+    gncDTO: GncDTO,
+    electronicDTO: ElectronicsDTO,
+    smartphoneDTO: SmartphoneDTO,
+    theftDTO: TheftDTO,
+    theftTireDTO: TheftTireDTO,
+    assetDTO: AssetDTO,
+    swornDeclaration: boolean,
+  ) {
+    try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
+
+      if (vehicleDTO) {
+        const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
+
+        if (newVehicle.gnc) {
+          const vehicleGnc = {
+            ...gncDTO,
+            vehicle: newVehicle.id,
+          };
+          await this.gncService.createGnc(vehicleGnc);
+        }
+
+        const asset = {
+          ...assetDTO,
+          vehicle: newVehicle,
+          users: userId,
+        };
+
+        const newAsset = await this.assetService.createAsset(asset);
+
+        const theftDate = theftDTO.date;
+        const theftLocation = theftDTO.location;
+        const theftTime = theftDTO.time;
+
+        const bodySinister: SinisterDTO = {
+          date: theftDate,
+          location: theftLocation,
+          time: theftTime,
+          asset: newAsset,
+        };
+
+        const newSinister = await this.sinisterRepository.save(bodySinister);
+
+        const newTheft = await this.theftService.createTheft(theftDTO);
+
+        if (newTheft.isTire) {
+          const theftTire = {
+            ...theftTireDTO,
+            theft: newTheft.id,
+          };
+
+          await this.theftTireService.createTheftTire(theftTire);
+        }
+
+        const bodySinisterType = {
+          crash: undefined,
+          fire: undefined,
+          damage: undefined,
+          theft: newTheft,
+          sinister: newSinister,
+        };
+
+        //newSinisterType
+        await this.sinisterTypeService.createSinisterType(bodySinisterType);
+
+        const response = {
+          sinister: newSinister,
+        };
+
+        return response;
+        // return { message: 'La inspeccion a sido realizada con exito' };
+      } else {
+        const newElectronic = await this.electronicService.createElectronics(
+          electronicDTO,
+        );
+
+        if (newElectronic.type === 'CELULAR') {
+          const relatedSmartphone = {
+            ...smartphoneDTO,
+            electronics: newElectronic.id,
+          };
+
+          await this.smartphoneService.createSmartphone(relatedSmartphone);
+        }
+
+        const asset = {
+          ...assetDTO,
+          users: userId as unknown as UserDTO,
+          electronics: newElectronic,
+        };
+
+        const newAsset = await this.assetService.createAsset(asset);
+
+        const theftDate = theftDTO.date;
+        const theftLocation = theftDTO.location;
+        const theftTime = theftDTO.time;
+
+        const bodySinister: SinisterDTO = {
+          date: theftDate,
+          location: theftLocation,
+          time: theftTime,
+          asset: newAsset,
+        };
+
+        const newSinister = await this.sinisterRepository.save(bodySinister);
+
+        const newTheft = await this.theftService.createTheft(theftDTO);
+
+        if (newTheft.isTire) {
+          const theftTire = {
+            ...theftTireDTO,
+            theft: newTheft.id,
+          };
+
+          await this.theftTireService.createTheftTire(theftTire);
+        }
+
+        const bodySinisterType = {
+          crash: undefined,
+          fire: undefined,
+          damage: undefined,
+          theft: newTheft,
+          sinister: newSinister,
+        };
+
+        //newSinisterType
+        await this.sinisterTypeService.createSinisterType(bodySinisterType);
+        
+        const response = {
+          sinister: newSinister,
+        };
+
+        return response;
+        // return { message: 'La inspeccion a sido realizada con exito' };
+      }
+
+
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async CreateSinisterInLegalUserTheft(
+    userId: string,
+    vehicleDTO: VehicleDTO,
+    gncDTO: GncDTO,
+    electronicDTO: ElectronicsDTO,
+    smartphoneDTO: SmartphoneDTO,
+    theftDTO: TheftDTO,
+    theftTireDTO: TheftTireDTO,
+    assetDTO: AssetDTO,
+    swornDeclaration: boolean,
+  ) {
+    try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
+
+      if (vehicleDTO) {
+        const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
+
+        if (newVehicle.gnc) {
+          const vehicleGnc = {
+            ...gncDTO,
+            vehicle: newVehicle.id,
+          };
+          await this.gncService.createGnc(vehicleGnc);
+        }
+
+        const asset = {
+          ...assetDTO,
+          vehicle: newVehicle,
+          legalUsers: userId,
+        };
+
+        const newAsset = await this.assetService.createAsset(asset);
+
+        const theftDate = theftDTO.date;
+        const theftLocation = theftDTO.location;
+        const theftTime = theftDTO.time;
+
+        const bodySinister: SinisterDTO = {
+          date: theftDate,
+          location: theftLocation,
+          time: theftTime,
+          asset: newAsset,
+        };
+
+        const newSinister = await this.sinisterRepository.save(bodySinister);
+
+        const newTheft = await this.theftService.createTheft(theftDTO);
+
+        if (newTheft.isTire) {
+          const theftTire = {
+            ...theftTireDTO,
+            theft: newTheft.id,
+          };
+
+          await this.theftTireService.createTheftTire(theftTire);
+        }
+
+        const bodySinisterType = {
+          crash: undefined,
+          fire: undefined,
+          damage: undefined,
+          theft: newTheft,
+          sinister: newSinister,
+        };
+
+        //newSinisterType
+        await this.sinisterTypeService.createSinisterType(bodySinisterType);
+      } else {
+        const newElectronic = await this.electronicService.createElectronics(
+          electronicDTO,
+        );
+
+        if (newElectronic.type === 'CELULAR') {
+          const relatedSmartphone = {
+            ...smartphoneDTO,
+            electronics: newElectronic.id,
+          };
+
+          await this.smartphoneService.createSmartphone(relatedSmartphone);
+        }
+
+        const asset = {
+          ...assetDTO,
+          legalUsers: userId as unknown as UserDTO,
+          electronics: newElectronic,
+        };
+
+        const newAsset = await this.assetService.createAsset(asset);
+
+        const theftDate = theftDTO.date;
+        const theftLocation = theftDTO.location;
+        const theftTime = theftDTO.time;
+
+        const bodySinister: SinisterDTO = {
+          date: theftDate,
+          location: theftLocation,
+          time: theftTime,
+          asset: newAsset,
+        };
+
+        const newSinister = await this.sinisterRepository.save(bodySinister);
+
+        const newTheft = await this.theftService.createTheft(theftDTO);
+
+        if (newTheft.isTire) {
+          const theftTire = {
+            ...theftTireDTO,
+            theft: newTheft.id,
+          };
+
+          await this.theftTireService.createTheftTire(theftTire);
+        }
+
+        const bodySinisterType = {
+          crash: undefined,
+          fire: undefined,
+          damage: undefined,
+          theft: newTheft,
+          sinister: newSinister,
+        };
+
+        //newSinisterType
+        await this.sinisterTypeService.createSinisterType(bodySinisterType);
+      }
+
+      return { message: 'La inspeccion a sido realizada con exito' };
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async CreateSinisterInUserFire(
+    userId: string,
+    vehicleDTO: VehicleDTO,
+    gncDTO: GncDTO,
+    fireDTO: FireDTO,
+    injuredDTO: InjuredData,
+    assetDTO: AssetDTO,
+    swornDeclaration: boolean,
+  ) {
+    try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
+
+      const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
+
+      if (newVehicle.gnc) {
+        const vehicleGnc = {
+          ...gncDTO,
+          vehicle: newVehicle.id,
+        };
+        await this.gncService.createGnc(vehicleGnc);
+      }
+
+      const asset = {
+        ...assetDTO,
+        vehicle: newVehicle,
+        users: userId,
+      };
+
+      const newAsset = await this.assetService.createAsset(asset);
+
+      const fireDate = fireDTO.date;
+      const fireLocation = fireDTO.location;
+      const fireTime = fireDTO.time;
+
+      const bodySinister: SinisterDTO = {
+        date: fireDate,
+        location: fireLocation,
+        time: fireTime,
+        asset: newAsset,
+      };
+
+      const newSinister = await this.sinisterRepository.save(bodySinister);
+
+      const newFire = await this.fireService.createFire(fireDTO);
+
+      const bodySinisterType: sinisterTypeDTO = {
+        crash: undefined,
+        fire: newFire,
+        damage: undefined,
+        theft: undefined,
+        sinister: newSinister,
+      };
+
+      //newSinisterType
+      await this.sinisterTypeService.createSinisterType(bodySinisterType);
+
+      if (injuredDTO) {
+        let newInjured: InjuredDTO & Injured;
+
+        if (newFire.thirdInjured && injuredDTO.amount) {
+          const bodyInjured: InjuredDTO = {
+            amount: injuredDTO.amount,
+            injuredInfo: injuredDTO.injuredInfo,
+            sinister: newSinister,
+          };
+
+          newInjured = await this.injuredService.createInjured(bodyInjured);
+
+          const allPeopleInjured = injuredDTO.injuredInfo;
+
+          for (let i = 0; i < allPeopleInjured.length; i++) {
+            const el = allPeopleInjured[i];
+
+            const bodyInjuredInfo: InjuredInfoDTO = {
+              ...el,
+              injured: newInjured,
+            };
+            await this.injuredInfoService.createInjuredInfo(bodyInjuredInfo);
+          }
+        }
+      }
+
+      return { message: 'La inspeccion a sido realizada con exito' };
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async CreateSinisterInLegalUserFire(
+    userId: string,
+    vehicleDTO: VehicleDTO,
+    gncDTO: GncDTO,
+    fireDTO: FireDTO,
+    injuredDTO: InjuredData,
+    assetDTO: AssetDTO,
+    swornDeclaration: boolean,
+  ) {
+    try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
+
+      const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
+
+      if (newVehicle.gnc) {
+        const vehicleGnc = {
+          ...gncDTO,
+          vehicle: newVehicle.id,
+        };
+        await this.gncService.createGnc(vehicleGnc);
+      }
+
+      const asset = {
+        ...assetDTO,
+        vehicle: newVehicle,
+        legalUsers: userId,
+      };
+
+      const newAsset = await this.assetService.createAsset(asset);
+
+      const fireDate = fireDTO.date;
+      const fireLocation = fireDTO.location;
+      const fireTime = fireDTO.time;
+
+      const bodySinister: SinisterDTO = {
+        date: fireDate,
+        location: fireLocation,
+        time: fireTime,
+        asset: newAsset,
+      };
+
+      const newSinister = await this.sinisterRepository.save(bodySinister);
+
+      const newFire = await this.fireService.createFire(fireDTO);
+
+      const bodySinisterType: sinisterTypeDTO = {
+        crash: undefined,
+        fire: newFire,
+        damage: undefined,
+        theft: undefined,
+        sinister: newSinister,
+      };
+
+      //newSinisterType
+      await this.sinisterTypeService.createSinisterType(bodySinisterType);
+
+      if (injuredDTO) {
+        let newInjured: InjuredDTO & Injured;
+
+        if (newFire.thirdInjured && injuredDTO.amount) {
+          const bodyInjured: InjuredDTO = {
+            amount: injuredDTO.amount,
+            injuredInfo: injuredDTO.injuredInfo,
+            sinister: newSinister,
+          };
+
+          newInjured = await this.injuredService.createInjured(bodyInjured);
+
+          const allPeopleInjured = injuredDTO.injuredInfo;
+
+          for (let i = 0; i < allPeopleInjured.length; i++) {
+            const el = allPeopleInjured[i];
+
+            const bodyInjuredInfo: InjuredInfoDTO = {
+              ...el,
+              injured: newInjured,
+            };
+            await this.injuredInfoService.createInjuredInfo(bodyInjuredInfo);
+          }
+        }
+      }
+
+      return { message: 'La inspeccion a sido realizada con exito' };
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async CreateSinisterInUserCrash(
+    userId: string,
+    vehicleDTO: VehicleDTO,
+    gncDTO: GncDTO,
+    crashDTO: CrashDTO,
+    injuredDTO: InjuredData,
+    thirdPartyVehicleDTO: ThirdPartyVehicleData,
+    assetDTO: AssetDTO,
+    swornDeclaration: boolean,
+  ) {
+    try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
+
+      const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
+
+      if (newVehicle.gnc) {
+        const vehicleGnc = {
+          ...gncDTO,
+          vehicle: newVehicle.id,
+        };
+        await this.gncService.createGnc(vehicleGnc);
+      }
+
+      const asset = {
+        ...assetDTO,
+        vehicle: newVehicle,
+        users: userId,
+      };
+
+      const newAsset = await this.assetService.createAsset(asset);
+
+      const crashDate = crashDTO.date;
+      const crashLocation = crashDTO.location;
+      const crashTime = crashDTO.time;
+
+      const bodySinister: SinisterDTO = {
+        date: crashDate,
+        location: crashLocation,
+        time: crashTime,
+        asset: newAsset,
+      };
+
+      const newSinister = await this.sinisterRepository.save(bodySinister);
+
+      const newCrash = await this.crashService.createCrash(crashDTO);
+
+      const bodySinisterType: sinisterTypeDTO = {
+        crash: newCrash,
+        fire: undefined,
+        damage: undefined,
+        theft: undefined,
+        sinister: newSinister,
+      };
+
+      //newSinisterType
+      await this.sinisterTypeService.createSinisterType(bodySinisterType);
+
+      if (injuredDTO) {
+        let newInjured: InjuredDTO & Injured;
+
+        if (newCrash.thirdInjured) {
+          const bodyInjured: InjuredDTO = {
+            amount: injuredDTO.amount,
+            injuredInfo: injuredDTO.injuredInfo,
+            sinister: newSinister,
+          };
+
+          newInjured = await this.injuredService.createInjured(bodyInjured);
+
+          const allPeopleInjured = injuredDTO.injuredInfo;
+
+          for (let i = 0; i < allPeopleInjured.length; i++) {
+            const el = allPeopleInjured[i];
+
+            const bodyInjuredInfo: InjuredInfoDTO = {
+              ...el,
+              injured: newInjured,
+            };
+            await this.injuredInfoService.createInjuredInfo(bodyInjuredInfo);
+          }
+        }
+      }
+
+      let newThirdPartyVehicle: ThirdPartyVehicle;
+      const thirdPartyVehicleEmails: string[] = [];
+
+      const allThirdParty: ThirdParty =
+        thirdPartyVehicleDTO.thirdPartyVehicleInfo;
+      if (allThirdParty) {
+        for (let i = 0; i < allThirdParty.length; i++) {
+          const el = allThirdParty[i];
+          thirdPartyVehicleEmails.push(el.email);
+
+          const bodyThirdPartyVehicle: ThirdPartyVehicleDTO = {
+            brand: el.brand,
+            model: el.model,
+            year: el.year,
+            plate: el.plate,
+            insuranceCompany: el.insuranceCompany,
+            insurancePolicy: el.insurancePolicy,
+            ownerName: el.ownerLastName,
+            ownerLastName: el.ownerLastName,
+            ownerDni: el.ownerDni,
+            sinister: newSinister,
+          };
+
+          newThirdPartyVehicle =
+            await this.thirdPartyVehicleService.createThirdPartyVehicle(
+              bodyThirdPartyVehicle,
+            );
+
+          const bodyThirdPartyDriver: ThirdPartyDriverDTO = {
+            name: el.name,
+            lastName: el.lastName,
+            dni: el.dni,
+            address: el.address,
+            phoneNumber: el.phoneNumber,
+            licensePhoto: el.licensePhoto,
+            email: el.email,
+            thirdPartyVehicle: newThirdPartyVehicle,
+          };
+
+          //newThirdPartyDriver
+          await this.thirdPartyDriverService.createThirdPartyDriver(
+            bodyThirdPartyDriver,
+          );
+        }
+      }
+
+      return { message: 'La inspeccion a sido realizada con exito' };
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async CreateSinisterInLegalUserCrash(
+    userId: string,
+    vehicleDTO: VehicleDTO,
+    gncDTO: GncDTO,
+    crashDTO: CrashDTO,
+    injuredDTO: InjuredData,
+    thirdPartyVehicleDTO: ThirdPartyVehicleData,
+    assetDTO: AssetDTO,
+    swornDeclaration: boolean,
+  ) {
+    try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
+
+      const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
+
+      if (newVehicle.gnc) {
+        const vehicleGnc = {
+          ...gncDTO,
+          vehicle: newVehicle.id,
+        };
+        await this.gncService.createGnc(vehicleGnc);
+      }
+
+      const asset = {
+        ...assetDTO,
+        vehicle: newVehicle,
+        legalUsers: userId,
+      };
+
+      const newAsset = await this.assetService.createAsset(asset);
+
+      const crashDate = crashDTO.date;
+      const crashLocation = crashDTO.location;
+      const crashTime = crashDTO.time;
+
+      const bodySinister: SinisterDTO = {
+        date: crashDate,
+        location: crashLocation,
+        time: crashTime,
+        asset: newAsset,
+      };
+
+      const newSinister = await this.sinisterRepository.save(bodySinister);
+
+      const newCrash = await this.crashService.createCrash(crashDTO);
+
+      const bodySinisterType: sinisterTypeDTO = {
+        crash: newCrash,
+        fire: undefined,
+        damage: undefined,
+        theft: undefined,
+        sinister: newSinister,
+      };
+
+      //newSinisterType
+      await this.sinisterTypeService.createSinisterType(bodySinisterType);
+
+      if (injuredDTO) {
+        let newInjured: InjuredDTO & Injured;
+
+        if (newCrash.thirdInjured) {
+          const bodyInjured: InjuredDTO = {
+            amount: injuredDTO.amount,
+            injuredInfo: injuredDTO.injuredInfo,
+            sinister: newSinister,
+          };
+
+          newInjured = await this.injuredService.createInjured(bodyInjured);
+
+          const allPeopleInjured = injuredDTO.injuredInfo;
+
+          for (let i = 0; i < allPeopleInjured.length; i++) {
+            const el = allPeopleInjured[i];
+
+            const bodyInjuredInfo: InjuredInfoDTO = {
+              ...el,
+              injured: newInjured,
+            };
+            await this.injuredInfoService.createInjuredInfo(bodyInjuredInfo);
+          }
+        }
+      }
+
+      let newThirdPartyVehicle: ThirdPartyVehicle;
+      const thirdPartyVehicleEmails: string[] = [];
+
+      const allThirdParty: ThirdParty =
+        thirdPartyVehicleDTO.thirdPartyVehicleInfo;
+      if (allThirdParty) {
+        for (let i = 0; i < allThirdParty.length; i++) {
+          const el = allThirdParty[i];
+          thirdPartyVehicleEmails.push(el.email);
+
+          const bodyThirdPartyVehicle: ThirdPartyVehicleDTO = {
+            brand: el.brand,
+            model: el.model,
+            year: el.year,
+            plate: el.plate,
+            insuranceCompany: el.insuranceCompany,
+            insurancePolicy: el.insurancePolicy,
+            ownerName: el.ownerLastName,
+            ownerLastName: el.ownerLastName,
+            ownerDni: el.ownerDni,
+            sinister: newSinister,
+          };
+
+          newThirdPartyVehicle =
+            await this.thirdPartyVehicleService.createThirdPartyVehicle(
+              bodyThirdPartyVehicle,
+            );
+
+          const bodyThirdPartyDriver: ThirdPartyDriverDTO = {
+            name: el.name,
+            lastName: el.lastName,
+            dni: el.dni,
+            address: el.address,
+            phoneNumber: el.phoneNumber,
+            licensePhoto: el.licensePhoto,
+            email: el.email,
+            thirdPartyVehicle: newThirdPartyVehicle,
+          };
+
+          //newThirdPartyDriver
+          await this.thirdPartyDriverService.createThirdPartyDriver(
+            bodyThirdPartyDriver,
+          );
+        }
+      }
+
+      return { message: 'La inspeccion a sido realizada con exito' };
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
     }

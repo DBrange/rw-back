@@ -31,23 +31,6 @@ export class AssetController {
     return await this.assetService.createAsset(body);
   }
 
-  @Post('in-legal-user/:id')
-  public async createAssetInLegalUser(
-    @Param('id') id: string,
-    @Body() requestData: AssetInspectionsInUser,
-  ) {
-    const result = await this.assetService.createAssetInLegalUser(
-      id,
-      requestData.vehicleDTO,
-      requestData.gncDTO,
-      requestData.electronicDTO,
-      requestData.smartphoneDTO,
-      requestData.assetDTO,
-      requestData.swornDeclaration,
-    );
-    return result;
-  }
-
   @Post('in-user/:id')
   public async createAssetInUser(
     @Param('id') id: string,
@@ -65,16 +48,33 @@ export class AssetController {
     return result;
   }
 
+  @Post('in-legal-user/:id')
+  public async createAssetInLegalUser(
+    @Param('id') id: string,
+    @Body() requestData: AssetInspectionsInUser,
+  ) {
+    const result = await this.assetService.createAssetInLegalUser(
+      id,
+      requestData.vehicleDTO,
+      requestData.gncDTO,
+      requestData.electronicDTO,
+      requestData.smartphoneDTO,
+      requestData.assetDTO,
+      requestData.swornDeclaration,
+    );
+    return result;
+  }
+
   @Get('user-login/:id')
   public getUserAssetsForId(@Param('id') id: string) {
-    return this.assetService.getUserAssetsForId(id)
+    return this.assetService.getUserAssetsForId(id);
   }
 
   @Get('legal-user-login/:id')
   public getLegalUserAssetsForId(@Param('id') id: string) {
-    return this.assetService.getLegalUserAssetsForId(id)
+    return this.assetService.getLegalUserAssetsForId(id);
   }
-  
+
   @Post('user')
   public async createVehicleAndGnc(
     @Body() requestData: AssetVehicleUserGncDTO,
@@ -128,5 +128,4 @@ export class AssetController {
     );
     return result;
   }
-
 }

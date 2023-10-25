@@ -324,7 +324,7 @@ export class AssetService {
     }
   }
 
-  public async createAsset(body: AssetDTO): Promise<AssetEntity> {
+  public async createAsset(body: any): Promise<AssetEntity> {
     try {
       const asset = await this.assetRepository.save(body);
 
@@ -689,12 +689,12 @@ export class AssetService {
           await this.smartphoneService.createSmartphone(relatedSmartphone);
         }
 
-        const fullAsset = {
+        const asset = {
           ...assetDTO,
           users: userId as unknown as UserDTO,
           electronics: newElectronic,
         };
-        await this.assetRepository.save(fullAsset);
+        await this.assetRepository.save(asset);
       }
 
       return { message: 'La inspeccion a sido realizada con exito' };
@@ -722,5 +722,4 @@ export class AssetService {
       throw ErrorManager.createSignaturError(error.message);
     }
   }
-
 }

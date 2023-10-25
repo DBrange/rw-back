@@ -105,3 +105,34 @@ export class SinisterLegalUserElectronicTheftDTO {
   assetDTO: AssetDTO;
   swornDeclaration: boolean;
 }
+
+export class SinisterInUserTheft {
+  vehicleDTO: VehicleDTO;
+  gncDTO: GncDTO;
+  electronicDTO: ElectronicsDTO;
+  smartphoneDTO: SmartphoneDTO;
+  theftDTO: TheftDTO;
+  theftTireDTO: TheftTireDTO;
+  assetDTO: AssetDTO;
+  swornDeclaration: boolean;
+}
+export class SinisterInUserFire {
+  userId: string;
+  vehicleDTO: VehicleDTO;
+  gncDTO: GncDTO;
+  fireDTO: FireDTO;
+  injuredDTO: InjuredData;
+  assetDTO: AssetDTO;
+  swornDeclaration: boolean;
+}
+
+export class SinisterInUserCrash {
+  userId: string;
+  vehicleDTO: VehicleDTO;
+  gncDTO: GncDTO;
+  crashDTO: CrashDTO;
+  injuredDTO: InjuredData;
+  thirdPartyVehicleDTO: ThirdPartyVehicleData;
+  assetDTO: AssetDTO;
+  swornDeclaration: boolean;
+}

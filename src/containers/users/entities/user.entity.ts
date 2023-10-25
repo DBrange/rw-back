@@ -45,9 +45,9 @@ export class UserEntity extends BaseEntity implements IUser {
   @Column({ type: 'enum', enum: ROLES })
   role: ROLES;
 
-  @OneToMany(() => AssetEntity, (asset) => asset.users)
-  asset: AssetEntity[];
-
   @ManyToOne(() => UserBrokerEntity, { nullable: true })
   userBroker: UserBrokerEntity;
+  
+  @OneToMany(() => AssetEntity, (asset) => asset.users)
+  asset: AssetEntity[];
 }
