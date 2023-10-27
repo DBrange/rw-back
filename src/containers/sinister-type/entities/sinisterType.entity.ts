@@ -25,8 +25,8 @@ export class SinisterType extends BaseEntity {
      @JoinColumn()
      theft: Theft;
 
-     @OneToOne(() => Sinister) 
-     @JoinColumn()
-     sinister: Sinister;
+    //  @OneToOne(() => Sinister) 
+    //  @JoinColumn()
+    //  sinister: Sinister;
 
 };

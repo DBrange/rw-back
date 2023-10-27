@@ -749,13 +749,23 @@ export class SinisterService {
 
   public async getAllVehicles(): Promise<Sinister[]> {
     try {
-      const sinisters: Sinister[] = await this.sinisterRepository.find();
+      const sinisters: Sinister[] = await this.sinisterRepository
+        .createQueryBuilder('sinister')
+        .leftJoinAndSelect('sinister.asset', 'asset')
+        .leftJoinAndSelect('asset.vehicle', 'vehicle')
+        .leftJoinAndSelect('asset.electronics', 'electronics')
+        .leftJoinAndSelect('sinister.injuredd', 'injuredd')
+        .leftJoinAndSelect('injuredd.injuredsInfo', 'injuredsInfo')
+        .leftJoinAndSelect('sinister.thirdPartyVehicle', 'thirdPartyVehicle')
+        .getMany();
+
       if (sinisters.length === 0) {
         throw new ErrorManager({
           type: 'BAD_REQUEST',
           message: 'No users found',
         });
       }
+
       return sinisters;
     } catch (error) {
       throw new ErrorManager.createSignaturError(error.message);
@@ -767,8 +777,17 @@ export class SinisterService {
       const sinister = await this.sinisterRepository
         .createQueryBuilder('sinister')
         .where({ id })
-        //  .leftJoinAndSelect('asset.asset', 'users')
-        //  .leftJoinAndSelect('user.users', 'asset')
+        .leftJoinAndSelect('sinister.asset', 'asset')
+        .leftJoinAndSelect('asset.vehicle', 'vehicle')
+        .leftJoinAndSelect('asset.electronics', 'electronics')
+        .leftJoinAndSelect('sinister.injuredd', 'injuredd')
+        .leftJoinAndSelect('injuredd.injuredsInfo', 'injuredsInfo')
+        .leftJoinAndSelect('sinister.thirdPartyVehicle', 'thirdPartyVehicle')
+        .leftJoinAndSelect('sinister.sinisterType', 'sinisterType')
+        .leftJoinAndSelect('sinisterType.theft', 'theft')
+        .leftJoinAndSelect('theft.TheftTire', 'TheftTire')
+        .leftJoinAndSelect('sinisterType.fire', 'fire')
+        .leftJoinAndSelect('sinisterType.crash', 'crash')
         .getOne();
 
       if (!sinister) {
@@ -783,7 +802,7 @@ export class SinisterService {
     }
   }
 
-  public async createSinister(body: SinisterDTO): Promise<Sinister> {
+  public async createSinister(body: any): Promise<Sinister> {
     try {
       const sinister = await this.sinisterRepository.save(body);
       if (!sinister) {
@@ -840,16 +859,27 @@ export class SinisterService {
       const theftLocation = theftDTO.location;
       const theftTime = theftDTO.time;
 
+      const newTheft = await this.theftService.createTheft(theftDTO);
+
+      const bodySinisterType: sinisterTypeDTO = {
+        crash: undefined,
+        fire: undefined,
+        damage: undefined,
+        theft: newTheft,
+      };
+
+      const newsinisterType = await this.sinisterTypeService.createSinisterType(
+        bodySinisterType,
+      );
       const bodySinister: SinisterDTO = {
         date: theftDate,
         location: theftLocation,
         time: theftTime,
         asset: newAsset,
+        sinisterType: newsinisterType,
       };
 
       const newSinister = await this.sinisterRepository.save(bodySinister);
-
-      const newTheft = await this.theftService.createTheft(theftDTO);
 
       if (newTheft.isTire) {
         const theftTire = {
@@ -860,16 +890,7 @@ export class SinisterService {
         await this.theftTireService.createTheftTire(theftTire);
       }
 
-      const bodySinisterType = {
-        crash: undefined,
-        fire: undefined,
-        damage: undefined,
-        theft: newTheft,
-        sinister: newSinister,
-      };
-
       //newSinisterType
-      await this.sinisterTypeService.createSinisterType(bodySinisterType);
 
       const response = {
         sinister: newSinister,
@@ -934,15 +955,6 @@ export class SinisterService {
       const fireLocation = fireDTO.location;
       const fireTime = fireDTO.time;
 
-      const bodySinister: SinisterDTO = {
-        date: fireDate,
-        location: fireLocation,
-        time: fireTime,
-        asset: newAsset,
-      };
-
-      const newSinister = await this.sinisterRepository.save(bodySinister);
-
       const newFire = await this.fireService.createFire(fireDTO);
 
       const bodySinisterType: sinisterTypeDTO = {
@@ -950,11 +962,22 @@ export class SinisterService {
         fire: newFire,
         damage: undefined,
         theft: undefined,
-        sinister: newSinister,
       };
 
       //newSinisterType
-      await this.sinisterTypeService.createSinisterType(bodySinisterType);
+      const newSinisterType = await this.sinisterTypeService.createSinisterType(
+        bodySinisterType,
+      );
+
+      const bodySinister: SinisterDTO = {
+        date: fireDate,
+        location: fireLocation,
+        time: fireTime,
+        asset: newAsset,
+        sinisterType: newSinisterType,
+      };
+
+      const newSinister = await this.sinisterRepository.save(bodySinister);
 
       if (injuredDTO) {
         let newInjured: InjuredDTO & Injured;
@@ -1045,15 +1068,6 @@ export class SinisterService {
       const crashLocation = crashDTO.location;
       const crashTime = crashDTO.time;
 
-      const bodySinister: SinisterDTO = {
-        date: crashDate,
-        location: crashLocation,
-        time: crashTime,
-        asset: newAsset,
-      };
-
-      const newSinister = await this.sinisterRepository.save(bodySinister);
-
       const newCrash = await this.crashService.createCrash(crashDTO);
 
       const bodySinisterType: sinisterTypeDTO = {
@@ -1061,11 +1075,22 @@ export class SinisterService {
         fire: undefined,
         damage: undefined,
         theft: undefined,
-        sinister: newSinister,
       };
 
       //newSinisterType
-      await this.sinisterTypeService.createSinisterType(bodySinisterType);
+      const newSinisterType = await this.sinisterTypeService.createSinisterType(
+        bodySinisterType,
+      );
+
+      const bodySinister: SinisterDTO = {
+        date: crashDate,
+        location: crashLocation,
+        time: crashTime,
+        asset: newAsset,
+        sinisterType: newSinisterType,
+      };
+
+      const newSinister = await this.sinisterRepository.save(bodySinister);
 
       if (injuredDTO) {
         let newInjured: InjuredDTO & Injured;
@@ -1208,16 +1233,28 @@ export class SinisterService {
       const theftLocation = theftDTO.location;
       const theftTime = theftDTO.time;
 
+      const newTheft = await this.theftService.createTheft(theftDTO);
+
+      const bodySinisterType: sinisterTypeDTO = {
+        crash: undefined,
+        fire: undefined,
+        damage: undefined,
+        theft: newTheft,
+      };
+
+      const newSinisterType = await this.sinisterTypeService.createSinisterType(
+        bodySinisterType,
+      );
+
       const bodySinister: SinisterDTO = {
         date: theftDate,
         location: theftLocation,
         time: theftTime,
         asset: newAsset,
+        sinisterType: newSinisterType,
       };
 
       const newSinister = await this.sinisterRepository.save(bodySinister);
-
-      const newTheft = await this.theftService.createTheft(theftDTO);
 
       if (newTheft.isTire) {
         const theftTire = {
@@ -1227,17 +1264,6 @@ export class SinisterService {
 
         await this.theftTireService.createTheftTire(theftTire);
       }
-
-      const bodySinisterType = {
-        crash: undefined,
-        fire: undefined,
-        damage: undefined,
-        theft: newTheft,
-        sinister: newSinister,
-      };
-
-      //newSinisterType
-      await this.sinisterTypeService.createSinisterType(bodySinisterType);
 
       const response = {
         sinister: newSinister,
@@ -1277,6 +1303,7 @@ export class SinisterService {
           message: 'Without sworn declaration',
         });
       }
+
       const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
 
       if (newVehicle.gnc) {
@@ -1304,16 +1331,29 @@ export class SinisterService {
       const theftLocation = theftDTO.location;
       const theftTime = theftDTO.time;
 
+      const newTheft = await this.theftService.createTheft(theftDTO);
+
+      const bodySinisterType: sinisterTypeDTO = {
+        crash: undefined,
+        fire: undefined,
+        damage: undefined,
+        theft: newTheft,
+      };
+
+      //newSinisterType
+      const newSinisterType = await this.sinisterTypeService.createSinisterType(
+        bodySinisterType,
+      );
+
       const bodySinister: SinisterDTO = {
         date: theftDate,
         location: theftLocation,
         time: theftTime,
         asset: newAsset,
+        sinisterType: newSinisterType,
       };
 
       const newSinister = await this.sinisterRepository.save(bodySinister);
-
-      const newTheft = await this.theftService.createTheft(theftDTO);
 
       if (newTheft.isTire) {
         const theftTire = {
@@ -1323,17 +1363,6 @@ export class SinisterService {
 
         await this.theftTireService.createTheftTire(theftTire);
       }
-
-      const bodySinisterType = {
-        crash: undefined,
-        fire: undefined,
-        damage: undefined,
-        theft: newTheft,
-        sinister: newSinister,
-      };
-
-      //newSinisterType
-      await this.sinisterTypeService.createSinisterType(bodySinisterType);
 
       const response = {
         sinister: newSinister,
@@ -1399,15 +1428,6 @@ export class SinisterService {
       const fireLocation = fireDTO.location;
       const fireTime = fireDTO.time;
 
-      const bodySinister: SinisterDTO = {
-        date: fireDate,
-        location: fireLocation,
-        time: fireTime,
-        asset: newAsset,
-      };
-
-      const newSinister = await this.sinisterRepository.save(bodySinister);
-
       const newFire = await this.fireService.createFire(fireDTO);
 
       const bodySinisterType: sinisterTypeDTO = {
@@ -1415,11 +1435,22 @@ export class SinisterService {
         fire: newFire,
         damage: undefined,
         theft: undefined,
-        sinister: newSinister,
       };
 
       //newSinisterType
-      await this.sinisterTypeService.createSinisterType(bodySinisterType);
+      const newSinisterType = await this.sinisterTypeService.createSinisterType(
+        bodySinisterType,
+      );
+
+      const bodySinister: SinisterDTO = {
+        date: fireDate,
+        location: fireLocation,
+        time: fireTime,
+        asset: newAsset,
+        sinisterType: newSinisterType,
+      };
+
+      const newSinister = await this.sinisterRepository.save(bodySinister);
 
       if (injuredDTO) {
         let newInjured: InjuredDTO & Injured;
@@ -1512,15 +1543,6 @@ export class SinisterService {
       const crashLocation = crashDTO.location;
       const crashTime = crashDTO.time;
 
-      const bodySinister: SinisterDTO = {
-        date: crashDate,
-        location: crashLocation,
-        time: crashTime,
-        asset: newAsset,
-      };
-
-      const newSinister = await this.sinisterRepository.save(bodySinister);
-
       const newCrash = await this.crashService.createCrash(crashDTO);
 
       const bodySinisterType: sinisterTypeDTO = {
@@ -1528,11 +1550,22 @@ export class SinisterService {
         fire: undefined,
         damage: undefined,
         theft: undefined,
-        sinister: newSinister,
       };
 
       //newSinisterType
-      await this.sinisterTypeService.createSinisterType(bodySinisterType);
+      const newSinisterType = await this.sinisterTypeService.createSinisterType(
+        bodySinisterType,
+      );
+
+      const bodySinister: SinisterDTO = {
+        date: crashDate,
+        location: crashLocation,
+        time: crashTime,
+        asset: newAsset,
+        sinisterType: newSinisterType,
+      };
+
+      const newSinister = await this.sinisterRepository.save(bodySinister);
 
       if (injuredDTO) {
         let newInjured: InjuredDTO & Injured;
@@ -1677,16 +1710,29 @@ export class SinisterService {
       const theftLocation = theftDTO.location;
       const theftTime = theftDTO.time;
 
+      const newTheft = await this.theftService.createTheft(theftDTO);
+
+      const bodySinisterType: sinisterTypeDTO = {
+        crash: undefined,
+        fire: undefined,
+        damage: undefined,
+        theft: newTheft,
+      };
+
+      //newSinisterType
+      const newSinisterType = await this.sinisterTypeService.createSinisterType(
+        bodySinisterType,
+      );
+
       const bodySinister: SinisterDTO = {
         date: theftDate,
         location: theftLocation,
         time: theftTime,
         asset: newAsset,
+        sinisterType: newSinisterType,
       };
 
       const newSinister = await this.sinisterRepository.save(bodySinister);
-
-      const newTheft = await this.theftService.createTheft(theftDTO);
 
       if (newTheft.isTire) {
         const theftTire = {
@@ -1696,17 +1742,6 @@ export class SinisterService {
 
         await this.theftTireService.createTheftTire(theftTire);
       }
-
-      const bodySinisterType = {
-        crash: undefined,
-        fire: undefined,
-        damage: undefined,
-        theft: newTheft,
-        sinister: newSinister,
-      };
-
-      //newSinisterType
-      await this.sinisterTypeService.createSinisterType(bodySinisterType);
 
       const response = {
         sinister: newSinister,
@@ -1730,7 +1765,8 @@ export class SinisterService {
   }
 
   // in login
-  public async CreateSinisterInUserTheft(
+  // post without inspection
+  public async createSinisterInUserTheft(
     userId: string,
     vehicleDTO: VehicleDTO,
     gncDTO: GncDTO,
@@ -1772,15 +1808,6 @@ export class SinisterService {
         const theftLocation = theftDTO.location;
         const theftTime = theftDTO.time;
 
-        const bodySinister: SinisterDTO = {
-          date: theftDate,
-          location: theftLocation,
-          time: theftTime,
-          asset: newAsset,
-        };
-
-        const newSinister = await this.sinisterRepository.save(bodySinister);
-
         const newTheft = await this.theftService.createTheft(theftDTO);
 
         if (newTheft.isTire) {
@@ -1797,11 +1824,22 @@ export class SinisterService {
           fire: undefined,
           damage: undefined,
           theft: newTheft,
-          sinister: newSinister,
         };
 
         //newSinisterType
-        await this.sinisterTypeService.createSinisterType(bodySinisterType);
+        const newSinisterType =
+          await this.sinisterTypeService.createSinisterType(bodySinisterType);
+
+        const bodySinister: SinisterDTO = {
+          date: theftDate,
+          location: theftLocation,
+          time: theftTime,
+          asset: newAsset,
+          sinisterType: newSinisterType,
+        };
+
+        // newSinister
+        const newSinister = await this.sinisterRepository.save(bodySinister);
 
         const response = {
           sinister: newSinister,
@@ -1835,15 +1873,6 @@ export class SinisterService {
         const theftLocation = theftDTO.location;
         const theftTime = theftDTO.time;
 
-        const bodySinister: SinisterDTO = {
-          date: theftDate,
-          location: theftLocation,
-          time: theftTime,
-          asset: newAsset,
-        };
-
-        const newSinister = await this.sinisterRepository.save(bodySinister);
-
         const newTheft = await this.theftService.createTheft(theftDTO);
 
         if (newTheft.isTire) {
@@ -1855,17 +1884,27 @@ export class SinisterService {
           await this.theftTireService.createTheftTire(theftTire);
         }
 
-        const bodySinisterType = {
+        const bodySinisterType: sinisterTypeDTO = {
           crash: undefined,
           fire: undefined,
           damage: undefined,
           theft: newTheft,
-          sinister: newSinister,
         };
 
         //newSinisterType
-        await this.sinisterTypeService.createSinisterType(bodySinisterType);
-        
+        const newSinisterType =
+          await this.sinisterTypeService.createSinisterType(bodySinisterType);
+
+        const bodySinister: SinisterDTO = {
+          date: theftDate,
+          location: theftLocation,
+          time: theftTime,
+          asset: newAsset,
+          sinisterType: newSinisterType,
+        };
+
+        const newSinister = await this.sinisterRepository.save(bodySinister);
+
         const response = {
           sinister: newSinister,
         };
@@ -1873,14 +1912,12 @@ export class SinisterService {
         return response;
         // return { message: 'La inspeccion a sido realizada con exito' };
       }
-
-
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
     }
   }
 
-  public async CreateSinisterInLegalUserTheft(
+  public async createSinisterInLegalUserTheft(
     userId: string,
     vehicleDTO: VehicleDTO,
     gncDTO: GncDTO,
@@ -1922,15 +1959,6 @@ export class SinisterService {
         const theftLocation = theftDTO.location;
         const theftTime = theftDTO.time;
 
-        const bodySinister: SinisterDTO = {
-          date: theftDate,
-          location: theftLocation,
-          time: theftTime,
-          asset: newAsset,
-        };
-
-        const newSinister = await this.sinisterRepository.save(bodySinister);
-
         const newTheft = await this.theftService.createTheft(theftDTO);
 
         if (newTheft.isTire) {
@@ -1947,11 +1975,21 @@ export class SinisterService {
           fire: undefined,
           damage: undefined,
           theft: newTheft,
-          sinister: newSinister,
         };
 
         //newSinisterType
-        await this.sinisterTypeService.createSinisterType(bodySinisterType);
+        const newSinisterType =
+          await this.sinisterTypeService.createSinisterType(bodySinisterType);
+
+        const bodySinister: SinisterDTO = {
+          date: theftDate,
+          location: theftLocation,
+          time: theftTime,
+          asset: newAsset,
+          sinisterType: newSinisterType,
+        };
+
+        const newSinister = await this.sinisterRepository.save(bodySinister);
       } else {
         const newElectronic = await this.electronicService.createElectronics(
           electronicDTO,
@@ -1978,15 +2016,6 @@ export class SinisterService {
         const theftLocation = theftDTO.location;
         const theftTime = theftDTO.time;
 
-        const bodySinister: SinisterDTO = {
-          date: theftDate,
-          location: theftLocation,
-          time: theftTime,
-          asset: newAsset,
-        };
-
-        const newSinister = await this.sinisterRepository.save(bodySinister);
-
         const newTheft = await this.theftService.createTheft(theftDTO);
 
         if (newTheft.isTire) {
@@ -1998,16 +2027,26 @@ export class SinisterService {
           await this.theftTireService.createTheftTire(theftTire);
         }
 
-        const bodySinisterType = {
+        const bodySinisterType: sinisterTypeDTO = {
           crash: undefined,
           fire: undefined,
           damage: undefined,
           theft: newTheft,
-          sinister: newSinister,
         };
 
         //newSinisterType
-        await this.sinisterTypeService.createSinisterType(bodySinisterType);
+        const newSinisterType =
+          await this.sinisterTypeService.createSinisterType(bodySinisterType);
+
+        const bodySinister: SinisterDTO = {
+          date: theftDate,
+          location: theftLocation,
+          time: theftTime,
+          asset: newAsset,
+          sinisterType: newSinisterType,
+        };
+
+        const newSinister = await this.sinisterRepository.save(bodySinister);
       }
 
       return { message: 'La inspeccion a sido realizada con exito' };
@@ -2016,7 +2055,7 @@ export class SinisterService {
     }
   }
 
-  public async CreateSinisterInUserFire(
+  public async createSinisterInUserFire(
     userId: string,
     vehicleDTO: VehicleDTO,
     gncDTO: GncDTO,
@@ -2055,15 +2094,6 @@ export class SinisterService {
       const fireLocation = fireDTO.location;
       const fireTime = fireDTO.time;
 
-      const bodySinister: SinisterDTO = {
-        date: fireDate,
-        location: fireLocation,
-        time: fireTime,
-        asset: newAsset,
-      };
-
-      const newSinister = await this.sinisterRepository.save(bodySinister);
-
       const newFire = await this.fireService.createFire(fireDTO);
 
       const bodySinisterType: sinisterTypeDTO = {
@@ -2071,11 +2101,22 @@ export class SinisterService {
         fire: newFire,
         damage: undefined,
         theft: undefined,
-        sinister: newSinister,
       };
 
       //newSinisterType
-      await this.sinisterTypeService.createSinisterType(bodySinisterType);
+      const newSinisterType = await this.sinisterTypeService.createSinisterType(
+        bodySinisterType,
+      );
+
+      const bodySinister: SinisterDTO = {
+        date: fireDate,
+        location: fireLocation,
+        time: fireTime,
+        asset: newAsset,
+        sinisterType: newSinisterType,
+      };
+
+      const newSinister = await this.sinisterRepository.save(bodySinister);
 
       if (injuredDTO) {
         let newInjured: InjuredDTO & Injured;
@@ -2109,7 +2150,7 @@ export class SinisterService {
     }
   }
 
-  public async CreateSinisterInLegalUserFire(
+  public async createSinisterInLegalUserFire(
     userId: string,
     vehicleDTO: VehicleDTO,
     gncDTO: GncDTO,
@@ -2148,15 +2189,6 @@ export class SinisterService {
       const fireLocation = fireDTO.location;
       const fireTime = fireDTO.time;
 
-      const bodySinister: SinisterDTO = {
-        date: fireDate,
-        location: fireLocation,
-        time: fireTime,
-        asset: newAsset,
-      };
-
-      const newSinister = await this.sinisterRepository.save(bodySinister);
-
       const newFire = await this.fireService.createFire(fireDTO);
 
       const bodySinisterType: sinisterTypeDTO = {
@@ -2164,11 +2196,22 @@ export class SinisterService {
         fire: newFire,
         damage: undefined,
         theft: undefined,
-        sinister: newSinister,
       };
 
       //newSinisterType
-      await this.sinisterTypeService.createSinisterType(bodySinisterType);
+      const newSinisterType = await this.sinisterTypeService.createSinisterType(
+        bodySinisterType,
+      );
+
+      const bodySinister: SinisterDTO = {
+        date: fireDate,
+        location: fireLocation,
+        time: fireTime,
+        asset: newAsset,
+        sinisterType: newSinisterType,
+      };
+
+      const newSinister = await this.sinisterRepository.save(bodySinister);
 
       if (injuredDTO) {
         let newInjured: InjuredDTO & Injured;
@@ -2202,7 +2245,7 @@ export class SinisterService {
     }
   }
 
-  public async CreateSinisterInUserCrash(
+  public async createSinisterInUserCrash(
     userId: string,
     vehicleDTO: VehicleDTO,
     gncDTO: GncDTO,
@@ -2242,15 +2285,6 @@ export class SinisterService {
       const crashLocation = crashDTO.location;
       const crashTime = crashDTO.time;
 
-      const bodySinister: SinisterDTO = {
-        date: crashDate,
-        location: crashLocation,
-        time: crashTime,
-        asset: newAsset,
-      };
-
-      const newSinister = await this.sinisterRepository.save(bodySinister);
-
       const newCrash = await this.crashService.createCrash(crashDTO);
 
       const bodySinisterType: sinisterTypeDTO = {
@@ -2258,11 +2292,22 @@ export class SinisterService {
         fire: undefined,
         damage: undefined,
         theft: undefined,
-        sinister: newSinister,
       };
 
       //newSinisterType
-      await this.sinisterTypeService.createSinisterType(bodySinisterType);
+      const newSinisterType = await this.sinisterTypeService.createSinisterType(
+        bodySinisterType,
+      );
+
+      const bodySinister: SinisterDTO = {
+        date: crashDate,
+        location: crashLocation,
+        time: crashTime,
+        asset: newAsset,
+        sinisterType: newSinisterType,
+      };
+
+      const newSinister = await this.sinisterRepository.save(bodySinister);
 
       if (injuredDTO) {
         let newInjured: InjuredDTO & Injured;
@@ -2342,7 +2387,7 @@ export class SinisterService {
     }
   }
 
-  public async CreateSinisterInLegalUserCrash(
+  public async createSinisterInLegalUserCrash(
     userId: string,
     vehicleDTO: VehicleDTO,
     gncDTO: GncDTO,
@@ -2382,15 +2427,6 @@ export class SinisterService {
       const crashLocation = crashDTO.location;
       const crashTime = crashDTO.time;
 
-      const bodySinister: SinisterDTO = {
-        date: crashDate,
-        location: crashLocation,
-        time: crashTime,
-        asset: newAsset,
-      };
-
-      const newSinister = await this.sinisterRepository.save(bodySinister);
-
       const newCrash = await this.crashService.createCrash(crashDTO);
 
       const bodySinisterType: sinisterTypeDTO = {
@@ -2398,11 +2434,22 @@ export class SinisterService {
         fire: undefined,
         damage: undefined,
         theft: undefined,
-        sinister: newSinister,
       };
 
       //newSinisterType
-      await this.sinisterTypeService.createSinisterType(bodySinisterType);
+      const newSinisterType = await this.sinisterTypeService.createSinisterType(
+        bodySinisterType,
+      );
+
+      const bodySinister: SinisterDTO = {
+        date: crashDate,
+        location: crashLocation,
+        time: crashTime,
+        asset: newAsset,
+        sinisterType: newSinisterType,
+      };
+
+      const newSinister = await this.sinisterRepository.save(bodySinister);
 
       if (injuredDTO) {
         let newInjured: InjuredDTO & Injured;
@@ -2477,6 +2524,336 @@ export class SinisterService {
       }
 
       return { message: 'La inspeccion a sido realizada con exito' };
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  // post with inspection
+  public async createSinisterInUserInspectionTheft(
+    assetId: string,
+    theftDTO: TheftDTO,
+    theftTireDTO: TheftTireDTO,
+    swornDeclaration: boolean,
+  ) {
+    try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
+
+      const asset = await this.assetService.getAssetsById(assetId);
+
+      const theftDate = theftDTO.date;
+      const theftLocation = theftDTO.location;
+      const theftTime = theftDTO.time;
+
+      const newTheft = await this.theftService.createTheft(theftDTO);
+
+      if (newTheft.isTire) {
+        const theftTire = {
+          ...theftTireDTO,
+          theft: newTheft.id,
+        };
+
+        await this.theftTireService.createTheftTire(theftTire);
+      }
+
+      const bodySinisterType: sinisterTypeDTO = {
+        crash: undefined,
+        fire: undefined,
+        damage: undefined,
+        theft: newTheft,
+      };
+
+      //newSinisterType
+      const newSinisterType = await this.sinisterTypeService.createSinisterType(
+        bodySinisterType,
+      );
+
+      const bodySinister: SinisterDTO = {
+        date: theftDate,
+        location: theftLocation,
+        time: theftTime,
+        asset: asset,
+        sinisterType: newSinisterType,
+      };
+
+      const newSinister = await this.sinisterRepository.save(bodySinister);
+
+      const response = {
+        sinister: newSinister,
+      };
+
+      return response;
+      // return { message: 'La inspeccion a sido realizada con exito' };
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async createSinisterInUserInspectionFire(
+    assetId: string,
+    fireDTO: FireDTO,
+    injuredDTO: InjuredData,
+    swornDeclaration: boolean,
+  ) {
+    try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
+
+      const asset = await this.assetService.getAssetsById(assetId);
+
+      const fireDate = fireDTO.date;
+      const fireLocation = fireDTO.location;
+      const fireTime = fireDTO.time;
+
+      const newFire = await this.fireService.createFire(fireDTO);
+
+      const bodySinisterType: sinisterTypeDTO = {
+        crash: undefined,
+        fire: newFire,
+        damage: undefined,
+        theft: undefined,
+      };
+
+      //newSinisterType
+      const newSinisterType = await this.sinisterTypeService.createSinisterType(
+        bodySinisterType,
+      );
+
+      const bodySinister: SinisterDTO = {
+        date: fireDate,
+        location: fireLocation,
+        time: fireTime,
+        asset: asset,
+        sinisterType: newSinisterType,
+      };
+
+      const newSinister = await this.sinisterRepository.save(bodySinister);
+
+      if (injuredDTO) {
+        let newInjured: InjuredDTO & Injured;
+
+        if (newFire.thirdInjured && injuredDTO.amount) {
+          const bodyInjured: InjuredDTO = {
+            amount: injuredDTO.amount,
+            injuredInfo: injuredDTO.injuredInfo,
+            sinister: newSinister,
+          };
+
+          newInjured = await this.injuredService.createInjured(bodyInjured);
+
+          const allPeopleInjured = injuredDTO.injuredInfo;
+
+          for (let i = 0; i < allPeopleInjured.length; i++) {
+            const el = allPeopleInjured[i];
+
+            const bodyInjuredInfo: InjuredInfoDTO = {
+              ...el,
+              injured: newInjured,
+            };
+            await this.injuredInfoService.createInjuredInfo(bodyInjuredInfo);
+          }
+        }
+      }
+
+      return { message: 'La inspeccion a sido realizada con exito' };
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async createSinisterInUserInspectionCrash(
+    assetId: string,
+    crashDTO: CrashDTO,
+    injuredDTO: InjuredData,
+    thirdPartyVehicleDTO: ThirdPartyVehicleData,
+    swornDeclaration: boolean,
+  ) {
+    try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
+
+      const asset = await this.assetService.getAssetsById(assetId);
+
+      const crashDate = crashDTO.date;
+      const crashLocation = crashDTO.location;
+      const crashTime = crashDTO.time;
+
+      const newCrash = await this.crashService.createCrash(crashDTO);
+
+      const bodySinisterType: sinisterTypeDTO = {
+        crash: newCrash,
+        fire: undefined,
+        damage: undefined,
+        theft: undefined,
+      };
+
+      //newSinisterType
+      const newSinisterType = await this.sinisterTypeService.createSinisterType(
+        bodySinisterType,
+      );
+
+      const bodySinister: SinisterDTO = {
+        date: crashDate,
+        location: crashLocation,
+        time: crashTime,
+        asset: asset,
+        sinisterType: newSinisterType,
+      };
+
+      const newSinister = await this.sinisterRepository.save(bodySinister);
+
+      if (injuredDTO) {
+        let newInjured: InjuredDTO & Injured;
+
+        if (newCrash.thirdInjured) {
+          const bodyInjured: InjuredDTO = {
+            amount: injuredDTO.amount,
+            injuredInfo: injuredDTO.injuredInfo,
+            sinister: newSinister,
+          };
+
+          newInjured = await this.injuredService.createInjured(bodyInjured);
+
+          const allPeopleInjured = injuredDTO.injuredInfo;
+
+          for (let i = 0; i < allPeopleInjured.length; i++) {
+            const el = allPeopleInjured[i];
+
+            const bodyInjuredInfo: InjuredInfoDTO = {
+              ...el,
+              injured: newInjured,
+            };
+            await this.injuredInfoService.createInjuredInfo(bodyInjuredInfo);
+          }
+        }
+      }
+
+      let newThirdPartyVehicle: ThirdPartyVehicle;
+      const thirdPartyVehicleEmails: string[] = [];
+
+      const allThirdParty: ThirdParty =
+        thirdPartyVehicleDTO.thirdPartyVehicleInfo;
+      if (allThirdParty) {
+        for (let i = 0; i < allThirdParty.length; i++) {
+          const el = allThirdParty[i];
+          thirdPartyVehicleEmails.push(el.email);
+
+          const bodyThirdPartyVehicle: ThirdPartyVehicleDTO = {
+            brand: el.brand,
+            model: el.model,
+            year: el.year,
+            plate: el.plate,
+            insuranceCompany: el.insuranceCompany,
+            insurancePolicy: el.insurancePolicy,
+            ownerName: el.ownerLastName,
+            ownerLastName: el.ownerLastName,
+            ownerDni: el.ownerDni,
+            sinister: newSinister,
+          };
+
+          newThirdPartyVehicle =
+            await this.thirdPartyVehicleService.createThirdPartyVehicle(
+              bodyThirdPartyVehicle,
+            );
+
+          const bodyThirdPartyDriver: ThirdPartyDriverDTO = {
+            name: el.name,
+            lastName: el.lastName,
+            dni: el.dni,
+            address: el.address,
+            phoneNumber: el.phoneNumber,
+            licensePhoto: el.licensePhoto,
+            email: el.email,
+            thirdPartyVehicle: newThirdPartyVehicle,
+          };
+
+          //newThirdPartyDriver
+          await this.thirdPartyDriverService.createThirdPartyDriver(
+            bodyThirdPartyDriver,
+          );
+        }
+      }
+
+      return { message: 'La inspeccion a sido realizada con exito' };
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  // in login
+  // get
+  public async getUserSinistersForId(id: string) {
+    try {
+      const userAssets = (await this.userService.getUsersById(id)).asset;
+
+      const sinisters = userAssets.map(async (asset) => {
+        const sinister = await this.sinisterRepository
+          .createQueryBuilder('sinister')
+          .where({ asset: asset.id })
+          .leftJoinAndSelect('sinister.asset', 'asset')
+          .leftJoinAndSelect('asset.vehicle', 'vehicle')
+          .leftJoinAndSelect('asset.electronics', 'electronics')
+          .leftJoinAndSelect('sinister.injuredd', 'injuredd')
+          .leftJoinAndSelect('injuredd.injuredsInfo', 'injuredsInfo')
+          .leftJoinAndSelect('sinister.thirdPartyVehicle', 'thirdPartyVehicle')
+          .leftJoinAndSelect('sinister.sinisterType', 'sinisterType')
+          .leftJoinAndSelect('sinisterType.theft', 'theft')
+          .leftJoinAndSelect('theft.TheftTire', 'TheftTire')
+          .leftJoinAndSelect('sinisterType.fire', 'fire')
+          .leftJoinAndSelect('sinisterType.crash', 'crash')
+          .getOne();
+
+        return sinister;
+      });
+
+      const sinistersWithoutNull = (await Promise.all(sinisters)).flatMap(
+        (sinister) => (!sinister ? [] : sinister),
+      );
+
+      return sinistersWithoutNull;
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async getLegalUserSinistersForId(id: string) {
+    try {
+      const userAssets = (await this.legalUserService.getLegalUserById(id))
+        .asset;
+
+      const sinisters = userAssets.map(async (asset) => {
+        const sinister = await this.sinisterRepository
+          .createQueryBuilder('sinister')
+          .where({ asset: asset.id })
+          .leftJoinAndSelect('sinister.asset', 'asset')
+          .leftJoinAndSelect('asset.vehicle', 'vehicle')
+          .leftJoinAndSelect('asset.electronics', 'electronics')
+          .leftJoinAndSelect('sinister.injuredd', 'injuredd')
+          .leftJoinAndSelect('injuredd.injuredsInfo', 'injuredsInfo')
+          .leftJoinAndSelect('sinister.thirdPartyVehicle', 'thirdPartyVehicle')
+          .getOne();
+
+        return sinister;
+      });
+
+      const sinistersWithoutNull = (await Promise.all(sinisters)).flatMap(
+        (sinister) => (!sinister ? [] : sinister),
+      );
+
+      return sinistersWithoutNull;
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
     }

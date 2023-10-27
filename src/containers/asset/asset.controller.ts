@@ -31,6 +31,7 @@ export class AssetController {
     return await this.assetService.createAsset(body);
   }
 
+  // create inspection user
   @Post('in-user/:id')
   public async createAssetInUser(
     @Param('id') id: string,
@@ -48,6 +49,7 @@ export class AssetController {
     return result;
   }
 
+  // create inspection legal
   @Post('in-legal-user/:id')
   public async createAssetInLegalUser(
     @Param('id') id: string,
@@ -65,11 +67,13 @@ export class AssetController {
     return result;
   }
 
+  // user for id
   @Get('user-login/:id')
   public getUserAssetsForId(@Param('id') id: string) {
     return this.assetService.getUserAssetsForId(id);
   }
 
+  // legal for id
   @Get('legal-user-login/:id')
   public getLegalUserAssetsForId(@Param('id') id: string) {
     return this.assetService.getLegalUserAssetsForId(id);

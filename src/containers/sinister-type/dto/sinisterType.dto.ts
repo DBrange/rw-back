@@ -23,8 +23,8 @@ export class sinisterTypeDTO {
      @IsUUID()
      theft: Theft;
 
-     @IsOptional()
-     @IsUUID()
-     sinister: Sinister;
+    //  @IsOptional()
+    //  @IsUUID()
+    //  sinister: Sinister;
      
 };

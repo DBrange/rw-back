@@ -7,20 +7,22 @@ import { ErrorManager } from 'src/utils/error.manager';
 
 @Injectable()
 export class SinisterTypeService {
-   constructor(
-     @InjectRepository(SinisterType)
-     private readonly sinisterTypeRepository: Repository<SinisterType>
-   ){}
+  constructor(
+    @InjectRepository(SinisterType)
+    private readonly sinisterTypeRepository: Repository<SinisterType>,
+  ) {}
 
-   public async createSinisterType(body: sinisterTypeDTO): Promise<SinisterType>{
-     try {
-          return await this.sinisterTypeRepository.save(body);
-     } catch (error) {
-          throw new Error(error);
-     }
-   }
+  public async createSinisterType(
+    body: sinisterTypeDTO,
+  ): Promise<SinisterType> {
+    try {
+      return await this.sinisterTypeRepository.save(body);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 
-   public async getSinisterTypeById(id: string): Promise<SinisterType> {
+  public async getSinisterTypeById(id: string): Promise<SinisterType> {
     try {
       const result = await this.sinisterTypeRepository
         .createQueryBuilder('sinisterType')
@@ -54,4 +56,4 @@ export class SinisterTypeService {
       throw new ErrorManager.createSignaturError(error.message);
     }
   }
-};
+}

@@ -141,6 +141,10 @@ export class UsersService {
     }
   }
 
+  // public async getSinistersOfUser(id: string) {
+    
+  // }
+
   //* parte de auth (autienticacion)
   public async findBy({ key, value }: { key: keyof UserDTO; value: any }) {
     try {

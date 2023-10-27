@@ -268,10 +268,6 @@ export class AssetService {
 
   public async getAllAssets(): Promise<AssetEntity[]> {
     try {
-      // const assets: AssetEntity[] = await this.assetRepository.find({
-      //   relations: ['users', 'legalUsers', 'vehicle', 'electronics'],
-      // });
-
       const assets = await this.assetRepository
         .createQueryBuilder('assets')
         .select([

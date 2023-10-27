@@ -1,6 +1,7 @@
+import { TheftTire } from 'src/containers/theft-tire/entities/theftTire.entity';
 import { BaseEntity } from '../../../config/base.entity';
 import { ITheft } from '../../../interfaces/theft.interface';
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, JoinColumn, OneToOne } from 'typeorm';
 
 @Entity({ name: 'theft' })
 export class Theft extends BaseEntity implements ITheft {
@@ -18,4 +19,8 @@ export class Theft extends BaseEntity implements ITheft {
 
   @Column()
   isTire: boolean;
+
+  @OneToOne(() => TheftTire)
+  @JoinColumn()
+  TheftTire: TheftTire;
 }

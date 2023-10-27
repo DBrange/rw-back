@@ -136,3 +136,23 @@ export class SinisterInUserCrash {
   assetDTO: AssetDTO;
   swornDeclaration: boolean;
 }
+export class SinisterInUserInspectionTheft {
+  assetId: string
+  theftDTO: TheftDTO;
+  theftTireDTO: TheftTireDTO;
+  swornDeclaration: boolean;
+}
+export class SinisterInUserInspectionFire {
+  assetId: string
+  fireDTO: FireDTO;
+  injuredDTO: InjuredData;
+  swornDeclaration: boolean;
+}
+
+export class SinisterInUserInspectionCrash {
+  assetId: string;
+  crashDTO: CrashDTO;
+  injuredDTO: InjuredData;
+  thirdPartyVehicleDTO: ThirdPartyVehicleData;
+  swornDeclaration: boolean;
+}
