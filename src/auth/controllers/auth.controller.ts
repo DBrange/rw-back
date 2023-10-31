@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Post, Res, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { AuthDTO } from '../dto/auth.dto';
 
@@ -8,18 +8,21 @@ export class AuthController {
 
   @Post('login')
   async login(
-    @Body() { username, password }: AuthDTO,
+    @Body() { email, password }: AuthDTO,
+    @Res({ passthrough: true }) res: Response,
   ) {
-    const userValidate = await this.authService.validateUser(
-      username,
-      password,
-    );
+    const userValidate = await this.authService.validateUser(email, password);
 
     if (!userValidate) {
       throw new UnauthorizedException('Data not valid');
     }
 
+    // const jwt = await this.authService.generateJWT(userValidate);
+
     const jwt = await this.authService.generateJWT(userValidate);
-    return jwt;
+    return { accessToken: jwt, user: userValidate };
+
+
+    // return JSON.stringify(userValidate);
   }
 };

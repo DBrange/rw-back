@@ -4,11 +4,13 @@ import {
   IsEnum,
   IsNotEmpty,
   IsOptional,
-  IsString
+  IsString,
+  IsUUID
 } from 'class-validator';
 import { GENDER } from 'src/constants/enums';
 import { IUser } from 'src/interfaces/users.interface';
 import { ROLES } from '../../../constants/roles';
+import { UserBrokerEntity } from 'src/containers/user-broker/entities/user-broker.entity';
 
 export class UserDTO implements IUser {
   @IsNotEmpty()
@@ -54,6 +56,10 @@ export class UserDTO implements IUser {
   @IsNotEmpty()
   @IsEnum(ROLES)
   role: ROLES;
+
+  @IsOptional()
+  @IsUUID()
+  broker: UserBrokerEntity;
 }
 
 export class UserUpdateDTO {
@@ -99,10 +105,15 @@ export class UserUpdateDTO {
   @IsOptional()
   @IsString()
   dni: string;
-
+  
   @IsOptional()
   @IsEnum(ROLES)
   role: ROLES;
+  
+  @IsOptional()
+  @IsUUID()
+  userBroker: UserBrokerEntity;
+
 }
 
 // export class UserToAssetDTO {

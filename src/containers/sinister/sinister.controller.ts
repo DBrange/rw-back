@@ -223,6 +223,16 @@ export class SinisterController {
     return this.sinisterService.getLegalUserSinistersForId(id);
   }
 
+  @Get('broker-sinisters-users/:id')
+  public getSinistersOfClients(@Param('id') id: string) {
+    return this.sinisterService.getSinistersOfClients(id);
+  }
+
+  @Get('broker-sinisters-legal-users/:id')
+  public getSinistersOfLegalClients(@Param('id') id: string) {
+    return this.sinisterService.getSinistersOfLegalClients(id);
+  }
+
   @Post('user-vehicle-theft')
   public async createUserVehicleTheft(
     @Body() requestData: SinisterUserVehicleTheftDTO,

@@ -72,11 +72,21 @@ export class AssetController {
   public getUserAssetsForId(@Param('id') id: string) {
     return this.assetService.getUserAssetsForId(id);
   }
-
+  
   // legal for id
   @Get('legal-user-login/:id')
   public getLegalUserAssetsForId(@Param('id') id: string) {
     return this.assetService.getLegalUserAssetsForId(id);
+  }
+  
+  @Get('broker-assets-users/:id')
+  public getAssetOfClients(@Param('id') id: string) {
+    return this.assetService.getAssetOfClients(id);
+  }
+  
+  @Get('broker-assets-legal-users/:id')
+  public getAssetOfLegalClients(@Param('id') id: string) {
+    return this.assetService.getAssetOfLegalClients(id);
   }
 
   @Post('user')

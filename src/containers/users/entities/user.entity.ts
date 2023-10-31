@@ -1,6 +1,6 @@
 
 import { Exclude } from 'class-transformer';
-import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 import { BaseEntity } from "../../../config/base.entity";
 import { GENDER } from "../../../constants/enums";
 import { ROLES } from "../../../constants/roles";
@@ -45,9 +45,14 @@ export class UserEntity extends BaseEntity implements IUser {
   @Column({ type: 'enum', enum: ROLES })
   role: ROLES;
 
-  @ManyToOne(() => UserBrokerEntity, { nullable: true })
-  userBroker: UserBrokerEntity;
+  @OneToOne(() => UserBrokerEntity)
+  @JoinColumn()
+  broker: UserBrokerEntity;
   
+  @ManyToOne(() => UserBrokerEntity, { nullable: true })
+  @JoinColumn()
+  userBroker: UserBrokerEntity;
+
   @OneToMany(() => AssetEntity, (asset) => asset.users)
   asset: AssetEntity[];
 }

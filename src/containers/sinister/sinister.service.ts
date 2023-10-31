@@ -50,6 +50,7 @@ import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { ErrorManager } from 'src/utils/error.manager';
 import { AssetEntity } from '../asset/entities/asset.entity';
+import { UserBrokerService } from '../user-broker/services/user-broker.service';
 interface PDF {
   userDTO: UserDTO;
   legalUserDTO: LegalUsersDTO;
@@ -87,6 +88,7 @@ export class SinisterService {
     private readonly crashService: CrashService,
     private readonly thirdPartyVehicleService: ThirdPartyVehicleService,
     private readonly thirdPartyDriverService: ThirdPartyDriverService,
+    private readonly userBrokerService: UserBrokerService,
   ) {}
 
   public async generarPDF({
@@ -2844,6 +2846,11 @@ export class SinisterService {
           .leftJoinAndSelect('sinister.injuredd', 'injuredd')
           .leftJoinAndSelect('injuredd.injuredsInfo', 'injuredsInfo')
           .leftJoinAndSelect('sinister.thirdPartyVehicle', 'thirdPartyVehicle')
+          .leftJoinAndSelect('sinister.sinisterType', 'sinisterType')
+          .leftJoinAndSelect('sinisterType.theft', 'theft')
+          .leftJoinAndSelect('theft.TheftTire', 'TheftTire')
+          .leftJoinAndSelect('sinisterType.fire', 'fire')
+          .leftJoinAndSelect('sinisterType.crash', 'crash')
           .getOne();
 
         return sinister;
@@ -2857,5 +2864,31 @@ export class SinisterService {
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
     }
+  }
+
+  public async getSinistersOfClients(brokerId: string) {
+    const clients = (await this.userBrokerService.getUserBrokerById(brokerId))
+      .clients;
+
+    const allSinistersPromises = clients.map(
+      async (client) => await this.getUserSinistersForId(client.id),
+    );
+
+    const allSinisters = (await Promise.all(allSinistersPromises)).flat();
+
+    return allSinisters;
+  }
+
+  public async getSinistersOfLegalClients(brokerId: string) {
+    const clients = (await this.userBrokerService.getUserBrokerById(brokerId))
+      .legalClients;
+
+    const allSinistersPromises = clients.map(
+      async (client) => await this.getLegalUserSinistersForId(client.id),
+    );
+
+    const allSinisters = (await Promise.all(allSinistersPromises)).flat();
+
+    return allSinisters;
   }
 }

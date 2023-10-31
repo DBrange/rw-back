@@ -19,6 +19,7 @@ import * as nodemailer from 'nodemailer';
 import * as puppeteer from 'puppeteer';
 import { ConfigService } from '@nestjs/config';
 import { ErrorManager } from 'src/utils/error.manager';
+import { UserBrokerService } from '../user-broker/services/user-broker.service';
 
 interface PDF {
   userDTO: UserDTO;
@@ -39,6 +40,7 @@ export class AssetService {
     private readonly electronicService: ElectronicsService,
     private readonly userService: UsersService,
     private readonly legalUserService: LegalUsersService,
+    private readonly userBrokerService: UserBrokerService,
   ) {}
 
   public async generarPDF({
@@ -717,5 +719,29 @@ export class AssetService {
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
     }
+  }
+
+  public async getAssetOfClients(brokerId: string) {
+    const clients = (await this.userBrokerService.getUserBrokerById(brokerId)).clients
+
+    const allAssetsPromises = clients.map(
+      async (client) => await this.getUserAssetsForId(client.id),
+    );
+
+    const allAssets = (await Promise.all(allAssetsPromises)).flat();
+
+    return allAssets
+  }
+
+  public async getAssetOfLegalClients(brokerId: string) {
+    const clients = (await this.userBrokerService.getUserBrokerById(brokerId)).legalClients
+
+    const allAssetsPromises = clients.map(
+      async (client) => await this.getLegalUserAssetsForId(client.id),
+    );
+
+    const allAssets = (await Promise.all(allAssetsPromises)).flat();
+
+    return allAssets
   }
 }

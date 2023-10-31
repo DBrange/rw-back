@@ -1,16 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LegalUsers } from './entities/legalUsers.entity';
-import { Repository } from 'typeorm';
-import { LegalUsersDTO } from './dto/legalUsers.dto';
+import { Repository, UpdateResult } from 'typeorm';
+import { LegalUsersDTO, LegalUsersUpdateDTO } from './dto/legalUsers.dto';
 import { ErrorManager } from 'src/utils/error.manager';
 import { AssetEntity } from '../asset/entities/asset.entity';
+import { UserBrokerService } from '../user-broker/services/user-broker.service';
+import { UserUpdateDTO } from '../users/dto/user.dto';
 
 @Injectable()
 export class LegalUsersService {
   constructor(
     @InjectRepository(LegalUsers)
     private readonly legalUsersRepository: Repository<LegalUsers>,
+    private readonly userBrokerService: UserBrokerService,
   ) {}
 
   public async getAllLegalUsers(): Promise<LegalUsers[]> {
@@ -30,20 +33,73 @@ export class LegalUsersService {
 
   public async getLegalUserById(id: string): Promise<LegalUsers> {
     try {
-      const resultado = await this.legalUsersRepository
-        .createQueryBuilder('legal_users')
-        .where({ id })
-        .select(['legal_users', 'asset.id'])
-        .leftJoin('legal_users.asset', 'asset')
-        .getOne();
+      // const resultado = await this.legalUsersRepository
+      //   .createQueryBuilder('legal_users')
+      //   .where({ id })
+      //   .select(['legal_users', 'asset.id'])
+      //   .leftJoinAndSelect('legal_users.asset', 'asset')
+      //   .getOne();
 
-      if (!resultado) {
+      // if (!resultado) {
+      //   throw new ErrorManager({
+      //     type: 'BAD_REQUEST',
+      //     message: 'No users found',
+      //   });
+      // }
+      // return resultado;
+
+      const userr = await this.legalUsersRepository.findOneBy({ id });
+      const user =
+        userr.role === 'CLIENT'
+          ? await this.legalUsersRepository
+              .createQueryBuilder('legal_users')
+              .where({ id })
+              // .select([
+              //   'user',
+              //   'asset.id',
+              //   'userBroker.id',
+              //   'userBroker.bussinesName',
+              //   'userBroker.enrollment',
+              // ])
+              // // .leftJoinAndSelect('user.broker', 'userBroker')
+              .leftJoinAndSelect('legal_users.userBroker', 'users')
+              // .leftJoin('users.broker', 'userBroker')
+              .leftJoinAndSelect('legal_users.asset', 'asset')
+              // .leftJoinAndSelect('asset.users', 'users')
+              .leftJoinAndSelect('asset.legalUsers', 'legalUsers')
+              .leftJoinAndSelect('asset.vehicle', 'vehicle')
+              .leftJoinAndSelect('asset.electronics', 'electronics')
+              .getOne()
+          : await this.legalUsersRepository
+              .createQueryBuilder('legal_users')
+              .where({ id })
+              .select(['legal_users', 'asset.id', 'userBroker.id'])
+              .leftJoinAndSelect('legal_users.broker', 'userBroker')
+              // .leftJoinAndSelect('user.userBroker', 'users')
+              // .leftJoinAndSelect('users.broker', 'userBroker')
+              .leftJoinAndSelect('legal_users.asset', 'asset')
+              // .leftJoinAndSelect('asset.users', 'users')
+              .leftJoinAndSelect('asset.legalUsers', 'legalUsers')
+              .leftJoinAndSelect('asset.vehicle', 'vehicle')
+              .leftJoinAndSelect('asset.electronics', 'electronics')
+              .getOne();
+
+      // const user = await this.userRepository
+      //   .createQueryBuilder('user')
+      //   .where({ id })
+      //   .select(['user', 'asset.id', 'userBroker.id'])
+      //   .leftJoinAndSelect('user.broker', 'userBroker')
+      //   .leftJoin('user.userBroker', 'userBroker.id')
+      //   .leftJoin('user.asset', 'asset')
+      //   .getOne();
+
+      if (!user) {
         throw new ErrorManager({
           type: 'BAD_REQUEST',
           message: 'No users found',
         });
       }
-      return resultado;
+      return user;
     } catch (error) {
       throw new ErrorManager.createSignaturError(error.message);
     }
@@ -75,6 +131,59 @@ export class LegalUsersService {
       return await this.legalUsersRepository.save(body);
     } catch (error) {
       throw new Error(error);
+    }
+  }
+
+  public async updateLegalUser(
+    id: string,
+    body: LegalUsersUpdateDTO,
+  ): Promise<UpdateResult> {
+    try {
+      const updatedUser = await this.legalUsersRepository.update(id, body);
+      if (updatedUser.affected === 0) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users were updated',
+        });
+      }
+      return updatedUser;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async addLegalClient(client: string, broker: string) {
+    try {
+      const currentBroker = await this.userBrokerService.getUserBrokerById(
+        broker,
+      );
+
+      if (!currentBroker) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+
+      const clientToAdd = await this.legalUsersRepository.findOneBy({
+        id: client,
+      });
+
+      if (!clientToAdd) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+
+      await this.updateLegalUser(client, {
+        ...clientToAdd,
+        userBroker: currentBroker,
+      });
+
+      return { message: 'El cliente a sido agregado con exito' };
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
     }
   }
 }

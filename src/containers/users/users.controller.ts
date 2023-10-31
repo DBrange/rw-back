@@ -23,7 +23,7 @@ export class UsersController {
 
   // @PublicAccess()
   @Post('register')
-  public async registerUser(@Body() body: UserDTO){
+  public async registerUser(@Body() body: UserDTO) {
     return await this.usersService.createUser(body);
   }
 
@@ -37,16 +37,21 @@ export class UsersController {
   public async getUsers() {
     return await this.usersService.getUsers();
   }
-  
+
   @Get('all-users')
   public async getAllUsers() {
     return await this.usersService.getAllUsers();
   }
 
   @Get(':id')
-  public async getUserById(@Param('id') id: string){
-  const user = await this.usersService.getUsersById(id);
-  return user;
+  public async getUserById(@Param('id') id: string) {
+    const user = await this.usersService.getUsersById(id);
+    return user;
+  }
+
+  @Post('add-client/:client/:broker')
+  public async addClient(@Param('client') client: string, @Param('broker') broker: string) {
+    return this.usersService.addClient(client, broker);
   }
 
   @Put('edit/:id')
@@ -58,7 +63,7 @@ export class UsersController {
   }
 
   @Delete('delete/:id')
-  public async deleteUser(@Param('id') id: string){
+  public async deleteUser(@Param('id') id: string) {
     return await this.usersService.deleteUser(id);
   }
 }

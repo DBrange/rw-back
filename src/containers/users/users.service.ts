@@ -12,6 +12,7 @@ import { LegalUsersService } from '../legal-users/legal-users.service';
 import { LegalUsersDTO } from '../legal-users/dto/legalUsers.dto';
 import { LegalUsers } from '../legal-users/entities/legalUsers.entity';
 import { AssetEntity } from '../asset/entities/asset.entity';
+import { UserBrokerEntity } from '../user-broker/entities/user-broker.entity';
 
 @Injectable()
 export class UsersService {
@@ -49,21 +50,25 @@ export class UsersService {
 
   public async createUserInLogin(body: UserUserBrokerDTO) {
     try {
-      let newUser: UserDTO | LegalUsersDTO;
+      let newBroker: UserBrokerEntity;
 
-      if (body.userDTO) {
-        // body.userDTO.password = await bcrypt.hash(body.userDTO.password, +process.env.HASH_SALT);
-        newUser = await this.userRepository.save(body.userDTO);
-      } else if (body.legalUserDTO) {
-        // body.legalUserDTO.password = await bcrypt.hash(body.legalUserDTO.password, +process.env.HASH_SALT);
-        newUser = await this.legalUserService.createLegalUsers(
-          body.legalUserDTO,
+      if (body.userBrokerDTO) {
+        newBroker = await this.userBrokerService.createUserBroker(
+          body.userBrokerDTO,
         );
       }
 
-      if (newUser.role === 'BROKER') {
-        await this.userBrokerService.createUserBroker(body.userBrokerDTO);
+      if (body.userDTO) {
+        // body.userDTO.password = await bcrypt.hash(body.userDTO.password, +process.env.HASH_SALT);
+        await this.userRepository.save({ ...body.userDTO, broker: newBroker });
+      } else if (body.legalUserDTO) {
+        // body.legalUserDTO.password = await bcrypt.hash(body.legalUserDTO.password, +process.env.HASH_SALT);
+        await this.legalUserService.createLegalUsers({
+          ...body.legalUserDTO,
+          broker: newBroker,
+        });
       }
+
       // body.password = await bcrypt.hash(body.password, +process.env.HASH_SALT);
       return { message: 'El usuario a sido creado con exito' };
     } catch (error) {
@@ -92,20 +97,50 @@ export class UsersService {
 
   public async getUsersById(id: string): Promise<UserEntity> {
     try {
+      const userr = await this.userRepository.findOneBy({ id });
+      const user =
+        userr.role === 'CLIENT'
+          ? await this.userRepository
+              .createQueryBuilder('user')
+              .where({ id })
+              // .select([
+              //   'user',
+              //   'asset.id',
+              //   'userBroker.id',
+              //   'userBroker.bussinesName',
+              //   'userBroker.enrollment',
+              // ])
+              // // .leftJoinAndSelect('user.broker', 'userBroker')
+              .leftJoinAndSelect('user.userBroker', 'users')
+              // .leftJoin('users.broker', 'userBroker')
+              .leftJoinAndSelect('user.asset', 'asset')
+              // .leftJoinAndSelect('asset.users', 'users')
+              .leftJoinAndSelect('asset.legalUsers', 'legalUsers')
+              .leftJoinAndSelect('asset.vehicle', 'vehicle')
+              .leftJoinAndSelect('asset.electronics', 'electronics')
+              .getOne()
+          : await this.userRepository
+              .createQueryBuilder('user')
+              .where({ id })
+              .select(['user', 'asset.id', 'userBroker.id'])
+              .leftJoinAndSelect('user.broker', 'userBroker')
+              // .leftJoinAndSelect('user.userBroker', 'users')
+              // .leftJoinAndSelect('users.broker', 'userBroker')
+              .leftJoinAndSelect('user.asset', 'asset')
+              // .leftJoinAndSelect('asset.users', 'users')
+              .leftJoinAndSelect('asset.legalUsers', 'legalUsers')
+              .leftJoinAndSelect('asset.vehicle', 'vehicle')
+              .leftJoinAndSelect('asset.electronics', 'electronics')
+              .getOne();
+
       // const user = await this.userRepository
       //   .createQueryBuilder('user')
       //   .where({ id })
-      //   .leftJoinAndSelect('user.asset', 'asset')
-      //   .leftJoinAndSelect('asset.vehicle', 'vehicle')
-      //   .leftJoinAndSelect('asset.electronics', 'electronics')
+      //   .select(['user', 'asset.id', 'userBroker.id'])
+      //   .leftJoinAndSelect('user.broker', 'userBroker')
+      //   .leftJoin('user.userBroker', 'userBroker.id')
+      //   .leftJoin('user.asset', 'asset')
       //   .getOne();
-
-      const user = await this.userRepository
-        .createQueryBuilder('user')
-        .where({ id })
-        .select(['user', 'asset.id'])
-        .leftJoin('user.asset', 'asset')
-        .getOne();
 
       if (!user) {
         throw new ErrorManager({
@@ -142,7 +177,7 @@ export class UsersService {
   }
 
   // public async getSinistersOfUser(id: string) {
-    
+
   // }
 
   //* parte de auth (autienticacion)
@@ -192,4 +227,85 @@ export class UsersService {
       throw new ErrorManager.createSignaturError(error.message);
     }
   }
+
+  public async addClient(client: string, broker: string) {
+    try {
+      const currentBroker = await this.userBrokerService.getUserBrokerById(
+        broker,
+      );
+
+      if (!currentBroker) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+
+      const clientToAdd = await this.userRepository.findOneBy({ id: client });
+
+      if (!clientToAdd) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+
+      await this.updateUser(client, {
+        ...clientToAdd,
+        userBroker: currentBroker,
+      });
+
+      return { message: 'El cliente a sido agregado con exito' };
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+  // public async addClient(client: string, broker: string) {
+  //   try {
+  //     // const currentBroker = await this.userBrokerService.getUserBrokerById(
+  //     //   broker,
+  //     // );
+
+  //     // if (!currentBroker) {
+  //     //   throw new ErrorManager({
+  //     //     type: 'BAD_REQUEST',
+  //     //     message: 'No users found',
+  //     //   });
+  //     // }
+
+  //     const clientToAdd = await this.userRepository.findOneBy({ id: client });
+  //     const userBrokerr = await this.userRepository
+  //       .createQueryBuilder('user')
+  //       .where({ id: broker })
+  //       .leftJoinAndSelect('user.broker', 'broker')
+  //       .getOne();
+
+  //     const currentBroker = await this.userBrokerService.getUserBrokerById(
+  //       userBrokerr.broker.id,
+  //     );
+  //     console.log(userBrokerr.broker.id);
+
+  //     if (!clientToAdd) {
+  //       throw new ErrorManager({
+  //         type: 'BAD_REQUEST',
+  //         message: 'No users found',
+  //       });
+  //     }
+
+  //     await this.updateUser(client, {
+  //       ...clientToAdd,
+  //       userBroker: userBrokerr,
+  //     });
+
+  //     // currentBroker.clients.push(clientToAdd);
+
+  //     // await this.userBrokerService.updateUserBroker(currentBroker.id, {
+  //     //   ...currentBroker
+  //     // });
+
+  //     return { message: 'El cliente a sido agregado con exito' };
+  //   } catch (error) {
+  //     throw new ErrorManager.createSignaturError(error.message);
+  //   }
+  // }
 }

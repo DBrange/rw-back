@@ -10,7 +10,7 @@ export class AuthService {
   constructor(private readonly userService: UsersService) {}
 
   public async validateUser(
-    username: string,
+    email: string,
     password: string,
   ): Promise<UserEntity | null> {
     // const userByUsername = await this.userService.findBy({
@@ -19,7 +19,7 @@ export class AuthService {
     // });
     const userByEmail = await this.userService.findBy({
       key: 'email',
-      value: username,
+      value: email,
     });
 
     // if (userByUsername) {
