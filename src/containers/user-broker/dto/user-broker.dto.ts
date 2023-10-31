@@ -12,7 +12,7 @@ export class UserBrokerDTO implements IUserBroker {
   @IsString()
   enrollment: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   card: string;
 
