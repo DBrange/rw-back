@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -49,8 +50,22 @@ export class UsersController {
     return user;
   }
 
+  @Post('verify')
+  public async verifyEmailDni(
+    @Query('email') email?: string,
+    @Query('dni') dni?: string,
+    @Query('enrollment') enrollment?: string,
+  ) {
+    const user = await this.usersService.verifyEmailDni(email, dni, enrollment);
+
+    return user;
+  }
+
   @Post('add-client/:client/:broker')
-  public async addClient(@Param('client') client: string, @Param('broker') broker: string) {
+  public async addClient(
+    @Param('client') client: string,
+    @Param('broker') broker: string,
+  ) {
     return this.usersService.addClient(client, broker);
   }
 

@@ -15,10 +15,8 @@ import { LegalUsersService } from 'src/containers/legal-users/legal-users.servic
 export class UserBrokerService {
   constructor(
     @InjectRepository(UserBrokerEntity)
-    private readonly userBrokerRepository: Repository<UserBrokerEntity>,
-  ) // private readonly userService: UsersService,
-  // private readonly leglaUserService: LegalUsersService,
-  {}
+    private readonly userBrokerRepository: Repository<UserBrokerEntity>, // private readonly userService: UsersService, // private readonly leglaUserService: LegalUsersService,
+  ) {}
 
   public async createUserBroker(body: UserBrokerDTO) {
     try {
@@ -107,5 +105,24 @@ export class UserBrokerService {
     }
 
     return userBroker;
+  }
+
+  public async verifyEnrollment(
+    enrollment: string | null,
+  ) {
+    try {
+      const verifyEnrollment = await this.userBrokerRepository
+        .createQueryBuilder('user')
+        .where({ enrollment })
+        .getOne();
+
+      if (verifyEnrollment) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
   }
 }

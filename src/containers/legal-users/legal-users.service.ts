@@ -19,15 +19,44 @@ export class LegalUsersService {
   public async getAllLegalUsers(): Promise<LegalUsers[]> {
     try {
       const resultados: LegalUsers[] = await this.legalUsersRepository.find();
-      if (resultados.length === 0) {
-        throw new ErrorManager({
-          type: 'BAD_REQUEST',
-          message: 'No users found',
-        });
-      }
+      // if (resultados.length === 0) {
+      //   throw new ErrorManager({
+      //     type: 'BAD_REQUEST',
+      //     message: 'No users found',
+      //   });
+      // }
       return resultados;
     } catch (error) {
       throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async verifyEmailCuit(
+    email: string | undefined,
+    cuit: string | undefined,
+    enrollment: string | undefined,
+  ) {
+    try {
+      if (enrollment) {
+        const verifyEnrollment = await this.userBrokerService.verifyEnrollment(
+          enrollment,
+        );
+        if (verifyEnrollment) true;
+      }
+
+      const emailOrCuit = await this.legalUsersRepository
+        .createQueryBuilder('user')
+        .where({ email })
+        .orWhere({ cuit })
+        .getOne();
+
+      if (emailOrCuit) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
     }
   }
 

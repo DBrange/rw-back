@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, Param } from '@nestjs/common';
+import { Body, Controller, Post, Get, Param, Query } from '@nestjs/common';
 import { LegalUsersService } from './legal-users.service';
 import { LegalUsersDTO, } from './dto/legalUsers.dto';
 import { LegalUsers } from './entities/legalUsers.entity';
@@ -15,6 +15,17 @@ export class LegalUsersController {
   @Get(':id')
   public async getLegalUserById(@Param('id') id: string): Promise<LegalUsers> {
     return this.legalUsersService.getLegalUserById(id);
+  }
+
+  @Post('verify')
+  public async verifyEmailDni(
+    @Query('email') email?: string,
+    @Query('cuit') cuit?: string,
+    @Query('enrollment') enrollment?: string,
+  ) {
+    const user = await this.legalUsersService.verifyEmailCuit(email, cuit, enrollment);
+
+    return user;
   }
 
   @Post('create')

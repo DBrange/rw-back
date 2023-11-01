@@ -36,12 +36,13 @@ export class UsersService {
     try {
       const users: UserEntity[] = await this.userRepository.find();
 
-      if (users.length === 0) {
-        throw new ErrorManager({
-          type: 'BAD_REQUEST',
-          message: 'No users found',
-        });
-      }
+      // if (users.length === 0) {
+      //   throw new ErrorManager({
+      //     type: 'BAD_REQUEST',
+      //     message: 'No users found',
+      //   });
+      // }
+
       return users;
     } catch (error) {
       throw new ErrorManager.createSignaturError(error.message);
@@ -71,6 +72,38 @@ export class UsersService {
 
       // body.password = await bcrypt.hash(body.password, +process.env.HASH_SALT);
       return { message: 'El usuario a sido creado con exito' };
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async verifyEmailDni(
+    email: string | undefined,
+    dni: string | undefined,
+    enrollment: string | undefined,
+  ) {
+    try {
+      if (enrollment) {
+        const verifyEnrollment = await this.userBrokerService.verifyEnrollment(
+          enrollment,
+        );
+        if (verifyEnrollment) return true;
+      }
+
+      const emailOrDni = await this.userRepository
+        .createQueryBuilder('user')
+        .where({ email })
+        .orWhere({ dni })
+        .getOne();
+      
+      const emailOrCuit = await this.legalUserService.verifyEmailCuit(email, dni, enrollment)
+
+      if (emailOrDni || emailOrCuit) {
+        return true;
+      } else {
+        return false;
+      }
+      
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
     }
