@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Query,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -16,9 +17,13 @@ import { AuthGuard } from '../../auth/guards/auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { AdminAccess } from '../../auth/decorators/admin.decorator';
 import { UserUserBrokerDTO } from './dto/allUser.dto';
+import {Response} from 'express'
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { AccessLevel } from 'src/auth/decorators/access-level.decorator';
+import { AccessLevelGuard } from 'src/auth/guards/access-level.guard';
 
 @Controller('users')
-// @UseGuards(AuthGuard, RolesGuard)
+@UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -27,7 +32,7 @@ export class UsersController {
   public async registerUser(@Body() body: UserDTO) {
     return await this.usersService.createUser(body);
   }
-
+// @AccessLevel()
   @Post('register-login')
   public async registerUserInLogin(@Body() body: UserUserBrokerDTO) {
     return await this.usersService.createUserInLogin(body);
@@ -37,6 +42,20 @@ export class UsersController {
   @Get('all')
   public async getUsers() {
     return await this.usersService.getUsers();
+  }
+
+  @Get('confirm/:token')
+  public async confirmEmail(
+    @Param('token') token: string,
+    @Res() res: Response,
+  ) {
+    const emailConfirmed = this.usersService.confirmEmail(token);
+
+        if (emailConfirmed) {
+          return res.redirect('/confirm.html');
+        } else {
+          return res.redirect('/error.html');
+        }
   }
 
   @Get('all-users')

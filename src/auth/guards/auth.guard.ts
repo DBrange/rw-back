@@ -31,7 +31,7 @@ export class AuthGuard implements CanActivate {
 
     const token = req.headers['rw_token'];
     if (!token || Array.isArray(token)) {
-      throw new UnauthorizedException('Invalid token no se por que ');
+      throw new UnauthorizedException('Invalid token');
     }
 
     const manageToken: IUseToken | string = useToken(token);

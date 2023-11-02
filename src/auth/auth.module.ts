@@ -7,11 +7,11 @@ import { UserBrokerModule } from 'src/containers/user-broker/user-broker.module'
 import { LegalUsersModule } from 'src/containers/legal-users/legal-users.module';
 import { LegalUsersService } from 'src/containers/legal-users/legal-users.service';
 
-
 @Global()
 @Module({
-  imports: [UsersModule, UserBrokerModule,LegalUsersModule],
+  imports: [UsersModule, UserBrokerModule, LegalUsersModule],
   providers: [AuthService, UsersService, LegalUsersService],
-  controllers: [AuthController]
+  controllers: [AuthController],
+  exports: [AuthModule, AuthService],
 })
 export class AuthModule {}

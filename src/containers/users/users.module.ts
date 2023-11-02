@@ -11,7 +11,7 @@ import { LegalUsersService } from '../legal-users/legal-users.service';
 
 @Global()
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity, UserBrokerEntity, LegalUsers])],
+  imports: [TypeOrmModule.forFeature([UserEntity, UserBrokerEntity, LegalUsers,])],
   controllers: [UsersController],
   providers: [UsersService, UserBrokerService, LegalUsersService],
   exports: [UsersService, TypeOrmModule],

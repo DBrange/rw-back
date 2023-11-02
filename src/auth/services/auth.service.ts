@@ -7,32 +7,23 @@ import { AuthResponse, PayloadToken } from '../interfaces/auth.interface';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UsersService) {}
-
+  constructor(private readonly userService: UsersService) { }
   public async validateUser(
     email: string,
     password: string,
   ): Promise<UserEntity | null> {
-    // const userByUsername = await this.userService.findBy({
-    //   key: 'username',
-    //   value: username,
-    // });
+
     const userByEmail = await this.userService.findBy({
       key: 'email',
       value: email,
     });
 
-    // if (userByUsername) {
-    //   const match = await bcrypt.compare(password, userByUsername.password);
-    //   if (match) return userByUsername;
-    // }
 
     if (userByEmail) {
       const match = await bcrypt.compare(password, userByEmail.password);
       if (match) return userByEmail;
     }
 
-    // return null;
   }
 
   public signJWT({

@@ -5,8 +5,12 @@ export enum ROLES {
   }
  
 export enum ACCESS_LEVEL{
-    BASIC = '3',
-    STANDARD = '10',
-    PREMIUM = 'INFINITE'
+    BASIC = 10,
+    STANDARD = 20,
+    PREMIUM = 30
 }  
 
+export enum AUTHORIZATION{
+  AUTHORIZED = 'AUTHORIZED',
+  UNAUTHORIZED = 'UNAUTHORIZED'
+}

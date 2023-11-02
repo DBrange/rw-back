@@ -9,10 +9,10 @@ import {
 } from 'class-validator';
 import { GENDER } from 'src/constants/enums';
 import { IUser } from 'src/interfaces/users.interface';
-import { ROLES } from '../../../constants/roles';
+import { AUTHORIZATION, ROLES } from '../../../constants/roles';
 import { UserBrokerEntity } from 'src/containers/user-broker/entities/user-broker.entity';
 
-export class UserDTO implements IUser {
+export class UserDTO  {
   @IsNotEmpty()
   @IsString()
   name: string;
@@ -113,6 +113,10 @@ export class UserUpdateDTO {
   @IsOptional()
   @IsUUID()
   userBroker: UserBrokerEntity;
+  
+  @IsOptional()
+  @IsUUID()
+  authorization: AUTHORIZATION;
 
 }
 

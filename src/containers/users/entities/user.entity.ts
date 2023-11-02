@@ -3,7 +3,7 @@ import { Exclude } from 'class-transformer';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 import { BaseEntity } from "../../../config/base.entity";
 import { GENDER } from "../../../constants/enums";
-import { ROLES } from "../../../constants/roles";
+import { ACCESS_LEVEL, AUTHORIZATION, ROLES } from '../../../constants/roles';
 import { IUser } from "../../../interfaces/users.interface";
 //import { UsersAssetsEntity } from "./userAsset.entity";
 import { AssetEntity } from "src/containers/asset/entities/asset.entity";
@@ -45,10 +45,24 @@ export class UserEntity extends BaseEntity implements IUser {
   @Column({ type: 'enum', enum: ROLES })
   role: ROLES;
 
+  @Column({
+    type: 'enum',
+    enum: ACCESS_LEVEL,
+    default: ACCESS_LEVEL.BASIC,
+  })
+  accessLevel: ACCESS_LEVEL;
+
+  @Column({
+    type: 'enum',
+    enum: AUTHORIZATION,
+    default: AUTHORIZATION.UNAUTHORIZED,
+  })
+  authorization: AUTHORIZATION;
+
   @OneToOne(() => UserBrokerEntity)
   @JoinColumn()
   broker: UserBrokerEntity;
-  
+
   @ManyToOne(() => UserBrokerEntity, { nullable: true })
   @JoinColumn()
   userBroker: UserBrokerEntity;
