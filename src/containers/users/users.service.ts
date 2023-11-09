@@ -176,12 +176,21 @@ export class UsersService {
 
   public async getAssetOfUser(id: string): Promise<AssetEntity[]> {
     try {
+
+
       const user = await this.userRepository
         .createQueryBuilder('user')
         .where({ id })
         .leftJoinAndSelect('user.asset', 'asset')
-        .leftJoinAndSelect('asset.vehicle', 'vehicle')
-        .leftJoinAndSelect('asset.electronics', 'electronics')
+        .leftJoin('asset.vehicle', 'vehicle')
+        .addSelect('vehicle.brand')
+        .addSelect('vehicle.model')
+        .addSelect('vehicle.plate')
+        .addSelect('vehicle.type')
+        .leftJoin('asset.electronics', 'electronics')
+        .addSelect('electronics.brand')
+        .addSelect('electronics.model')
+        .addSelect('electronics.type')
         .getOne();
 
       if (!user) {
@@ -195,6 +204,7 @@ export class UsersService {
       throw new ErrorManager.createSignaturError(error.message);
     }
   }
+  
 
   // public async getSinistersOfUser(id: string) {
 

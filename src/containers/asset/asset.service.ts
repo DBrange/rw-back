@@ -575,69 +575,6 @@ export class AssetService {
     }
   }
 
-  public async createAssetInLegalUser(
-    userId: string,
-    vehicleDTO: VehicleDTO,
-    gncDTO: GncDTO,
-    electronicDTO: ElectronicsDTO,
-    smartphoneDTO: SmartphoneDTO,
-    assetDTO: AssetDTO,
-    swornDeclaration: boolean,
-  ) {
-    try {
-      if (!swornDeclaration) {
-        throw new ErrorManager({
-          type: 'BAD_REQUEST',
-          message: 'Without sworn declaration',
-        });
-      }
-
-      if (vehicleDTO) {
-        const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
-
-        if (newVehicle.gnc) {
-          const vehicleGnc = {
-            ...gncDTO,
-            vehicle: newVehicle.id,
-          };
-          await this.gncService.createGnc(vehicleGnc);
-        }
-
-        const asset = {
-          ...assetDTO,
-          vehicle: newVehicle,
-          legalUsers: userId as unknown as LegalUsersDTO,
-        };
-
-        await this.assetRepository.save(asset);
-      } else {
-        const newElectronic = await this.electronicService.createElectronics(
-          electronicDTO,
-        );
-
-        if (newElectronic.type === 'CELULAR') {
-          const relatedSmartphone = {
-            ...smartphoneDTO,
-            electronics: newElectronic.id,
-          };
-
-          await this.smartphoneService.createSmartphone(relatedSmartphone);
-        }
-
-        const fullAsset = {
-          ...assetDTO,
-          legalUsers: userId as unknown as LegalUsersDTO,
-          electronics: newElectronic,
-        };
-        await this.assetRepository.save(fullAsset);
-      }
-
-      return { message: 'La inspeccion a sido realizada con exito' };
-    } catch (error) {
-      throw ErrorManager.createSignaturError(error.message);
-    }
-  }
-
   public async createAssetInUser(
     userId: string,
     vehicleDTO: VehicleDTO,
@@ -701,6 +638,69 @@ export class AssetService {
     }
   }
 
+  public async createAssetInLegalUser(
+    userId: string,
+    vehicleDTO: VehicleDTO,
+    gncDTO: GncDTO,
+    electronicDTO: ElectronicsDTO,
+    smartphoneDTO: SmartphoneDTO,
+    assetDTO: AssetDTO,
+    swornDeclaration: boolean,
+  ) {
+    try {
+      if (!swornDeclaration) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Without sworn declaration',
+        });
+      }
+
+      if (vehicleDTO) {
+        const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
+
+        if (newVehicle.gnc) {
+          const vehicleGnc = {
+            ...gncDTO,
+            vehicle: newVehicle.id,
+          };
+          await this.gncService.createGnc(vehicleGnc);
+        }
+
+        const asset = {
+          ...assetDTO,
+          vehicle: newVehicle,
+          legalUsers: userId as unknown as LegalUsersDTO,
+        };
+
+        await this.assetRepository.save(asset);
+      } else {
+        const newElectronic = await this.electronicService.createElectronics(
+          electronicDTO,
+        );
+
+        if (newElectronic.type === 'CELULAR') {
+          const relatedSmartphone = {
+            ...smartphoneDTO,
+            electronics: newElectronic.id,
+          };
+
+          await this.smartphoneService.createSmartphone(relatedSmartphone);
+        }
+
+        const fullAsset = {
+          ...assetDTO,
+          legalUsers: userId as unknown as LegalUsersDTO,
+          electronics: newElectronic,
+        };
+        await this.assetRepository.save(fullAsset);
+      }
+
+      return { message: 'La inspeccion a sido realizada con exito' };
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
   public async getUserAssetsForId(id: string) {
     try {
       const user = await this.userService.getAssetOfUser(id);
@@ -722,7 +722,8 @@ export class AssetService {
   }
 
   public async getAssetOfClients(brokerId: string) {
-    const clients = (await this.userBrokerService.getUserBrokerById(brokerId)).clients
+    const clients = (await this.userBrokerService.getUserBrokerById(brokerId))
+      .clients;
 
     const allAssetsPromises = clients.map(
       async (client) => await this.getUserAssetsForId(client.id),
@@ -730,11 +731,12 @@ export class AssetService {
 
     const allAssets = (await Promise.all(allAssetsPromises)).flat();
 
-    return allAssets
+    return allAssets;
   }
 
   public async getAssetOfLegalClients(brokerId: string) {
-    const clients = (await this.userBrokerService.getUserBrokerById(brokerId)).legalClients
+    const clients = (await this.userBrokerService.getUserBrokerById(brokerId))
+      .legalClients;
 
     const allAssetsPromises = clients.map(
       async (client) => await this.getLegalUserAssetsForId(client.id),
@@ -742,6 +744,6 @@ export class AssetService {
 
     const allAssets = (await Promise.all(allAssetsPromises)).flat();
 
-    return allAssets
+    return allAssets;
   }
 }

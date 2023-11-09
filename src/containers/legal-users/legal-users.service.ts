@@ -139,8 +139,15 @@ export class LegalUsersService {
         .createQueryBuilder('legal_users')
         .where({ id })
         .leftJoinAndSelect('legal_users.asset', 'asset')
-        .leftJoinAndSelect('asset.vehicle', 'vehicle')
-        .leftJoinAndSelect('asset.electronics', 'electronics')
+        .leftJoin('asset.vehicle', 'vehicle')
+        .addSelect('vehicle.brand')
+        .addSelect('vehicle.model')
+        .addSelect('vehicle.plate')
+        .addSelect('vehicle.type')
+        .leftJoin('asset.electronics', 'electronics')
+        .addSelect('electronics.brand')
+        .addSelect('electronics.model')
+        .addSelect('electronics.type')
         .getOne();
 
       if (!legalUser) {
@@ -213,6 +220,20 @@ export class LegalUsersService {
       return { message: 'El cliente a sido agregado con exito' };
     } catch (error) {
       throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async findBy({ key, value }: { key: keyof LegalUsersDTO; value: any }) {
+    try {
+      const user: LegalUsers = await this.legalUsersRepository
+        .createQueryBuilder('legal_users')
+        .addSelect('legal_users.password')
+        .where({ [key]: value })
+        .getOne();
+
+      return user;
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
     }
   }
 }

@@ -1,3 +1,4 @@
+import { LegalUsers } from 'src/containers/legal-users/entities/legalUsers.entity';
 import { ROLES } from '../../constants/roles';
 import { UserEntity } from '../../containers/users/entities/user.entity';
 
@@ -13,7 +14,8 @@ export interface AuthBody {
 
 export interface AuthResponse {
   accessToken: string;
-  user: UserEntity;
+  user: UserEntity | LegalUsers;
+  exp: number
 }
 
 export interface AuthTokenResult {

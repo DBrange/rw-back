@@ -27,23 +27,27 @@ import { AccessLevelGuard } from 'src/auth/guards/access-level.guard';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // @PublicAccess()
+  @PublicAccess()
   @Post('register')
   public async registerUser(@Body() body: UserDTO) {
     return await this.usersService.createUser(body);
   }
-// @AccessLevel()
+
+  @PublicAccess()
   @Post('register-login')
   public async registerUserInLogin(@Body() body: UserUserBrokerDTO) {
     return await this.usersService.createUserInLogin(body);
   }
-
   // @AdminAccess()
+  // @AccessLevel(10)
+  // @Roles('CLIENT')
+  @PublicAccess()
   @Get('all')
   public async getUsers() {
     return await this.usersService.getUsers();
   }
 
+  @PublicAccess()
   @Get('confirm/:token')
   public async confirmEmail(
     @Param('token') token: string,
@@ -51,24 +55,29 @@ export class UsersController {
   ) {
     const emailConfirmed = this.usersService.confirmEmail(token);
 
-        if (emailConfirmed) {
-          return res.redirect('/confirm.html');
-        } else {
-          return res.redirect('/error.html');
-        }
+    if (emailConfirmed) {
+      return res.redirect('/confirm.html');
+    } else {
+      return res.redirect('/error.html');
+    }
   }
 
+  @Roles('ADMIN')
+  @PublicAccess()
   @Get('all-users')
   public async getAllUsers() {
     return await this.usersService.getAllUsers();
   }
 
+  // @Roles('CLIENT', 'BROKER')
+  @PublicAccess()
   @Get(':id')
   public async getUserById(@Param('id') id: string) {
     const user = await this.usersService.getUsersById(id);
     return user;
   }
 
+  @PublicAccess()
   @Post('verify')
   public async verifyEmailDni(
     @Query('email') email?: string,
@@ -80,6 +89,8 @@ export class UsersController {
     return user;
   }
 
+  // @Roles('CLIENT')
+  @PublicAccess()
   @Post('add-client/:client/:broker')
   public async addClient(
     @Param('client') client: string,
@@ -88,6 +99,7 @@ export class UsersController {
     return this.usersService.addClient(client, broker);
   }
 
+  @PublicAccess()
   @Put('edit/:id')
   public async updateUser(
     @Param('id') id: string,
@@ -96,6 +108,7 @@ export class UsersController {
     return await this.usersService.updateUser(id, body);
   }
 
+  @PublicAccess()
   @Delete('delete/:id')
   public async deleteUser(@Param('id') id: string) {
     return await this.usersService.deleteUser(id);
