@@ -1,7 +1,7 @@
 import { BaseEntity } from "../../../config/base.entity";
 import { Vehicle } from "../../../containers/vehicle/entities/vehicle.entity";
 import { IGnc } from "../../../interfaces/gnc.interface";
-import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
+import { Column, Entity, OneToOne } from "typeorm";
 
 @Entity({name: 'gnc'})
 export class Gnc extends BaseEntity implements IGnc {
@@ -16,7 +16,6 @@ export class Gnc extends BaseEntity implements IGnc {
      plate: string;
 
      @OneToOne(() => Vehicle)
-     @JoinColumn()
      vehicle: Vehicle;
 
 };

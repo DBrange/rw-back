@@ -22,5 +22,5 @@ export class Theft extends BaseEntity implements ITheft {
 
   @OneToOne(() => TheftTire)
   @JoinColumn()
-  TheftTire: TheftTire;
+  theftTire: TheftTire;
 }

@@ -1,22 +1,19 @@
 import { Electronics } from '../../../containers/electronics/entities/electronics.entity';
 import { BaseEntity } from "../../../config/base.entity";
 import { ISmartphone } from "../../../interfaces/smartphone.interface";
-import { Entity, Column, JoinColumn, OneToOne } from "typeorm";
+import { Entity, Column, OneToOne } from "typeorm";
 
-@Entity({name: 'smartphones'})
+@Entity({ name: 'smartphones' })
 export class Smartphone extends BaseEntity implements ISmartphone {
+  @Column()
+  imei: string;
 
-     @Column()
-     imei: string;
+  @Column()
+  phoneNumber: string;
 
-     @Column()
-     phoneNumber: string;
+  @Column()
+  phoneService: string;
 
-     @Column()
-     phoneService: string;
-
-     @OneToOne(() => Electronics)
-     @JoinColumn()
-     electronics: Electronics;
-     
+  @OneToOne(() => Electronics, (electronic) => electronic.smartphones)
+  electronics: Electronics;
 };

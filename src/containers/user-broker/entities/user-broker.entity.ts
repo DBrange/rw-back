@@ -22,7 +22,7 @@ export class UserBrokerEntity extends BaseEntity implements IUserBroker {
 
   @OneToMany(() => UserEntity, (user) => user.userBroker)
   @JoinColumn()
-  clients: (UserEntity)[];
+  clients: UserEntity[];
 
   @OneToMany(() => LegalUsers, (user) => user.userBroker)
   @JoinColumn()
@@ -33,7 +33,7 @@ export class UserBrokerUpdateDTO {
   @IsOptional()
   @IsString()
   bussinesName: string;
-  
+
   @IsOptional()
   @IsString()
   enrollment: string;
@@ -44,9 +44,9 @@ export class UserBrokerUpdateDTO {
 
   @IsOptional()
   @IsUUID('4', { each: true })
-  clients: ( UserEntity)[];
+  clients: UserEntity[];
 
   @IsOptional()
   @IsUUID('4', { each: true })
-  legalClients: ( LegalUsers)[];
+  legalClients: LegalUsers[];
 }

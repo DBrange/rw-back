@@ -18,9 +18,9 @@ export class AssetDTO {
      @IsUUID()
      legalUsers: LegalUsers;
 
-     @IsOptional()
-     @IsUUID()
-     electronics: Electronics;
+    //  @IsOptional()
+    //  @IsUUID()
+    //  electronics: Electronics;
 
 
 };

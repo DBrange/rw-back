@@ -27,7 +27,7 @@ export class ThirdPartyDriver extends BaseEntity implements IThirdPartyDriver {
      @Column()
      email: string;
      
-     @OneToOne(() => ThirdPartyVehicle)
-     @JoinColumn()
-     thirdPartyVehicle: ThirdPartyVehicle;
+    //  @OneToOne(() => ThirdPartyVehicle)
+    //  @JoinColumn()
+    //  thirdPartyVehicle: ThirdPartyVehicle;
 };

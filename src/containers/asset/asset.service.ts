@@ -20,6 +20,7 @@ import * as puppeteer from 'puppeteer';
 import { ConfigService } from '@nestjs/config';
 import { ErrorManager } from 'src/utils/error.manager';
 import { UserBrokerService } from '../user-broker/services/user-broker.service';
+import { Smartphone } from '../smartphones/entities/smartphone.entity';
 
 interface PDF {
   userDTO: UserDTO;
@@ -307,7 +308,9 @@ export class AssetService {
         .leftJoinAndSelect('assets.users', 'users')
         .leftJoinAndSelect('assets.legalUsers', 'legalUsers')
         .leftJoinAndSelect('assets.vehicle', 'vehicle')
+        .leftJoinAndSelect('vehicle.gncId', 'gnc')
         .leftJoinAndSelect('assets.electronics', 'electronics')
+        .leftJoinAndSelect('electronics.smartphones', 'smartphones')
         .getOne();
 
       if (!result) {
@@ -593,42 +596,48 @@ export class AssetService {
       }
 
       if (vehicleDTO) {
-        const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
-
-        if (newVehicle.gnc) {
+        let newGnc;
+        if (vehicleDTO.gnc) {
           const vehicleGnc = {
             ...gncDTO,
-            vehicle: newVehicle.id,
           };
-          await this.gncService.createGnc(vehicleGnc);
+          newGnc = await this.gncService.createGnc(vehicleGnc);
         }
 
+        const newVehicle = await this.vehicleService.createVehicle({
+          ...vehicleDTO,
+          gncId: newGnc,
+        });
         const asset = {
           ...assetDTO,
-          vehicle: newVehicle,
+          vehicle: { ...newVehicle },
           users: userId as unknown as UserDTO,
         };
 
         await this.assetRepository.save(asset);
       } else {
-        const newElectronic = await this.electronicService.createElectronics(
-          electronicDTO,
-        );
-
-        if (newElectronic.type === 'CELULAR') {
+        let newSmartphone: Smartphone;
+        if (electronicDTO.type === 'CELULAR') {
           const relatedSmartphone = {
             ...smartphoneDTO,
-            electronics: newElectronic.id,
           };
 
-          await this.smartphoneService.createSmartphone(relatedSmartphone);
+          newSmartphone = await this.smartphoneService.createSmartphone(
+            relatedSmartphone,
+          );
         }
+
+        const newElectronic = await this.electronicService.createElectronics({
+          ...electronicDTO,
+          smartphones: newSmartphone,
+        });
 
         const asset = {
           ...assetDTO,
           users: userId as unknown as UserDTO,
-          electronics: newElectronic,
+          electronics: { ...newElectronic },
         };
+
         await this.assetRepository.save(asset);
       }
 
@@ -656,45 +665,50 @@ export class AssetService {
       }
 
       if (vehicleDTO) {
-        const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
-
-        if (newVehicle.gnc) {
+        let newGnc;
+        if (vehicleDTO.gnc) {
           const vehicleGnc = {
             ...gncDTO,
-            vehicle: newVehicle.id,
           };
-          await this.gncService.createGnc(vehicleGnc);
+          newGnc = await this.gncService.createGnc(vehicleGnc);
         }
 
+        const newVehicle = await this.vehicleService.createVehicle({
+          ...vehicleDTO,
+          gncId: newGnc,
+        });
         const asset = {
           ...assetDTO,
-          vehicle: newVehicle,
+          vehicle: { ...newVehicle },
           legalUsers: userId as unknown as LegalUsersDTO,
         };
 
         await this.assetRepository.save(asset);
       } else {
-        const newElectronic = await this.electronicService.createElectronics(
-          electronicDTO,
-        );
-
-        if (newElectronic.type === 'CELULAR') {
+        let newSmartphone: Smartphone;
+        if (electronicDTO.type === 'CELULAR') {
           const relatedSmartphone = {
             ...smartphoneDTO,
-            electronics: newElectronic.id,
           };
 
-          await this.smartphoneService.createSmartphone(relatedSmartphone);
+          newSmartphone = await this.smartphoneService.createSmartphone(
+            relatedSmartphone,
+          );
         }
 
-        const fullAsset = {
+        const newElectronic = await this.electronicService.createElectronics({
+          ...electronicDTO,
+          smartphones: newSmartphone,
+        });
+
+        const asset = {
           ...assetDTO,
           legalUsers: userId as unknown as LegalUsersDTO,
-          electronics: newElectronic,
+          electronics: { ...newElectronic },
         };
-        await this.assetRepository.save(fullAsset);
-      }
 
+        await this.assetRepository.save(asset);
+      }
       return { message: 'La inspeccion a sido realizada con exito' };
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);

@@ -5,8 +5,10 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
 } from 'class-validator';
 import { FUEL, TYPE } from 'src/constants/enums';
+import { Gnc } from 'src/containers/gnc/entities/gnc.entity';
 import { IVehicle } from 'src/interfaces/vehicle.interface';
 
 export class VehicleDTO implements IVehicle {
@@ -77,4 +79,8 @@ export class VehicleDTO implements IVehicle {
   @IsNotEmpty()
   @IsBoolean()
   noSpareTire: boolean;
+
+  @IsOptional()
+  @IsUUID()
+  gncId: Gnc;
 }

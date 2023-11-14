@@ -1,39 +1,45 @@
+import { ThirdPartyDriver } from "src/containers/third-party-driver/entities/thirdPartyDriver.entity";
 import { BaseEntity } from "../../../config/base.entity";
 import { Sinister } from "../../../containers/sinister/entities/sinister.entity";
 import { IThirdPartyVehicle } from "../../../interfaces/thirdPartyVehicle.interface";
-import { Entity, Column, ManyToOne } from "typeorm";
+import { Entity, Column, ManyToOne, JoinColumn, OneToOne } from "typeorm";
 
-@Entity({name: 'third_party_vehicle'})
-export class ThirdPartyVehicle extends BaseEntity implements IThirdPartyVehicle {
+@Entity({ name: 'third_party_vehicle' })
+export class ThirdPartyVehicle
+  extends BaseEntity
+  implements IThirdPartyVehicle
+{
+  @Column()
+  brand: string;
 
-     @Column()
-     brand: string;
+  @Column()
+  model: string;
 
-     @Column()
-     model: string;
+  @Column()
+  year: number;
 
-     @Column()
-     year: number;
+  @Column()
+  plate: string;
 
-     @Column()
-     plate: string;
+  @Column()
+  insuranceCompany: string;
 
-     @Column()
-     insuranceCompany: string;
+  @Column()
+  insurancePolicy: string;
 
-     @Column()
-     insurancePolicy: string;
+  @Column()
+  ownerName: string;
 
-     @Column()
-     ownerName: string;
+  @Column()
+  ownerLastName: string;
 
-     @Column()
-     ownerLastName: string;
+  @Column()
+  ownerDni: string;
 
-     @Column()
-     ownerDni: string;
+  @OneToOne(() => ThirdPartyDriver)
+  @JoinColumn()
+  thirdPartyDriver: ThirdPartyDriver;
 
-     @ManyToOne(() => Sinister , (sinister) => sinister.thirdPartyVehicle)
-     sinister: Sinister;
-
+  @ManyToOne(() => Sinister, (sinister) => sinister.thirdPartyVehicle)
+  sinister: Sinister;
 };

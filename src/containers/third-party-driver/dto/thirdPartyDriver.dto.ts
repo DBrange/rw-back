@@ -31,9 +31,9 @@ export class ThirdPartyDriverDTO {
      @IsEmail()
      email: string;
 
-     @IsNotEmpty()
-     @IsUUID()
-     thirdPartyVehicle: ThirdPartyVehicle;
+    //  @IsNotEmpty()
+    //  @IsUUID()
+    //  thirdPartyVehicle: ThirdPartyVehicle;
 
      
 };

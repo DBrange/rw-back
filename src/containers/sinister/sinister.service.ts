@@ -51,6 +51,7 @@ import { join } from 'path';
 import { ErrorManager } from 'src/utils/error.manager';
 import { AssetEntity } from '../asset/entities/asset.entity';
 import { UserBrokerService } from '../user-broker/services/user-broker.service';
+import { Smartphone } from '../smartphones/entities/smartphone.entity';
 interface PDF {
   userDTO: UserDTO;
   legalUserDTO: LegalUsersDTO;
@@ -781,13 +782,19 @@ export class SinisterService {
         .where({ id })
         .leftJoinAndSelect('sinister.asset', 'asset')
         .leftJoinAndSelect('asset.vehicle', 'vehicle')
+        .leftJoinAndSelect('vehicle.gncId', 'gnc')
         .leftJoinAndSelect('asset.electronics', 'electronics')
+        .leftJoinAndSelect('electronics.smartphones', 'smartphones')
         .leftJoinAndSelect('sinister.injuredd', 'injuredd')
         .leftJoinAndSelect('injuredd.injuredsInfo', 'injuredsInfo')
         .leftJoinAndSelect('sinister.thirdPartyVehicle', 'thirdPartyVehicle')
+        .leftJoinAndSelect(
+          'thirdPartyVehicle.thirdPartyDriver',
+          'thirdPartyDriver',
+        )
         .leftJoinAndSelect('sinister.sinisterType', 'sinisterType')
         .leftJoinAndSelect('sinisterType.theft', 'theft')
-        .leftJoinAndSelect('theft.TheftTire', 'TheftTire')
+        .leftJoinAndSelect('theft.theftTire', 'theftTire')
         .leftJoinAndSelect('sinisterType.fire', 'fire')
         .leftJoinAndSelect('sinisterType.crash', 'crash')
         .getOne();
@@ -1130,6 +1137,23 @@ export class SinisterService {
           const el = allThirdParty[i];
           thirdPartyVehicleEmails.push(el.email);
 
+          const bodyThirdPartyDriver: ThirdPartyDriverDTO = {
+            name: el.name,
+            lastName: el.lastName,
+            dni: el.dni,
+            address: el.address,
+            phoneNumber: el.phoneNumber,
+            licensePhoto: el.licensePhoto,
+            email: el.email,
+            // thirdPartyVehicle: newThirdPartyVehicle,
+          };
+
+          //newThirdPartyDriver
+          const newThirdPartyDriver =
+            await this.thirdPartyDriverService.createThirdPartyDriver(
+              bodyThirdPartyDriver,
+            );
+
           const bodyThirdPartyVehicle: ThirdPartyVehicleDTO = {
             brand: el.brand,
             model: el.model,
@@ -1140,28 +1164,13 @@ export class SinisterService {
             ownerName: el.ownerLastName,
             ownerLastName: el.ownerLastName,
             ownerDni: el.ownerDni,
+            thirdPartyDriver: newThirdPartyDriver,
             sinister: newSinister,
           };
 
-          newThirdPartyVehicle =
-            await this.thirdPartyVehicleService.createThirdPartyVehicle(
-              bodyThirdPartyVehicle,
-            );
-
-          const bodyThirdPartyDriver: ThirdPartyDriverDTO = {
-            name: el.name,
-            lastName: el.lastName,
-            dni: el.dni,
-            address: el.address,
-            phoneNumber: el.phoneNumber,
-            licensePhoto: el.licensePhoto,
-            email: el.email,
-            thirdPartyVehicle: newThirdPartyVehicle,
-          };
-
-          //newThirdPartyDriver
-          await this.thirdPartyDriverService.createThirdPartyDriver(
-            bodyThirdPartyDriver,
+          //newThirdPartyVehicle
+          await this.thirdPartyVehicleService.createThirdPartyVehicle(
+            bodyThirdPartyVehicle,
           );
         }
       }
@@ -1595,16 +1604,32 @@ export class SinisterService {
         }
       }
 
-      let newThirdPartyVehicle: ThirdPartyVehicle;
-      const thirdPartyVehicleMails: string[] = [];
+      const thirdPartyVehicleEmails: string[] = [];
 
-      if (crashDTO.friendlyStatement) {
-        const allThirdParty: ThirdParty =
-          thirdPartyVehicleDTO.thirdPartyVehicleInfo;
-
+      const allThirdParty: ThirdParty =
+        thirdPartyVehicleDTO.thirdPartyVehicleInfo;
+      if (allThirdParty) {
         for (let i = 0; i < allThirdParty.length; i++) {
           const el = allThirdParty[i];
-          thirdPartyVehicleMails.push(el.email);
+          thirdPartyVehicleEmails.push(el.email);
+
+          const bodyThirdPartyDriver: ThirdPartyDriverDTO = {
+            name: el.name,
+            lastName: el.lastName,
+            dni: el.dni,
+            address: el.address,
+            phoneNumber: el.phoneNumber,
+            licensePhoto: el.licensePhoto,
+            email: el.email,
+            // thirdPartyVehicle: newThirdPartyVehicle,
+          };
+
+          //newThirdPartyDriver
+          const newThirdPartyDriver =
+            await this.thirdPartyDriverService.createThirdPartyDriver(
+              bodyThirdPartyDriver,
+            );
+
           const bodyThirdPartyVehicle: ThirdPartyVehicleDTO = {
             brand: el.brand,
             model: el.model,
@@ -1615,28 +1640,13 @@ export class SinisterService {
             ownerName: el.ownerLastName,
             ownerLastName: el.ownerLastName,
             ownerDni: el.ownerDni,
+            thirdPartyDriver: newThirdPartyDriver,
             sinister: newSinister,
           };
 
-          newThirdPartyVehicle =
-            await this.thirdPartyVehicleService.createThirdPartyVehicle(
-              bodyThirdPartyVehicle,
-            );
-
-          const bodyThirdPartyDriver: ThirdPartyDriverDTO = {
-            name: el.name,
-            lastName: el.lastName,
-            dni: el.dni,
-            address: el.address,
-            phoneNumber: el.phoneNumber,
-            licensePhoto: el.licensePhoto,
-            email: el.email,
-            thirdPartyVehicle: newThirdPartyVehicle,
-          };
-
-          //newThirdPartyDriver
-          await this.thirdPartyDriverService.createThirdPartyDriver(
-            bodyThirdPartyDriver,
+          //newThirdPartyVehicle
+          await this.thirdPartyVehicleService.createThirdPartyVehicle(
+            bodyThirdPartyVehicle,
           );
         }
       }
@@ -1656,7 +1666,7 @@ export class SinisterService {
       });
 
       const emails = crashDTO.friendlyStatement
-        ? [legalUserDTO.email, ...thirdPartyVehicleMails]
+        ? [legalUserDTO.email, ...thirdPartyVehicleEmails]
         : [legalUserDTO.email];
 
       this.sendPdfEmail(generatePdf, [...emails]);
@@ -1788,20 +1798,23 @@ export class SinisterService {
       }
 
       if (vehicleDTO) {
-        const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
-
-        if (newVehicle.gnc) {
+        let newGnc;
+        if (vehicleDTO.gnc) {
           const vehicleGnc = {
             ...gncDTO,
-            vehicle: newVehicle.id,
           };
-          await this.gncService.createGnc(vehicleGnc);
+          newGnc = await this.gncService.createGnc(vehicleGnc);
         }
+
+        const newVehicle = await this.vehicleService.createVehicle({
+          ...vehicleDTO,
+          gncId: newGnc,
+        });
 
         const asset = {
           ...assetDTO,
-          vehicle: newVehicle,
-          users: userId,
+          vehicle: { ...newVehicle },
+          users: userId as unknown as UserDTO,
         };
 
         const newAsset = await this.assetService.createAsset(asset);
@@ -1850,23 +1863,26 @@ export class SinisterService {
         return response;
         // return { message: 'La inspeccion a sido realizada con exito' };
       } else {
-        const newElectronic = await this.electronicService.createElectronics(
-          electronicDTO,
-        );
-
-        if (newElectronic.type === 'CELULAR') {
+        let newSmartphone: Smartphone;
+        if (electronicDTO.type === 'CELULAR') {
           const relatedSmartphone = {
             ...smartphoneDTO,
-            electronics: newElectronic.id,
           };
 
-          await this.smartphoneService.createSmartphone(relatedSmartphone);
+          newSmartphone = await this.smartphoneService.createSmartphone(
+            relatedSmartphone,
+          );
         }
+
+        const newElectronic = await this.electronicService.createElectronics({
+          ...electronicDTO,
+          smartphones: newSmartphone,
+        });
 
         const asset = {
           ...assetDTO,
           users: userId as unknown as UserDTO,
-          electronics: newElectronic,
+          electronics: { ...newElectronic },
         };
 
         const newAsset = await this.assetService.createAsset(asset);
@@ -1939,20 +1955,23 @@ export class SinisterService {
       }
 
       if (vehicleDTO) {
-        const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
-
-        if (newVehicle.gnc) {
+        let newGnc;
+        if (vehicleDTO.gnc) {
           const vehicleGnc = {
             ...gncDTO,
-            vehicle: newVehicle.id,
           };
-          await this.gncService.createGnc(vehicleGnc);
+          newGnc = await this.gncService.createGnc(vehicleGnc);
         }
+
+        const newVehicle = await this.vehicleService.createVehicle({
+          ...vehicleDTO,
+          gncId: newGnc,
+        });
 
         const asset = {
           ...assetDTO,
-          vehicle: newVehicle,
-          legalUsers: userId,
+          vehicle: { ...newVehicle },
+          legalUsers: userId as unknown as UserDTO,
         };
 
         const newAsset = await this.assetService.createAsset(asset);
@@ -1993,23 +2012,26 @@ export class SinisterService {
 
         const newSinister = await this.sinisterRepository.save(bodySinister);
       } else {
-        const newElectronic = await this.electronicService.createElectronics(
-          electronicDTO,
-        );
-
-        if (newElectronic.type === 'CELULAR') {
+        let newSmartphone: Smartphone;
+        if (electronicDTO.type === 'CELULAR') {
           const relatedSmartphone = {
             ...smartphoneDTO,
-            electronics: newElectronic.id,
           };
 
-          await this.smartphoneService.createSmartphone(relatedSmartphone);
+          newSmartphone = await this.smartphoneService.createSmartphone(
+            relatedSmartphone,
+          );
         }
+
+        const newElectronic = await this.electronicService.createElectronics({
+          ...electronicDTO,
+          smartphones: newSmartphone,
+        });
 
         const asset = {
           ...assetDTO,
           legalUsers: userId as unknown as UserDTO,
-          electronics: newElectronic,
+          electronics: { ...newElectronic },
         };
 
         const newAsset = await this.assetService.createAsset(asset);
@@ -2074,20 +2096,22 @@ export class SinisterService {
         });
       }
 
-      const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
-
-      if (newVehicle.gnc) {
+      let newGnc;
+      if (vehicleDTO.gnc) {
         const vehicleGnc = {
           ...gncDTO,
-          vehicle: newVehicle.id,
         };
-        await this.gncService.createGnc(vehicleGnc);
+        newGnc = await this.gncService.createGnc(vehicleGnc);
       }
 
+      const newVehicle = await this.vehicleService.createVehicle({
+        ...vehicleDTO,
+        gncId: newGnc,
+      });
       const asset = {
         ...assetDTO,
-        vehicle: newVehicle,
-        users: userId,
+        vehicle: { ...newVehicle },
+        users: userId as unknown as UserDTO,
       };
 
       const newAsset = await this.assetService.createAsset(asset);
@@ -2169,20 +2193,22 @@ export class SinisterService {
         });
       }
 
-      const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
-
-      if (newVehicle.gnc) {
+      let newGnc;
+      if (vehicleDTO.gnc) {
         const vehicleGnc = {
           ...gncDTO,
-          vehicle: newVehicle.id,
         };
-        await this.gncService.createGnc(vehicleGnc);
+        newGnc = await this.gncService.createGnc(vehicleGnc);
       }
 
+      const newVehicle = await this.vehicleService.createVehicle({
+        ...vehicleDTO,
+        gncId: newGnc,
+      });
       const asset = {
         ...assetDTO,
-        vehicle: newVehicle,
-        legalUsers: userId,
+        vehicle: { ...newVehicle },
+        legalUsers: userId as unknown as UserDTO,
       };
 
       const newAsset = await this.assetService.createAsset(asset);
@@ -2265,20 +2291,22 @@ export class SinisterService {
         });
       }
 
-      const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
-
-      if (newVehicle.gnc) {
+      let newGnc;
+      if (vehicleDTO.gnc) {
         const vehicleGnc = {
           ...gncDTO,
-          vehicle: newVehicle.id,
         };
-        await this.gncService.createGnc(vehicleGnc);
+        newGnc = await this.gncService.createGnc(vehicleGnc);
       }
 
+      const newVehicle = await this.vehicleService.createVehicle({
+        ...vehicleDTO,
+        gncId: newGnc,
+      });
       const asset = {
         ...assetDTO,
-        vehicle: newVehicle,
-        users: userId,
+        vehicle: { ...newVehicle },
+        users: userId as unknown as UserDTO,
       };
 
       const newAsset = await this.assetService.createAsset(asset);
@@ -2337,7 +2365,6 @@ export class SinisterService {
         }
       }
 
-      let newThirdPartyVehicle: ThirdPartyVehicle;
       const thirdPartyVehicleEmails: string[] = [];
 
       const allThirdParty: ThirdParty =
@@ -2346,6 +2373,23 @@ export class SinisterService {
         for (let i = 0; i < allThirdParty.length; i++) {
           const el = allThirdParty[i];
           thirdPartyVehicleEmails.push(el.email);
+
+          const bodyThirdPartyDriver: ThirdPartyDriverDTO = {
+            name: el.name,
+            lastName: el.lastName,
+            dni: el.dni,
+            address: el.address,
+            phoneNumber: el.phoneNumber,
+            licensePhoto: el.licensePhoto,
+            email: el.email,
+            // thirdPartyVehicle: newThirdPartyVehicle,
+          };
+
+          //newThirdPartyDriver
+          const newThirdPartyDriver =
+            await this.thirdPartyDriverService.createThirdPartyDriver(
+              bodyThirdPartyDriver,
+            );
 
           const bodyThirdPartyVehicle: ThirdPartyVehicleDTO = {
             brand: el.brand,
@@ -2357,28 +2401,13 @@ export class SinisterService {
             ownerName: el.ownerLastName,
             ownerLastName: el.ownerLastName,
             ownerDni: el.ownerDni,
+            thirdPartyDriver: newThirdPartyDriver,
             sinister: newSinister,
           };
 
-          newThirdPartyVehicle =
-            await this.thirdPartyVehicleService.createThirdPartyVehicle(
-              bodyThirdPartyVehicle,
-            );
-
-          const bodyThirdPartyDriver: ThirdPartyDriverDTO = {
-            name: el.name,
-            lastName: el.lastName,
-            dni: el.dni,
-            address: el.address,
-            phoneNumber: el.phoneNumber,
-            licensePhoto: el.licensePhoto,
-            email: el.email,
-            thirdPartyVehicle: newThirdPartyVehicle,
-          };
-
-          //newThirdPartyDriver
-          await this.thirdPartyDriverService.createThirdPartyDriver(
-            bodyThirdPartyDriver,
+          //newThirdPartyVehicle
+          await this.thirdPartyVehicleService.createThirdPartyVehicle(
+            bodyThirdPartyVehicle,
           );
         }
       }
@@ -2407,20 +2436,22 @@ export class SinisterService {
         });
       }
 
-      const newVehicle = await this.vehicleService.createVehicle(vehicleDTO);
-
-      if (newVehicle.gnc) {
+      let newGnc;
+      if (vehicleDTO.gnc) {
         const vehicleGnc = {
           ...gncDTO,
-          vehicle: newVehicle.id,
         };
-        await this.gncService.createGnc(vehicleGnc);
+        newGnc = await this.gncService.createGnc(vehicleGnc);
       }
 
+      const newVehicle = await this.vehicleService.createVehicle({
+        ...vehicleDTO,
+        gncId: newGnc,
+      });
       const asset = {
         ...assetDTO,
-        vehicle: newVehicle,
-        legalUsers: userId,
+        vehicle: { ...newVehicle },
+        users: userId as unknown as UserDTO,
       };
 
       const newAsset = await this.assetService.createAsset(asset);
@@ -2479,7 +2510,7 @@ export class SinisterService {
         }
       }
 
-      let newThirdPartyVehicle: ThirdPartyVehicle;
+      // let newThirdPartyVehicle: ThirdPartyVehicle;
       const thirdPartyVehicleEmails: string[] = [];
 
       const allThirdParty: ThirdParty =
@@ -2488,6 +2519,23 @@ export class SinisterService {
         for (let i = 0; i < allThirdParty.length; i++) {
           const el = allThirdParty[i];
           thirdPartyVehicleEmails.push(el.email);
+
+          const bodyThirdPartyDriver: ThirdPartyDriverDTO = {
+            name: el.name,
+            lastName: el.lastName,
+            dni: el.dni,
+            address: el.address,
+            phoneNumber: el.phoneNumber,
+            licensePhoto: el.licensePhoto,
+            email: el.email,
+            // thirdPartyVehicle: newThirdPartyVehicle,
+          };
+
+          //newThirdPartyDriver
+          const newThirdPartyDriver =
+            await this.thirdPartyDriverService.createThirdPartyDriver(
+              bodyThirdPartyDriver,
+            );
 
           const bodyThirdPartyVehicle: ThirdPartyVehicleDTO = {
             brand: el.brand,
@@ -2499,28 +2547,13 @@ export class SinisterService {
             ownerName: el.ownerLastName,
             ownerLastName: el.ownerLastName,
             ownerDni: el.ownerDni,
+            thirdPartyDriver: newThirdPartyDriver,
             sinister: newSinister,
           };
 
-          newThirdPartyVehicle =
-            await this.thirdPartyVehicleService.createThirdPartyVehicle(
-              bodyThirdPartyVehicle,
-            );
-
-          const bodyThirdPartyDriver: ThirdPartyDriverDTO = {
-            name: el.name,
-            lastName: el.lastName,
-            dni: el.dni,
-            address: el.address,
-            phoneNumber: el.phoneNumber,
-            licensePhoto: el.licensePhoto,
-            email: el.email,
-            thirdPartyVehicle: newThirdPartyVehicle,
-          };
-
-          //newThirdPartyDriver
-          await this.thirdPartyDriverService.createThirdPartyDriver(
-            bodyThirdPartyDriver,
+          //newThirdPartyVehicle
+          await this.thirdPartyVehicleService.createThirdPartyVehicle(
+            bodyThirdPartyVehicle,
           );
         }
       }
@@ -2743,7 +2776,6 @@ export class SinisterService {
         }
       }
 
-      let newThirdPartyVehicle: ThirdPartyVehicle;
       const thirdPartyVehicleEmails: string[] = [];
 
       const allThirdParty: ThirdParty =
@@ -2752,6 +2784,23 @@ export class SinisterService {
         for (let i = 0; i < allThirdParty.length; i++) {
           const el = allThirdParty[i];
           thirdPartyVehicleEmails.push(el.email);
+
+          const bodyThirdPartyDriver: ThirdPartyDriverDTO = {
+            name: el.name,
+            lastName: el.lastName,
+            dni: el.dni,
+            address: el.address,
+            phoneNumber: el.phoneNumber,
+            licensePhoto: el.licensePhoto,
+            email: el.email,
+            // thirdPartyVehicle: newThirdPartyVehicle,
+          };
+
+          //newThirdPartyDriver
+          const newThirdPartyDriver =
+            await this.thirdPartyDriverService.createThirdPartyDriver(
+              bodyThirdPartyDriver,
+            );
 
           const bodyThirdPartyVehicle: ThirdPartyVehicleDTO = {
             brand: el.brand,
@@ -2763,28 +2812,13 @@ export class SinisterService {
             ownerName: el.ownerLastName,
             ownerLastName: el.ownerLastName,
             ownerDni: el.ownerDni,
+            thirdPartyDriver: newThirdPartyDriver,
             sinister: newSinister,
           };
 
-          newThirdPartyVehicle =
-            await this.thirdPartyVehicleService.createThirdPartyVehicle(
-              bodyThirdPartyVehicle,
-            );
-
-          const bodyThirdPartyDriver: ThirdPartyDriverDTO = {
-            name: el.name,
-            lastName: el.lastName,
-            dni: el.dni,
-            address: el.address,
-            phoneNumber: el.phoneNumber,
-            licensePhoto: el.licensePhoto,
-            email: el.email,
-            thirdPartyVehicle: newThirdPartyVehicle,
-          };
-
-          //newThirdPartyDriver
-          await this.thirdPartyDriverService.createThirdPartyDriver(
-            bodyThirdPartyDriver,
+          //newThirdPartyVehicle
+          await this.thirdPartyVehicleService.createThirdPartyVehicle(
+            bodyThirdPartyVehicle,
           );
         }
       }
@@ -2802,20 +2836,38 @@ export class SinisterService {
       const userAssets = (await this.userService.getUsersById(id)).asset;
 
       const sinisters = userAssets.map(async (asset) => {
-        const sinister = await this.sinisterRepository
+        // const sinister = await this.sinisterRepository
+        //   .createQueryBuilder('sinister')
+        //   .where({ asset: asset.id })
+        //   .leftJoinAndSelect('sinister.asset', 'asset')
+        //   .leftJoinAndSelect('asset.vehicle', 'vehicle')
+        //   .leftJoinAndSelect('asset.electronics', 'electronics')
+        //   .leftJoinAndSelect('sinister.injuredd', 'injuredd')
+        //   .leftJoinAndSelect('injuredd.injuredsInfo', 'injuredsInfo')
+        //   .leftJoinAndSelect('sinister.thirdPartyVehicle', 'thirdPartyVehicle')
+        //   .leftJoinAndSelect(
+        //     'thirdPartyVehicle.thirdPartyDriver',
+        //     'thirdPartyDriver',
+        //   )
+        //   .leftJoinAndSelect('sinister.sinisterType', 'sinisterType')
+        //   .leftJoinAndSelect('sinisterType.theft', 'theft')
+        //   .leftJoinAndSelect('theft.theftTire', 'theftTire')
+        //   .leftJoinAndSelect('sinisterType.fire', 'fire')
+        //   .leftJoinAndSelect('sinisterType.crash', 'crash')
+        //   .getOne();
+         const sinister = await this.sinisterRepository
           .createQueryBuilder('sinister')
           .where({ asset: asset.id })
           .leftJoinAndSelect('sinister.asset', 'asset')
-          .leftJoinAndSelect('asset.vehicle', 'vehicle')
-          .leftJoinAndSelect('asset.electronics', 'electronics')
-          .leftJoinAndSelect('sinister.injuredd', 'injuredd')
-          .leftJoinAndSelect('injuredd.injuredsInfo', 'injuredsInfo')
-          .leftJoinAndSelect('sinister.thirdPartyVehicle', 'thirdPartyVehicle')
-          .leftJoinAndSelect('sinister.sinisterType', 'sinisterType')
-          .leftJoinAndSelect('sinisterType.theft', 'theft')
-          .leftJoinAndSelect('theft.TheftTire', 'TheftTire')
-          .leftJoinAndSelect('sinisterType.fire', 'fire')
-          .leftJoinAndSelect('sinisterType.crash', 'crash')
+          .leftJoin('asset.vehicle', 'vehicle')
+          .addSelect('vehicle.brand')
+          .addSelect('vehicle.model')
+          .addSelect('vehicle.plate')
+          .addSelect('vehicle.type')
+          .leftJoin('asset.electronics', 'electronics')
+          .addSelect('electronics.brand')
+          .addSelect('electronics.model')
+          .addSelect('electronics.type')
           .getOne();
 
         return sinister;
@@ -2837,20 +2889,35 @@ export class SinisterService {
         .asset;
 
       const sinisters = userAssets.map(async (asset) => {
+        // const sinister = await this.sinisterRepository
+        //   .createQueryBuilder('sinister')
+        //   .where({ asset: asset.id })
+        //   .leftJoinAndSelect('sinister.asset', 'asset')
+        //   .leftJoinAndSelect('asset.vehicle', 'vehicle')
+        //   .leftJoinAndSelect('asset.electronics', 'electronics')
+        //   .leftJoinAndSelect('sinister.injuredd', 'injuredd')
+        //   .leftJoinAndSelect('injuredd.injuredsInfo', 'injuredsInfo')
+        //   .leftJoinAndSelect('sinister.thirdPartyVehicle', 'thirdPartyVehicle')
+        //   .leftJoinAndSelect('sinister.sinisterType', 'sinisterType')
+        //   .leftJoinAndSelect('sinisterType.theft', 'theft')
+        //   .leftJoinAndSelect('theft.TheftTire', 'TheftTire')
+        //   .leftJoinAndSelect('sinisterType.fire', 'fire')
+        //   .leftJoinAndSelect('sinisterType.crash', 'crash')
+        //   .getOne();
+
         const sinister = await this.sinisterRepository
           .createQueryBuilder('sinister')
           .where({ asset: asset.id })
           .leftJoinAndSelect('sinister.asset', 'asset')
-          .leftJoinAndSelect('asset.vehicle', 'vehicle')
-          .leftJoinAndSelect('asset.electronics', 'electronics')
-          .leftJoinAndSelect('sinister.injuredd', 'injuredd')
-          .leftJoinAndSelect('injuredd.injuredsInfo', 'injuredsInfo')
-          .leftJoinAndSelect('sinister.thirdPartyVehicle', 'thirdPartyVehicle')
-          .leftJoinAndSelect('sinister.sinisterType', 'sinisterType')
-          .leftJoinAndSelect('sinisterType.theft', 'theft')
-          .leftJoinAndSelect('theft.TheftTire', 'TheftTire')
-          .leftJoinAndSelect('sinisterType.fire', 'fire')
-          .leftJoinAndSelect('sinisterType.crash', 'crash')
+          .leftJoin('asset.vehicle', 'vehicle')
+          .addSelect('vehicle.brand')
+          .addSelect('vehicle.model')
+          .addSelect('vehicle.plate')
+          .addSelect('vehicle.type')
+          .leftJoin('asset.electronics', 'electronics')
+          .addSelect('electronics.brand')
+          .addSelect('electronics.model')
+          .addSelect('electronics.type')
           .getOne();
 
         return sinister;
