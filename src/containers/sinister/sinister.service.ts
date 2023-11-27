@@ -2833,51 +2833,59 @@ export class SinisterService {
   // get
   public async getUserSinistersForId(id: string) {
     try {
-      const userAssets = (await this.userService.getUsersById(id)).asset;
 
-      const sinisters = userAssets.map(async (asset) => {
-        // const sinister = await this.sinisterRepository
-        //   .createQueryBuilder('sinister')
-        //   .where({ asset: asset.id })
-        //   .leftJoinAndSelect('sinister.asset', 'asset')
-        //   .leftJoinAndSelect('asset.vehicle', 'vehicle')
-        //   .leftJoinAndSelect('asset.electronics', 'electronics')
-        //   .leftJoinAndSelect('sinister.injuredd', 'injuredd')
-        //   .leftJoinAndSelect('injuredd.injuredsInfo', 'injuredsInfo')
-        //   .leftJoinAndSelect('sinister.thirdPartyVehicle', 'thirdPartyVehicle')
-        //   .leftJoinAndSelect(
-        //     'thirdPartyVehicle.thirdPartyDriver',
-        //     'thirdPartyDriver',
-        //   )
-        //   .leftJoinAndSelect('sinister.sinisterType', 'sinisterType')
-        //   .leftJoinAndSelect('sinisterType.theft', 'theft')
-        //   .leftJoinAndSelect('theft.theftTire', 'theftTire')
-        //   .leftJoinAndSelect('sinisterType.fire', 'fire')
-        //   .leftJoinAndSelect('sinisterType.crash', 'crash')
-        //   .getOne();
-         const sinister = await this.sinisterRepository
-          .createQueryBuilder('sinister')
-          .where({ asset: asset.id })
-          .leftJoinAndSelect('sinister.asset', 'asset')
-          .leftJoin('asset.vehicle', 'vehicle')
-          .addSelect('vehicle.brand')
-          .addSelect('vehicle.model')
-          .addSelect('vehicle.plate')
-          .addSelect('vehicle.type')
-          .leftJoin('asset.electronics', 'electronics')
-          .addSelect('electronics.brand')
-          .addSelect('electronics.model')
-          .addSelect('electronics.type')
-          .getOne();
+      const users = (await this.userService.getUsers()).find(el => el.id === id)
+      if (users) {
+        
+      
+        const userAssets = (await this.userService.getUsersById(id)).asset;
 
-        return sinister;
-      });
+        const sinisters = userAssets.map(async (asset) => {
+          // const sinister = await this.sinisterRepository
+          //   .createQueryBuilder('sinister')
+          //   .where({ asset: asset.id })
+          //   .leftJoinAndSelect('sinister.asset', 'asset')
+          //   .leftJoinAndSelect('asset.vehicle', 'vehicle')
+          //   .leftJoinAndSelect('asset.electronics', 'electronics')
+          //   .leftJoinAndSelect('sinister.injuredd', 'injuredd')
+          //   .leftJoinAndSelect('injuredd.injuredsInfo', 'injuredsInfo')
+          //   .leftJoinAndSelect('sinister.thirdPartyVehicle', 'thirdPartyVehicle')
+          //   .leftJoinAndSelect(
+          //     'thirdPartyVehicle.thirdPartyDriver',
+          //     'thirdPartyDriver',
+          //   )
+          //   .leftJoinAndSelect('sinister.sinisterType', 'sinisterType')
+          //   .leftJoinAndSelect('sinisterType.theft', 'theft')
+          //   .leftJoinAndSelect('theft.theftTire', 'theftTire')
+          //   .leftJoinAndSelect('sinisterType.fire', 'fire')
+          //   .leftJoinAndSelect('sinisterType.crash', 'crash')
+          //   .getOne();
+          const sinister = await this.sinisterRepository
+            .createQueryBuilder('sinister')
+            .where({ asset: asset.id })
+            .leftJoinAndSelect('sinister.asset', 'asset')
+            .leftJoin('asset.vehicle', 'vehicle')
+            .addSelect('vehicle.brand')
+            .addSelect('vehicle.model')
+            .addSelect('vehicle.plate')
+            .addSelect('vehicle.type')
+            .leftJoin('asset.electronics', 'electronics')
+            .addSelect('electronics.brand')
+            .addSelect('electronics.model')
+            .addSelect('electronics.type')
+            .getOne();
 
-      const sinistersWithoutNull = (await Promise.all(sinisters)).flatMap(
-        (sinister) => (!sinister ? [] : sinister),
-      );
+          return sinister;
+        });
 
-      return sinistersWithoutNull;
+        const sinistersWithoutNull = (await Promise.all(sinisters)).flatMap(
+          (sinister) => (!sinister ? [] : sinister),
+        );
+
+        return sinistersWithoutNull;
+      } else {
+        return this.getLegalUserSinistersForId(id)
+      }
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
     }
@@ -2937,11 +2945,23 @@ export class SinisterService {
     const clients = (await this.userBrokerService.getUserBrokerById(brokerId))
       .clients;
 
-    const allSinistersPromises = clients.map(
+    const allUserSinistersPromises = clients.map(
       async (client) => await this.getUserSinistersForId(client.id),
     );
 
-    const allSinisters = (await Promise.all(allSinistersPromises)).flat();
+    const legalClients = (await this.userBrokerService.getUserBrokerById(brokerId))
+      .legalClients;
+
+    const allLegalUserSinistersPromises = legalClients.map(
+      async (client) => await this.getLegalUserSinistersForId(client.id),
+    );
+
+    const allSinisters = (
+      await Promise.all([
+        ...allLegalUserSinistersPromises,
+        ...allUserSinistersPromises,
+      ])
+    ).flat();
 
     return allSinisters;
   }
@@ -2954,7 +2974,7 @@ export class SinisterService {
       async (client) => await this.getLegalUserSinistersForId(client.id),
     );
 
-    const allSinisters = (await Promise.all(allSinistersPromises)).flat();
+    const allSinisters = (await Promise.all([allSinistersPromises])).flat();
 
     return allSinisters;
   }

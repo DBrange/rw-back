@@ -99,6 +99,22 @@ export class UsersController {
     return this.usersService.addClient(client, broker);
   }
 
+
+
+  @PublicAccess()
+  @Get('client-detail/:id')
+  public async clientDetailForId(@Param('id') id: string) {
+    const user = await this.usersService.clientDetailForId(id);
+    return user;
+  }
+
+  @PublicAccess()
+  @Get('broker-clients/:id')
+  public async allClientsOfBroker(@Param('id') id: string) {
+    const user = await this.usersService.allClientsOfBroker(id);
+    return user;
+  }
+
   @PublicAccess()
   @Put('edit/:id')
   public async updateUser(

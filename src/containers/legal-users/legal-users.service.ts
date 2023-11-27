@@ -133,6 +133,32 @@ export class LegalUsersService {
       throw new ErrorManager.createSignaturError(error.message);
     }
   }
+
+  public async getLegalUserByIdForBroker(id: string): Promise<LegalUsers> {
+    try {
+      const user = await this.legalUsersRepository
+        .createQueryBuilder('legal_users')
+        .select(['legal_users.id','legal_users.companyName', 'legal_users.cuit'])
+        .where({ id })
+        // .addSelect('legal_users.companyName')
+        // .addSelect('legal_users.cuit')
+        // .leftJoinAndSelect('legal_users.asset', 'asset')
+        // .leftJoinAndSelect('asset.legalUsers', 'legalUsers')
+        // .leftJoinAndSelect('asset.vehicle', 'vehicle')
+        // .leftJoinAndSelect('asset.electronics', 'electronics')
+        .getOne();
+
+      if (!user) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+      return user;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
   public async getAssetOfLegalUser(id: string): Promise<AssetEntity[]> {
     try {
       const legalUser = await this.legalUsersRepository
@@ -223,7 +249,13 @@ export class LegalUsersService {
     }
   }
 
-  public async findBy({ key, value }: { key: keyof LegalUsersDTO; value: any }) {
+  public async findBy({
+    key,
+    value,
+  }: {
+    key: keyof LegalUsersDTO;
+    value: any;
+  }) {
     try {
       const user: LegalUsers = await this.legalUsersRepository
         .createQueryBuilder('legal_users')

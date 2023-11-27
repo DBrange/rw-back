@@ -64,7 +64,10 @@ export class UsersService {
       }
 
       if (body.userDTO) {
-        body.userDTO.password = await bcrypt.hash(body.userDTO.password, +process.env.HASH_SALT);
+        body.userDTO.password = await bcrypt.hash(
+          body.userDTO.password,
+          +process.env.HASH_SALT,
+        );
         const { email, id } = await this.userRepository.save({
           ...body.userDTO,
           broker: newBroker,
@@ -76,7 +79,10 @@ export class UsersService {
 
         await this.sendEmailForValidateNewUser(email, template);
       } else if (body.legalUserDTO) {
-        body.legalUserDTO.password = await bcrypt.hash(body.legalUserDTO.password, +process.env.HASH_SALT);
+        body.legalUserDTO.password = await bcrypt.hash(
+          body.legalUserDTO.password,
+          +process.env.HASH_SALT,
+        );
         const { email, id } = await this.legalUserService.createLegalUsers({
           ...body.legalUserDTO,
           broker: newBroker,
@@ -176,8 +182,6 @@ export class UsersService {
 
   public async getAssetOfUser(id: string): Promise<AssetEntity[]> {
     try {
-
-
       const user = await this.userRepository
         .createQueryBuilder('user')
         .where({ id })
@@ -204,7 +208,6 @@ export class UsersService {
       throw new ErrorManager.createSignaturError(error.message);
     }
   }
-  
 
   // public async getSinistersOfUser(id: string) {
 
@@ -271,7 +274,19 @@ export class UsersService {
         });
       }
 
-      const clientToAdd = await this.userRepository.findOneBy({ id: client });
+      // const clientToAdd = await this.userRepository.findOneBy({ id: client });
+
+      const users = await this.getUsers();
+      console.log(users);
+      const findUser = users.find((el) => el.id === client);
+
+      let clientToAdd;
+
+      if (findUser) {
+        clientToAdd = await this.userRepository.findOneBy({ id: client });
+      } else {
+        return await this.legalUserService.addLegalClient(client, broker);
+      }
 
       if (!clientToAdd) {
         throw new ErrorManager({
@@ -289,6 +304,67 @@ export class UsersService {
     } catch (error) {
       throw new ErrorManager.createSignaturError(error.message);
     }
+  }
+
+  public async clientDetailForId(id: string) {
+    const users = (await this.getUsers()).find(user => user.id === id)
+    
+    if (users) {
+      return await this.getUsersById(id)
+    } else {
+      return await this.legalUserService.getLegalUserById(id)
+    }
+  }
+
+  public async getUserByIdForBroker(id: string): Promise<UserEntity> {
+    try {
+      const user = await this.userRepository
+        .createQueryBuilder('users')
+        .select(['users.id', 'users.name', 'users.lastName','users.dni'])
+        .where({ id })
+        // .addSelect('users.name')
+        // .addSelect('users.lastName')
+        // .addSelect('users.dni')
+        // .leftJoinAndSelect('users.asset', 'asset')
+        // .leftJoinAndSelect('asset.legalUsers', 'legalUsers')
+        // .leftJoinAndSelect('asset.vehicle', 'vehicle')
+        // .leftJoinAndSelect('asset.electronics', 'electronics')
+        .getOne();
+
+      if (!user) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+      return user;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async allClientsOfBroker(brokerId: string) {
+    const clients = (await this.userBrokerService.getUserBrokerById(brokerId))
+      .clients;
+
+    const allUserPromises = clients.map(
+      async (client) => await this.getUserByIdForBroker(client.id),
+    );
+
+    const legalClients = (
+      await this.userBrokerService.getUserBrokerById(brokerId)
+    ).legalClients;
+
+    const allLegalUserPromises = legalClients.map(
+      async (client) =>
+        await this.legalUserService.getLegalUserByIdForBroker(client.id),
+    );
+
+    const allSinisters = (
+      await Promise.all([...allLegalUserPromises, ...allUserPromises])
+    ).flat();
+
+    return allSinisters;
   }
 
   public async getToken(payload) {

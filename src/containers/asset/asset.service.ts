@@ -717,6 +717,15 @@ export class AssetService {
 
   public async getUserAssetsForId(id: string) {
     try {
+
+      // const users = (await this.userService.getUsers()).find(user => user.id === id)
+
+      // if (users) {
+      //   return await this.userService.getAssetOfUser(id);
+      // } else {
+      //   return await this.legalUserService.getLegalUserById(id)
+      // }
+
       const user = await this.userService.getAssetOfUser(id);
 
       return user;
@@ -738,12 +747,20 @@ export class AssetService {
   public async getAssetOfClients(brokerId: string) {
     const clients = (await this.userBrokerService.getUserBrokerById(brokerId))
       .clients;
+    const legalClients = (await this.userBrokerService.getUserBrokerById(brokerId))
+      .legalClients;
+    
 
-    const allAssetsPromises = clients.map(
+    const allUserAssetsPromises = clients.map(
       async (client) => await this.getUserAssetsForId(client.id),
     );
+    const allLegalUserAssetsPromises = legalClients.map(
+      async (client) => await this.getLegalUserAssetsForId(client.id),
+    );
 
-    const allAssets = (await Promise.all(allAssetsPromises)).flat();
+    const allAssets = (
+      await Promise.all([...allUserAssetsPromises, ...allLegalUserAssetsPromises])
+    ).flat();
 
     return allAssets;
   }
