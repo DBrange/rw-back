@@ -1,15 +1,13 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { TheftTire } from './entities/theftTire.entity';
-import { TheftTireController } from './theft-tire.controller';
-import { TheftTireService } from './theft-tire.service';
-import { Theft } from '../theft/entities/theft.entity';
-import { TheftTheftTireModule } from '../theft-theft-tire/theft-theft-tire.module';
+import { TheftTireService } from './services/theft-tire.service';
+import { TheftTireController } from './controllers/theft-tire.controller';
+import { TypeOrmModule } from '@nestjs/typeorm/dist';
+import { TheftTireEntity } from './entities/theft-tire.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TheftTire, Theft]), TheftTheftTireModule],
   providers: [TheftTireService],
   controllers: [TheftTireController],
+  imports: [TypeOrmModule.forFeature([TheftTireEntity])],
   exports: [TheftTireService],
 })
 export class TheftTireModule {}

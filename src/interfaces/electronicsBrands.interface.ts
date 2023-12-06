@@ -1,4 +1,4 @@
-export interface IElectronicsBrands {
+export interface IElectronicsBrand {
     
      name: string;
 

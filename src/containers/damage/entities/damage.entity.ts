@@ -1,14 +1,24 @@
-import { BaseEntity } from "../../../config/base.entity";
-import { IDamage } from "../../../interfaces/damage.interface";
-import { Column, Entity } from "typeorm";
+import { IDamage } from "src/interfaces/damage.interface";
+import { Entity, Column } from "typeorm";
+import { BaseEntity } from 'src/config/base.entity';
 
-@Entity({name: 'damage'})
-export class Damage extends BaseEntity implements IDamage {
+@Entity({ name: 'damages' })
+export class DamageEntity extends BaseEntity implements IDamage {
+  @Column()
+  time: string;
 
-     @Column()
-     details: string;
+  @Column()
+  date: Date;
 
-     @Column({array: true})
-     photo: string;
-     
+  @Column()
+  location: string;
+  
+  @Column()
+  details: string;
+
+  @Column({ array: true })
+  reportPhoto: string;
+
+  @Column({ nullable: true })
+  budget: string;
 };

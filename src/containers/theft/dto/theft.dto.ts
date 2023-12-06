@@ -22,3 +22,25 @@ export class TheftDTO {
   @IsBoolean()
   isTire: boolean;
 };
+
+export class UpdateTheftDTO {
+  @IsNotEmpty()
+  @IsString()
+  time: string;
+
+  @IsNotEmpty()
+  @IsDate()
+  date: Date;
+
+  @IsNotEmpty()
+  @IsString()
+  location: string;
+
+  @IsNotEmpty()
+  @IsString()
+  reportPhoto: string;
+
+  @IsNotEmpty()
+  @IsBoolean()
+  isTire: boolean;
+};

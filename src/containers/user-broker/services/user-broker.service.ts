@@ -1,120 +1,97 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import {
-  UserBrokerEntity,
-  UserBrokerUpdateDTO,
-} from '../entities/user-broker.entity';
-import { Repository, UpdateResult } from 'typeorm';
-import { UserBrokerDTO } from '../dto/user-broker.dto';
+import { UserBrokerEntity } from '../entities/user-broker.entity';
+import { InjectRepository } from '@nestjs/typeorm/dist';
 import { ErrorManager } from 'src/utils/error.manager';
-import { UsersService } from 'src/containers/users/users.service';
-import { UserEntity } from 'src/containers/users/entities/user.entity';
-import { LegalUsersService } from 'src/containers/legal-users/legal-users.service';
+import { Repository, UpdateResult, DeleteResult } from 'typeorm';
+import { UserBrokerDTO, UpdateUserBrokerDTO } from '../dto/user-broker.dto';
 
 @Injectable()
 export class UserBrokerService {
   constructor(
     @InjectRepository(UserBrokerEntity)
-    private readonly userBrokerRepository: Repository<UserBrokerEntity>, // private readonly userService: UsersService, // private readonly leglaUserService: LegalUsersService,
+    private readonly userBrokerRepository: Repository<UserBrokerEntity>,
   ) {}
 
   public async createUserBroker(body: UserBrokerDTO) {
     try {
+      // body.password = await bcrypt.hash(body.password, +process.env.HASH_SALT);
       return await this.userBrokerRepository.save(body);
+      // return { message: 'The user has been created successfully.' };
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
     }
   }
 
-  public async getusersBroker() {
+  public async getUsersBroker(): Promise<UserBrokerEntity[]> {
     try {
-      const usersBroker: UserBrokerEntity[] =
-        await this.userBrokerRepository.find();
+      const users: UserBrokerEntity[] = await this.userBrokerRepository.find();
 
-      if (usersBroker.length === 0) {
-        throw new ErrorManager({
-          type: 'BAD_REQUEST',
-          message: 'No users found',
-        });
-      }
-
-      return usersBroker;
+      return users;
     } catch (error) {
       throw new ErrorManager.createSignaturError(error.message);
     }
   }
 
-  public async getUserBrokerById(id: string) {
+  public async getUserBrokerById(id: string): Promise<UserBrokerEntity> {
     try {
-      const userBroker: UserBrokerEntity = await this.userBrokerRepository
-        .createQueryBuilder('userBroker')
+      const user = await this.userBrokerRepository
+        .createQueryBuilder('users_broker')
         .where({ id })
-        .leftJoinAndSelect('userBroker.clients', 'clients')
-        .leftJoinAndSelect('userBroker.legalClients', 'legalClients')
-        // .leftJoinAndSelect('userBroker.clients', 'users')
+        .leftJoinAndSelect('users_broker.clients', 'clients')
         .getOne();
 
-      if (!userBroker) {
+      if (!user) {
         throw new ErrorManager({
           type: 'BAD_REQUEST',
           message: 'No users found',
         });
       }
-
-      return userBroker;
+      return user;
     } catch (error) {
       throw new ErrorManager.createSignaturError(error.message);
     }
   }
-
-  
-
-  // public async addClient(client: string, broker: string) {
-  //   try {
-  //     const currentBroker = this.userBrokerRepository.findOneBy({ id: broker });
-
-  //     if (!currentBroker) {
-  //       throw new ErrorManager({
-  //         type: 'BAD_REQUEST',
-  //         message: 'No users found',
-  //       });
-  //     }
-
-  //     const clientToAdd = await this.userService.getUsersById(client);
-
-  //     this.updateToAddClients((await currentBroker).id, {
-  //       clients: [...(await currentBroker).clients, clientToAdd.id],
-  //     });
-  //   } catch (error) {
-  //     throw new ErrorManager.createSignaturError(error.message);
-  //   }
-  // }
 
   public async updateUserBroker(
     id: string,
-    body: UserBrokerUpdateDTO,
+    body: UpdateUserBrokerDTO,
   ): Promise<UpdateResult> {
-    const userBroker: UpdateResult = await this.userBrokerRepository.update(
-      id,
-      body,
-    );
+    try {
+      const updatedUser = await this.userBrokerRepository.update(id, body);
+      if (updatedUser.affected === 0) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users were updated',
+        });
+      }
 
-    if (!userBroker.affected) {
-      throw new ErrorManager({
-        type: 'BAD_REQUEST',
-        message: 'Failed to update user',
-      });
+      return updatedUser;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
     }
-
-    return userBroker;
   }
 
-  public async verifyEnrollment(
-    enrollment: string | null,
-  ) {
+  public async deleteUserBroker(id: string): Promise<DeleteResult> {
+    try {
+      const user: DeleteResult = await this.userBrokerRepository.delete(id);
+
+      if (!user) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Failed to delete user',
+        });
+      }
+
+      return user;
+    } catch (err) {
+      throw ErrorManager.createSignaturError(err.message);
+    }
+  }
+
+  public async verifyEnrollment(enrollment: string | null) {
     try {
       const verifyEnrollment = await this.userBrokerRepository
-        .createQueryBuilder('user')
+        .createQueryBuilder('users_broker')
         .where({ enrollment })
         .getOne();
 

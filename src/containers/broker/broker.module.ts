@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
+import { BrokerService } from './services/broker.service';
 import { BrokerController } from './controllers/broker.controller';
-import { BrokerService } from './broker.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Broker } from './entities/broker.entity';
-import { UserEntity } from '../users/entities/user.entity';
+import { BrokerEntity } from './entities/broker.entity';
+import { TypeOrmModule } from '@nestjs/typeorm/dist';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Broker, UserEntity])],
-  controllers: [BrokerController],
   providers: [BrokerService],
+  controllers: [BrokerController],
+  imports: [TypeOrmModule.forFeature([BrokerEntity])],
 })
 export class BrokerModule {}

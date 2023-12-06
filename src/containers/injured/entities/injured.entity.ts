@@ -1,11 +1,11 @@
-import { BaseEntity } from "../../../config/base.entity";
-import { IInjured } from "../../../interfaces/injured.interface";
-import { Entity, Column, ManyToOne, JoinColumn, OneToMany } from "typeorm";
-import { Sinister } from "../../../containers/sinister/entities/sinister.entity";
-import { InjuredInfo } from "../../../containers/injured-info/entities/injuredInfo.entity";
+import { InjuredInfoEntity } from "src/containers/injured-info/entities/injured-info.entity";
+import { SinisterEntity } from "src/containers/sinister/entities/sinister.entity";
+import { IInjured } from "src/interfaces/injured.interface";
+import { Entity, Column, OneToMany, ManyToOne } from "typeorm";
+import { BaseEntity } from 'src/config/base.entity';
 
-@Entity({ name: 'injured' })
-export class Injured extends BaseEntity implements IInjured {
+@Entity({ name: 'injureds' })
+export class InjuredEntity extends BaseEntity implements IInjured {
   @Column()
   amount: number;
 
@@ -15,9 +15,9 @@ export class Injured extends BaseEntity implements IInjured {
   // })
   // injuredInfo: InjuredInfo;
 
-  @OneToMany(() => InjuredInfo, (injuredsInfo) => injuredsInfo.injured)
-  injuredsInfo: InjuredInfo[];
+  @OneToMany(() => InjuredInfoEntity, (injuredsInfo) => injuredsInfo.injured)
+  injuredsInfo: InjuredInfoEntity[];
 
-  @ManyToOne(() => Sinister, (sinister) => sinister.injuredd)
-  sinister: Sinister;
+  @ManyToOne(() => SinisterEntity, (sinister) => sinister.injuredd)
+  sinister: string;
 };

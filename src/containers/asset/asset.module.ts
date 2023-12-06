@@ -1,46 +1,47 @@
 import { Module } from '@nestjs/common';
-import { AssetController } from './asset.controller';
-import { AssetService } from './asset.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { AssetEntity } from './entities/asset.entity';
-import { Vehicle } from '../vehicle/entities/vehicle.entity';
-import { UserEntity } from '../users/entities/user.entity';
-import { LegalUsers } from '../legal-users/entities/legalUsers.entity';
-import { Electronics } from '../electronics/entities/electronics.entity';
-import { GncService } from '../gnc/gnc.service';
-import { VehicleService } from '../vehicle/vehicle.service';
-import { UsersService } from '../users/users.service';
-import { LegalUsersService } from '../legal-users/legal-users.service';
-import { ElectronicsService } from '../electronics/electronics.service';
-import { SmartphonesService } from '../smartphones/smartphones.service';
-import { Gnc } from '../gnc/entities/gnc.entity';
-import { Smartphone } from '../smartphones/entities/smartphone.entity';
-import { UserBrokerService } from '../user-broker/services/user-broker.service';
+import { AssetController } from './controllers/asset.controller';
+import { AssetService } from './services/asset.service';
+import { TypeOrmModule } from '@nestjs/typeorm/dist';
+import { ElectronicEntity } from '../electronic/entities/electronic.entity';
+import { ElectronicService } from '../electronic/services/electronic.service';
+import { GncEntity } from '../gnc/entities/gnc.entity';
+import { GncService } from '../gnc/services/gnc.service';
+import { LegalUserEntity } from '../legal-user/entities/legal-user.entity';
+import { LegalUserService } from '../legal-user/services/legal-user.service';
+import { SmartphoneEntity } from '../smartphone/entities/smartphone.entity';
+import { SmartphoneService } from '../smartphone/services/smartphone.service';
 import { UserBrokerEntity } from '../user-broker/entities/user-broker.entity';
+import { UserBrokerService } from '../user-broker/services/user-broker.service';
+import { UserEntity } from '../user/entities/user.entity';
+import { UserService } from '../user/services/user.service';
+import { VehicleEntity } from '../vehicle/entities/vehicle.entity';
+import { VehicleService } from '../vehicle/services/vehicle.service';
+import { AssetEntity } from './entities/asset.entity';
 
 @Module({
+  providers: [
+    AssetService,
+    VehicleService,
+    GncService,
+    SmartphoneService,
+    ElectronicService,
+    UserService,
+    LegalUserService,
+    UserBrokerService,
+  ],
+  controllers: [AssetController],
   imports: [
     TypeOrmModule.forFeature([
       AssetEntity,
-      Vehicle,
-      Gnc,
+      VehicleEntity,
+      GncEntity,
+      SmartphoneEntity,
+      ElectronicEntity,
       UserEntity,
-      Smartphone,
-      LegalUsers,
-      Electronics,
-      UserBrokerEntity
+      LegalUserEntity,
+      UserBrokerEntity,
     ]),
   ],
-  controllers: [AssetController],
-  providers: [
-    AssetService,
-    GncService,
-    VehicleService,
-    ElectronicsService,
-    SmartphonesService,
-    UsersService,
-    LegalUsersService,
-    UserBrokerService
-  ],
+  exports: [AssetService],
 })
 export class AssetModule {}

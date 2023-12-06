@@ -1,13 +1,12 @@
+import { FUEL, TYPE } from "src/constants/enums";
 import { AssetEntity } from "src/containers/asset/entities/asset.entity";
-import { BaseEntity } from "../../../config/base.entity";
-import { FUEL, TYPE } from "../../../constants/enums";
-// import { CarModel } from "../../../containers/car-models/entities/carModel.entity";
-import { IVehicle } from "../../../interfaces/vehicle.interface";
-import { Entity, Column, JoinColumn, OneToOne } from "typeorm";
-import { Gnc } from "src/containers/gnc/entities/gnc.entity";
+import { GncEntity } from "src/containers/gnc/entities/gnc.entity";
+import { IVehicle } from "src/interfaces/vehicle.interface";
+import { Entity, Column, OneToOne, JoinColumn } from "typeorm";
+import { BaseEntity } from 'src/config/base.entity';
 
-@Entity({ name: 'vehicle' })
-export class Vehicle extends BaseEntity implements IVehicle {
+@Entity({ name: 'vehicles' })
+export class VehicleEntity extends BaseEntity implements IVehicle {
   @Column()
   year: number;
 
@@ -53,11 +52,11 @@ export class Vehicle extends BaseEntity implements IVehicle {
   @Column()
   okm: boolean;
 
-  @OneToOne(() => Gnc)
+  @OneToOne(() => GncEntity)
   @JoinColumn()
-  gncId: Gnc;
+  gncId: string;
 
   @OneToOne(() => AssetEntity)
   @JoinColumn()
-  asset: AssetEntity;
+  asset: string;
 };

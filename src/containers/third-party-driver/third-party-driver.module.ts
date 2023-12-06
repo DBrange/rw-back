@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
-import { ThirdPartyDriverController } from './third-party-driver.controller';
-import { ThirdPartyDriverService } from './third-party-driver.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ThirdPartyDriver } from './entities/thirdPartyDriver.entity';
-import { ThirdPartyVehicle } from '../third-party-vehicle/entities/thirdPartyVehicle.entity';
+import { ThirdPartyDriverService } from './services/third-party-driver.service';
+import { ThirdPartyDriverController } from './controllers/third-party-driver.controller';
+import { TypeOrmModule } from '@nestjs/typeorm/dist';
+import { ThirdPartyDriverEntity } from './entities/third-party-driver.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ThirdPartyDriver, ThirdPartyVehicle])],
-  controllers: [ThirdPartyDriverController],
   providers: [ThirdPartyDriverService],
+  controllers: [ThirdPartyDriverController],
+  imports: [TypeOrmModule.forFeature([ThirdPartyDriverEntity])],
   exports: [ThirdPartyDriverService],
 })
 export class ThirdPartyDriverModule {}

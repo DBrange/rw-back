@@ -1,8 +1,14 @@
-import { IsNotEmpty, IsUUID } from 'class-validator';
-import { UserEntity } from 'src/containers/users/entities/user.entity';
+import { IsNotEmpty, IsUUID } from "class-validator";
+import { UserEntity } from "src/containers/user/entities/user.entity";
 
 export class BrokerDTO {
   @IsNotEmpty()
   @IsUUID()
-  user: UserEntity;
+  user: string;
+}
+
+export class UpdateBrokerDTO {
+  @IsNotEmpty()
+  @IsUUID()
+  user: string;
 }

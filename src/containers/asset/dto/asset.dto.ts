@@ -1,26 +1,48 @@
-import { IsOptional, IsUUID } from "class-validator";
-import { Electronics } from "src/containers/electronics/entities/electronics.entity";
-import { LegalUsers } from "src/containers/legal-users/entities/legalUsers.entity";
-import { UserEntity } from "src/containers/users/entities/user.entity";
-import { Vehicle } from "src/containers/vehicle/entities/vehicle.entity";
+import { IsBoolean, IsOptional, IsUUID } from 'class-validator';
+import { LegalUserEntity } from 'src/containers/legal-user/entities/legal-user.entity';
+import { UserEntity } from 'src/containers/user/entities/user.entity';
+import { VehicleEntity } from 'src/containers/vehicle/entities/vehicle.entity';
 
 export class AssetDTO {
+  @IsOptional()
+  @IsUUID()
+  vehicle: string;
 
-     @IsOptional()
-     @IsUUID()
-     vehicle: Vehicle;
+  @IsOptional()
+  @IsUUID()
+  user: string;
 
-     @IsOptional()
-     @IsUUID()
-     users: UserEntity;
+  @IsOptional()
+  @IsUUID()
+  client: string;
 
-     @IsOptional()
-     @IsUUID()
-     legalUsers: LegalUsers;
+  @IsOptional()
+  @IsBoolean()
+  insured: boolean;
 
-    //  @IsOptional()
-    //  @IsUUID()
-    //  electronics: Electronics;
+  @IsOptional()
+  @IsBoolean()
+  inspection: boolean;
+}
 
+export class UpdateAssetDTO {
+  @IsOptional()
+  @IsUUID()
+  vehicle: string;
 
-};
+  @IsOptional()
+  @IsUUID()
+  user: string;
+
+  @IsOptional()
+  @IsUUID()
+  client: string;
+
+  @IsOptional()
+  @IsBoolean()
+  insured: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  inspection: boolean;
+}

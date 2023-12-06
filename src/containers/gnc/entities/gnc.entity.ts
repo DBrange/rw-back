@@ -1,21 +1,19 @@
-import { BaseEntity } from "../../../config/base.entity";
-import { Vehicle } from "../../../containers/vehicle/entities/vehicle.entity";
-import { IGnc } from "../../../interfaces/gnc.interface";
-import { Column, Entity, OneToOne } from "typeorm";
+import { VehicleEntity } from "src/containers/vehicle/entities/vehicle.entity";
+import { IGnc } from "src/interfaces/gnc.interface";
+import { Entity, Column, OneToOne } from "typeorm";
+import { BaseEntity } from 'src/config/base.entity';
 
-@Entity({name: 'gnc'})
-export class Gnc extends BaseEntity implements IGnc {
+@Entity({ name: 'gncs' })
+export class GncEntity extends BaseEntity implements IGnc {
+  @Column()
+  expireDate: Date;
 
-     @Column()
-     expireDate: Date;
+  @Column()
+  oblea: string;
 
-     @Column()
-     oblea: string;
+  @Column()
+  plate: string;
 
-     @Column()
-     plate: string;
-
-     @OneToOne(() => Vehicle)
-     vehicle: Vehicle;
-
+  @OneToOne(() => VehicleEntity)
+  vehicle: string;
 };

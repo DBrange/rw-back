@@ -1,36 +1,37 @@
-import { Body, Controller, Post, Get, Param, Put } from '@nestjs/common';
-import { UserBrokerDTO } from '../dto/user-broker.dto';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { UpdateUserBrokerDTO, UserBrokerDTO } from '../dto/user-broker.dto';
 import { UserBrokerService } from '../services/user-broker.service';
-import { UserBrokerUpdateDTO } from '../entities/user-broker.entity';
 
 @Controller('user-broker')
+// @UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
 export class UserBrokerController {
   constructor(private readonly userBrokerService: UserBrokerService) {}
-  @Post('register')
-  public async registerUserBroker(@Body() body: UserBrokerDTO) {
+
+  @Post('')
+  public async createUserBroker(@Body() body: UserBrokerDTO) {
     return await this.userBrokerService.createUserBroker(body);
   }
 
-  @Get('all')
-  public async getAllUsersBroker() {
-    return await this.userBrokerService.getusersBroker();
+  @Get('')
+  public async getUsersBroker() {
+    return await this.userBrokerService.getUsersBroker();
   }
 
-  @Get(':id')
-  public async getUserBrokerById(@Param('id') id: string) {
+  @Get(':userBrokerId')
+  public async getUserBrokerById(@Param('userBrokerId') id: string) {
     return await this.userBrokerService.getUserBrokerById(id);
   }
 
-  @Put(':id')
+  @Put(':userBrokerId')
   public async updateUserBroker(
-    @Param('id') id: string,
-    @Body() body: UserBrokerUpdateDTO,
+    @Param('userBrokerId') id: string,
+    @Body() body: UpdateUserBrokerDTO,
   ) {
     return await this.userBrokerService.updateUserBroker(id, body);
   }
 
-  // @Post('add-client/:client/:broker')
-  // public async addClient(@Param('client') client: string, @Param('broker') broker: string) {
-  //   this.userBrokerService.addClient(client, broker)
-  // }
+  @Delete(':userBrokerId')
+  public async deleteUserBroker(@Param('userBrokerId') id: string) {
+    return await this.userBrokerService.deleteUserBroker(id);
+  }
 }

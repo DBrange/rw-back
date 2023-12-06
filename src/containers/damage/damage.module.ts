@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
-import { DamageController } from './damage.controller';
-import { DamageService } from './damage.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Damage } from './entities/damage.entity';
+import { DamageService } from './services/damage.service';
+import { DamageController } from './controllers/damage.controller';
+import { TypeOrmModule } from '@nestjs/typeorm/dist';
+import { DamageEntity } from './entities/damage.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Damage])],
+  providers: [DamageService],
   controllers: [DamageController],
-  providers: [DamageService]
+  imports: [TypeOrmModule.forFeature([DamageEntity])],
+  exports: [DamageService],
 })
 export class DamageModule {}

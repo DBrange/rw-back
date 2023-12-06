@@ -1,4 +1,4 @@
-import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsString, IsDate, IsBoolean, IsOptional } from "class-validator";
 
 export class CrashDTO {
   @IsNotEmpty()
@@ -38,6 +38,48 @@ export class CrashDTO {
   thirdInjured: boolean;
 
   @IsNotEmpty()
+  @IsBoolean()
+  friendlyStatement: boolean;
+};
+
+export class UpdateCrashDTO {
+  @IsOptional()
+  @IsString()
+  time: string;
+
+  @IsOptional()
+  @IsDate()
+  date: Date;
+
+  @IsOptional()
+  @IsString()
+  location: string;
+
+  @IsOptional()
+  @IsString()
+  details: string;
+
+  @IsOptional()
+  @IsBoolean()
+  injured: boolean;
+
+  @IsOptional()
+  @IsString()
+  injuries: string;
+
+  @IsOptional()
+  @IsBoolean()
+  ambulance: boolean;
+
+  @IsOptional()
+  @IsString()
+  ambulanceTo: string;
+
+  @IsOptional()
+  @IsBoolean()
+  thirdInjured: boolean;
+
+  @IsOptional()
   @IsBoolean()
   friendlyStatement: boolean;
 };

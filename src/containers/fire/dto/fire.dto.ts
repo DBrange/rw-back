@@ -43,3 +43,41 @@ export class FireDTO {
   @IsBoolean()
   thirdInjured: boolean;
 }
+
+export class UpdateFireDTO {
+  @IsOptional()
+  @IsString()
+  time: string;
+
+  @IsOptional()
+  @IsDate()
+  date: Date;
+
+  @IsOptional()
+  @IsString()
+  location: string;
+
+  @IsOptional()
+  @IsString()
+  details: string;
+
+  @IsOptional()
+  @IsBoolean()
+  injured: boolean;
+
+  @IsOptional()
+  @IsString()
+  injuries: string;
+
+  @IsOptional()
+  @IsBoolean()
+  ambulance: boolean;
+
+  @IsOptional()
+  @IsString()
+  ambulanceTo: string;
+
+  @IsOptional()
+  @IsBoolean()
+  thirdInjured: boolean;
+}

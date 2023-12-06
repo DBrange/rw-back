@@ -1,9 +1,9 @@
-import { BaseEntity } from "../../../config/base.entity";
-import { ICrash } from "../../../interfaces/crash.interface";
-import { Column, Entity } from "typeorm";
+import { ICrash } from "src/interfaces/crash.interface";
+import { Entity, Column } from "typeorm";
+import { BaseEntity } from 'src/config/base.entity';
 
-@Entity({ name: 'crash' })
-export class Crash extends BaseEntity implements ICrash {
+@Entity({ name: 'crashes' })
+export class CrashEntity extends BaseEntity implements ICrash {
   @Column()
   time: string;
 

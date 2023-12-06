@@ -1,13 +1,13 @@
-import { BaseEntity } from '../../../config/base.entity';
-import { AssetEntity } from '../../../containers/asset/entities/asset.entity';
-import { ISinister } from '../../../interfaces/sinister.interface';
-import { ThirdPartyVehicle } from '../../../containers/third-party-vehicle/entities/thirdPartyVehicle.entity';
-import { Injured } from '../../../containers/injured/entities/injured.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
-import { SinisterType } from 'src/containers/sinister-type/entities/sinisterType.entity';
+import { AssetEntity } from "src/containers/asset/entities/asset.entity";
+import { InjuredEntity } from "src/containers/injured/entities/injured.entity";
+import { SinisterTypeEntity } from "src/containers/sinister-type/entities/sinister-type.entity";
+import { ThirdPartyVehicleEntity } from "src/containers/third-party-vehicle/entities/third-party-vehicle.entity";
+import { ISinister } from "src/interfaces/sinister.interface";
+import { Entity, Column, ManyToOne, OneToMany, OneToOne, JoinColumn } from "typeorm";
+import { BaseEntity } from 'src/config/base.entity';
 
-@Entity({ name: 'sinister' })
-export class Sinister extends BaseEntity implements ISinister {
+@Entity({ name: 'sinisters' })
+export class SinisterEntity extends BaseEntity implements ISinister {
   @Column()
   time: string;
 
@@ -17,19 +17,19 @@ export class Sinister extends BaseEntity implements ISinister {
   @Column()
   location: string;
 
-  @ManyToOne(() => AssetEntity, (asset) => asset.sinister)
+  @ManyToOne(() => AssetEntity, (asset) => asset.sinisters)
   asset: AssetEntity;
 
   @OneToMany(
-    () => ThirdPartyVehicle,
+    () => ThirdPartyVehicleEntity,
     (thirdPartyVehicle) => thirdPartyVehicle.sinister,
   )
-  thirdPartyVehicle: ThirdPartyVehicle[];
+  thirdPartyVehicle: string[];
 
-  @OneToMany(() => Injured, (injuredd) => injuredd.sinister)
-  injuredd: Injured[];
+  @OneToMany(() => InjuredEntity, (injuredd) => injuredd.sinister)
+  injuredd: string[];
 
-  @OneToOne(() => SinisterType)
+  @OneToOne(() => SinisterTypeEntity)
   @JoinColumn()
-  sinisterType: SinisterType;
+  sinisterType: SinisterTypeEntity;
 }

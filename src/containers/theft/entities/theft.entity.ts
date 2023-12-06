@@ -1,10 +1,10 @@
-import { TheftTire } from 'src/containers/theft-tire/entities/theftTire.entity';
-import { BaseEntity } from '../../../config/base.entity';
-import { ITheft } from '../../../interfaces/theft.interface';
-import { Entity, Column, JoinColumn, OneToOne } from 'typeorm';
+import { TheftTireEntity } from "src/containers/theft-tire/entities/theft-tire.entity";
+import { ITheft } from "src/interfaces/theft.interface";
+import { Entity, Column, OneToOne, JoinColumn } from "typeorm";
+import { BaseEntity } from 'src/config/base.entity';
 
-@Entity({ name: 'theft' })
-export class Theft extends BaseEntity implements ITheft {
+@Entity({ name: 'thefts' })
+export class TheftEntity extends BaseEntity implements ITheft {
   @Column()
   time: string;
 
@@ -20,7 +20,7 @@ export class Theft extends BaseEntity implements ITheft {
   @Column()
   isTire: boolean;
 
-  @OneToOne(() => TheftTire)
+  @OneToOne(() => TheftTireEntity)
   @JoinColumn()
-  theftTire: TheftTire;
+  theftTire: string;
 }

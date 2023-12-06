@@ -1,7 +1,9 @@
 export interface IDamage {
-     
-     details: string;
-     photo: string;
- 
+  time: string
+  date: Date
+  location: string
+  details: string
+  reportPhoto: string
+  budget: string
 };
  

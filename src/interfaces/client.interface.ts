@@ -1,4 +1,4 @@
-import { UserEntity } from "../containers/users/entities/user.entity";
+import { UserEntity } from "src/containers/user/entities/user.entity";
 
 export interface Client {
     id: number;

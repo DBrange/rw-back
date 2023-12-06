@@ -13,13 +13,13 @@ import {
   ROLES_KEY,
 } from '../../constants/key-decorators';
 import { ACCESS_LEVEL, ROLES } from '../../constants/roles';
-import { UsersService } from 'src/containers/users/users.service';
+import { UserService } from 'src/containers/user/services/user.service';
 
 @Injectable()
 export class AccessLevelGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    private readonly userService: UsersService,
+    private readonly userService: UserService,
   ) {}
   async canActivate(context: ExecutionContext) {
     const isPublic = this.reflector.get<boolean>(
@@ -65,7 +65,7 @@ export class AccessLevelGuard implements CanActivate {
       return true;
     }
 
-    const user = await this.userService.getUsersById(idUser);
+    const user = await this.userService.getUserById(idUser);
 
     if (accessLevel > user.accessLevel) {
       throw new UnauthorizedException('No tienes permisos para esta operacion');

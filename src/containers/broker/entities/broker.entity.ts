@@ -1,10 +1,10 @@
+import { UserEntity } from "src/containers/user/entities/user.entity";
+import { Entity, OneToOne, JoinColumn } from "typeorm";
 import { BaseEntity } from 'src/config/base.entity';
-import { UserEntity } from 'src/containers/users/entities/user.entity';
-import { Entity, JoinColumn, OneToOne } from 'typeorm';
 
 @Entity('brokers')
-export class Broker extends BaseEntity {
+export class BrokerEntity extends BaseEntity {
   @OneToOne(() => UserEntity)
   @JoinColumn()
-  user: UserEntity;
+  user: string;
 }

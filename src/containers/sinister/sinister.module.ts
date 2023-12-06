@@ -1,77 +1,55 @@
 import { Module } from '@nestjs/common';
-import { SinisterController } from './sinister.controller';
-import { SinisterService } from './sinister.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Sinister } from './entities/sinister.entity';
+import { SinisterService } from './services/sinister.service';
+import { SinisterController } from './controllers/sinister.controller';
+import { TypeOrmModule } from '@nestjs/typeorm/dist';
 import { AssetEntity } from '../asset/entities/asset.entity';
-import { Electronics } from '../electronics/entities/electronics.entity';
-import { Gnc } from '../gnc/entities/gnc.entity';
-import { LegalUsers } from '../legal-users/entities/legalUsers.entity';
-import { Smartphone } from '../smartphones/entities/smartphone.entity';
-import { UserEntity } from '../users/entities/user.entity';
-import { Vehicle } from '../vehicle/entities/vehicle.entity';
-import { SinisterType } from '../sinister-type/entities/sinisterType.entity';
-import { Theft } from '../theft/entities/theft.entity';
-
-import { TheftTire } from '../theft-tire/entities/theftTire.entity';
-import { AssetService } from '../asset/asset.service';
-import { ElectronicsService } from '../electronics/electronics.service';
-import { GncService } from '../gnc/gnc.service';
-import { LegalUsersService } from '../legal-users/legal-users.service';
-import { SmartphonesService } from '../smartphones/smartphones.service';
-import { UsersService } from '../users/users.service';
-import { VehicleService } from '../vehicle/vehicle.service';
-import { SinisterTypeService } from '../sinister-type/sinister-type.service';
-import { TheftTireService } from '../theft-tire/theft-tire.service';
-import { TheftService } from '../theft/theft.service';
-import { FireService } from '../fire/fire.service';
-import { Fire } from '../fire/entities/fire.entity';
-import { Injured } from '../injured/entities/injured.entity';
-import { InjuredService } from '../injured/injured.service';
-import { InjuredInfo } from '../injured-info/entities/injuredInfo.entity';
-import { InjuredInfoService } from '../injured-info/injured-info.service';
-import { Crash } from '../crash/entities/crash.entity';
-import { CrashService } from '../crash/crash.service';
-import { ThirdPartyDriverService } from '../third-party-driver/third-party-driver.service';
-import { ThirdPartyVehicleService } from '../third-party-vehicle/third-party-vehicle.service';
-import { ThirdPartyVehicle } from '../third-party-vehicle/entities/thirdPartyVehicle.entity';
-import { ThirdPartyDriver } from '../third-party-driver/entities/thirdPartyDriver.entity';
+import { CrashEntity } from '../crash/entities/crash.entity';
+import { ElectronicEntity } from '../electronic/entities/electronic.entity';
+import { FireEntity } from '../fire/entities/fire.entity';
+import { GncEntity } from '../gnc/entities/gnc.entity';
+import { InjuredInfoEntity } from '../injured-info/entities/injured-info.entity';
+import { InjuredEntity } from '../injured/entities/injured.entity';
+import { LegalUserEntity } from '../legal-user/entities/legal-user.entity';
+import { SinisterTypeEntity } from '../sinister-type/entities/sinister-type.entity';
+import { SmartphoneEntity } from '../smartphone/entities/smartphone.entity';
+import { TheftTireEntity } from '../theft-tire/entities/theft-tire.entity';
+import { TheftEntity } from '../theft/entities/theft.entity';
+import { ThirdPartyDriverEntity } from '../third-party-driver/entities/third-party-driver.entity';
+import { ThirdPartyVehicleEntity } from '../third-party-vehicle/entities/third-party-vehicle.entity';
 import { UserBrokerEntity } from '../user-broker/entities/user-broker.entity';
+import { UserEntity } from '../user/entities/user.entity';
+import { VehicleEntity } from '../vehicle/entities/vehicle.entity';
+import { SinisterEntity } from './entities/sinister.entity';
+import { AssetService } from '../asset/services/asset.service';
+import { CrashService } from '../crash/services/crash.service';
+import { ElectronicService } from '../electronic/services/electronic.service';
+import { FireService } from '../fire/services/fire.service';
+import { GncService } from '../gnc/services/gnc.service';
+import { InjuredInfoService } from '../injured-info/services/injured-info.service';
+import { InjuredService } from '../injured/services/injured.service';
+import { LegalUserService } from '../legal-user/services/legal-user.service';
+import { SinisterTypeService } from '../sinister-type/services/sinister-type.service';
+import { SmartphoneService } from '../smartphone/services/smartphone.service';
+import { TheftTireService } from '../theft-tire/services/theft-tire.service';
+import { TheftService } from '../theft/services/theft.service';
+import { ThirdPartyDriverService } from '../third-party-driver/services/third-party-driver.service';
+import { ThirdPartyVehicleService } from '../third-party-vehicle/services/third-party-vehicle.service';
 import { UserBrokerService } from '../user-broker/services/user-broker.service';
+import { VehicleService } from '../vehicle/services/vehicle.service';
+import { UserService } from '../user/services/user.service';
+import { DamageService } from '../damage/services/damage.service';
+import { DamageEntity } from '../damage/entities/damage.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      Sinister,
-      AssetEntity,
-      Vehicle,
-      Gnc,
-      UserEntity,
-      LegalUsers,
-      Smartphone,
-      Electronics,
-      SinisterType,
-      Theft,
-      TheftTire,
-      Fire,
-      Injured,
-      InjuredInfo,
-      Crash,
-      ThirdPartyVehicle,
-      ThirdPartyDriver,
-      UserBrokerEntity
-    ]),
-  ],
-  controllers: [SinisterController],
   providers: [
     SinisterService,
     AssetService,
     GncService,
     VehicleService,
-    UsersService,
-    LegalUsersService,
-    ElectronicsService,
-    SmartphonesService,
+    UserService,
+    LegalUserService,
+    ElectronicService,
+    SmartphoneService,
     SinisterTypeService,
     TheftTireService,
     TheftService,
@@ -81,8 +59,33 @@ import { UserBrokerService } from '../user-broker/services/user-broker.service';
     CrashService,
     ThirdPartyVehicleService,
     ThirdPartyDriverService,
-    UserBrokerService
+    DamageService,
+    UserBrokerService,
   ],
-  exports: [SinisterService]
+  controllers: [SinisterController],
+  imports: [
+    TypeOrmModule.forFeature([
+      SinisterEntity,
+      AssetEntity,
+      VehicleEntity,
+      GncEntity,
+      UserEntity,
+      LegalUserEntity,
+      SmartphoneEntity,
+      ElectronicEntity,
+      SinisterTypeEntity,
+      TheftEntity,
+      TheftTireEntity,
+      FireEntity,
+      InjuredEntity,
+      InjuredInfoEntity,
+      CrashEntity,
+      ThirdPartyVehicleEntity,
+      ThirdPartyDriverEntity,
+      DamageEntity,
+      UserBrokerEntity,
+    ]),
+  ],
+  exports: [SinisterService],
 })
 export class SinisterModule {}

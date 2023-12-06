@@ -7,14 +7,14 @@ import {
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { PUBLIC_KEY } from '../../constants/key-decorators';
-import { UsersService } from '../../containers/users/users.service';
 import { useToken } from '../../utils/use.token';
 import { IUseToken } from '../interfaces/auth.interface';
+import { UserService } from 'src/containers/user/services/user.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private readonly userService: UsersService,
+    private readonly userService: UserService,
     private readonly reflector: Reflector,
   ) {}
   async canActivate(context: ExecutionContext) {
@@ -45,7 +45,7 @@ export class AuthGuard implements CanActivate {
     }
 
     const { sub } = manageToken;
-    const user = await this.userService.getUsersById(sub);
+    const user = await this.userService.getUserById(sub);
     if(!user){
       throw new UnauthorizedException('Invalid user');
     }

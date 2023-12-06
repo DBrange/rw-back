@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
-import { InjuredInfoController } from './injured-info.controller';
-import { InjuredInfoService } from './injured-info.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { InjuredInfo } from './entities/injuredInfo.entity';
-import { Injured } from '../injured/entities/injured.entity';
+import { InjuredInfoService } from './services/injured-info.service';
+import { InjuredInfoController } from './controllers/injured-info.controller';
+import { TypeOrmModule } from '@nestjs/typeorm/dist';
+import { InjuredInfoEntity } from './entities/injured-info.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([InjuredInfo, Injured])],
-  controllers: [InjuredInfoController],
   providers: [InjuredInfoService],
-  exports: [InjuredInfoService]
+  controllers: [InjuredInfoController],
+  imports: [TypeOrmModule.forFeature([InjuredInfoEntity])],
+  exports: [InjuredInfoService],
 })
 export class InjuredInfoModule {}

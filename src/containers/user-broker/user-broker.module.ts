@@ -1,17 +1,13 @@
 import { Module } from '@nestjs/common';
-import { UserEntity } from '../users/entities/user.entity';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserBrokerController } from './controllers/user-broker.controller';
 import { UserBrokerService } from './services/user-broker.service';
+import { UserBrokerController } from './controllers/user-broker.controller';
 import { UserBrokerEntity } from './entities/user-broker.entity';
-import { LegalUsers } from '../legal-users/entities/legalUsers.entity';
-import { LegalUsersService } from '../legal-users/legal-users.service';
-import { UsersService } from '../users/users.service';
+import { TypeOrmModule } from '@nestjs/typeorm/dist';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserBrokerEntity])],
-  controllers: [UserBrokerController],
-  exports: [UserBrokerService],
   providers: [UserBrokerService],
+  controllers: [UserBrokerController],
+  imports: [TypeOrmModule.forFeature([UserBrokerEntity])],
+  exports: [UserBrokerService],
 })
 export class UserBrokerModule {}

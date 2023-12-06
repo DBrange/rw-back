@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { TheftController } from './theft.controller';
-import { TheftService } from './theft.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Theft } from './entities/theft.entity';
+import { TheftService } from './services/theft.service';
+import { TheftController } from './controllers/theft.controller';
+import { TypeOrmModule } from '@nestjs/typeorm/dist';
+import { TheftEntity } from './entities/theft.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Theft])],
-  controllers: [TheftController],
   providers: [TheftService],
+  controllers: [TheftController],
+  imports: [TypeOrmModule.forFeature([TheftEntity])],
   exports: [TheftService],
 })
 export class TheftModule {}

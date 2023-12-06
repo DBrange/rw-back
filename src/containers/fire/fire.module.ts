@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
-import { FireController } from './fire.controller';
-import { FireService } from './fire.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Fire } from './entities/fire.entity';
+import { FireService } from './services/fire.service';
+import { FireController } from './controllers/fire.controller';
+import { TypeOrmModule } from '@nestjs/typeorm/dist';
+import { FireEntity } from './entities/fire.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Fire])],
+  providers: [FireService],
   controllers: [FireController],
-  providers: [FireService]
+  imports: [TypeOrmModule.forFeature([FireEntity])],
+  exports: [FireService],
 })
 export class FireModule {}

@@ -1,17 +1,13 @@
 import { Module } from '@nestjs/common';
-import { SinisterTypeController } from './sinister-type.controller';
-import { SinisterTypeService } from './sinister-type.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { SinisterType } from './entities/sinisterType.entity';
-import { Crash } from '../crash/entities/crash.entity';
-import { Electronics } from '../electronics/entities/electronics.entity';
-import { UserEntity } from '../users/entities/user.entity';
-import { LegalUsers } from '../legal-users/entities/legalUsers.entity';
+import { SinisterTypeService } from './services/sinister-type.service';
+import { SinisterTypeController } from './controllers/sinister-type.controller';
+import { TypeOrmModule } from '@nestjs/typeorm/dist';
+import { SinisterTypeEntity } from './entities/sinister-type.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([SinisterType, Crash, Electronics, UserEntity, LegalUsers])],
-  controllers: [SinisterTypeController],
   providers: [SinisterTypeService],
-  exports: [SinisterTypeService]
+  controllers: [SinisterTypeController],
+  imports: [TypeOrmModule.forFeature([SinisterTypeEntity])],
+  exports: [SinisterTypeService],
 })
 export class SinisterTypeModule {}

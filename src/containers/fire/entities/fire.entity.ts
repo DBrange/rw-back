@@ -1,9 +1,9 @@
-import { BaseEntity } from '../../../config/base.entity';
-import { IFire } from '../../../interfaces/fire.interface';
-import { Column, Entity } from 'typeorm';
+import { IFire } from "src/interfaces/fire.interface";
+import { Entity, Column } from "typeorm";
+import { BaseEntity } from 'src/config/base.entity';
 
-@Entity({ name: 'fire' })
-export class Fire extends BaseEntity implements IFire {
+@Entity({ name: 'fires' })
+export class FireEntity extends BaseEntity implements IFire {
   @Column()
   time: string;
 

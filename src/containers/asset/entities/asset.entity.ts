@@ -1,27 +1,33 @@
-import { Sinister } from '../../../containers/sinister/entities/sinister.entity';
-import { BaseEntity } from '../../../config/base.entity';
-import { Electronics } from '../../../containers/electronics/entities/electronics.entity';
-import { LegalUsers } from '../../../containers/legal-users/entities/legalUsers.entity';
-import { UserEntity } from '../../../containers/users/entities/user.entity';
-import { Vehicle } from '../../../containers/vehicle/entities/vehicle.entity';
-import { Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+import { ElectronicEntity } from "src/containers/electronic/entities/electronic.entity";
+import { SinisterEntity } from "src/containers/sinister/entities/sinister.entity";
+import { UserEntity } from "src/containers/user/entities/user.entity";
+import { VehicleEntity } from "src/containers/vehicle/entities/vehicle.entity";
+import { Entity, ManyToOne, OneToOne, JoinColumn, OneToMany, Column } from "typeorm";
+import { BaseEntity } from 'src/config/base.entity';
 
-@Entity({ name: 'asset' })
+@Entity({ name: 'assets' })
 export class AssetEntity extends BaseEntity {
-  @ManyToOne(() => UserEntity, (users) => users.asset)
-  users: UserEntity;
+  @ManyToOne(() => UserEntity, (users) => users.assets)
+  user: string;
 
-  @ManyToOne(() => LegalUsers, (legalUsers) => legalUsers.asset)
-  legalUsers: LegalUsers;
-
-  @OneToOne(() => Vehicle)
+  @OneToOne(() => VehicleEntity)
   @JoinColumn()
-  vehicle: Vehicle;
+  vehicle: string;
 
-  @OneToOne(() => Electronics)
+  @OneToOne(() => ElectronicEntity)
   @JoinColumn()
-  electronics: Electronics;
+  electronic: string;
 
-  @OneToMany(() => Sinister, (sinister) => sinister.asset)
-  sinister: Sinister[];
+  @ManyToOne(() => UserEntity, (user) => user.brokerAssets)
+  @JoinColumn()
+  client: string;
+
+  @Column({ default: false })
+  insured: boolean;
+
+  @Column({ default: true })
+  inspection: boolean;
+
+  @OneToMany(() => SinisterEntity, (sinister) => sinister.asset)
+  sinisters: SinisterEntity[];
 }

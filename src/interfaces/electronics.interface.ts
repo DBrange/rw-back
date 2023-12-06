@@ -1,4 +1,4 @@
-export interface IElectronics {
+export interface IElectronic {
      
      type: string;
 

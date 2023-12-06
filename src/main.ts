@@ -5,9 +5,6 @@ import * as morgan from 'morgan';
 import { CORS } from './constants/cors';
 import {ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 
-
-
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
