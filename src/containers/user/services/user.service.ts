@@ -188,4 +188,22 @@ export class UserService {
 
     return client.assets;
   }
+
+  public async getClientById(id: string) {
+    const user = await this.userRepository
+      .createQueryBuilder('users')
+      .where({ id })
+      .leftJoinAndSelect('users.personalUser', 'personalUser')
+      .leftJoinAndSelect('users.legalUser', 'legalUsers')
+      .getOne();
+
+    if (!user) {
+      throw new ErrorManager({
+        type: 'BAD_REQUEST',
+        message: 'No users found',
+      });
+    }
+
+    return user;
+  }
 }

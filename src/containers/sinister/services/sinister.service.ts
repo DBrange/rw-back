@@ -177,15 +177,13 @@ export class SinisterService {
 
   private async sinisterInfo(info: TheftDTO | FireDTO | CrashDTO | DamageDTO) {
     try {
-      
       const date = info.date;
       const location = info.location;
       const time = info.time;
-      
+
       return { date, location, time };
     } catch (error) {
-            throw ErrorManager.createSignaturError(error.message);
-
+      throw ErrorManager.createSignaturError(error.message);
     }
   }
 
@@ -195,34 +193,32 @@ export class SinisterService {
     newSinister: SinisterEntity,
   ) {
     try {
-      
       let newInjured: InjuredEntity;
-      
-    if (thirdInjured && injuredDTO.amount) {
-      const bodyInjured: InjuredDTO = {
-        amount: injuredDTO.amount,
-        injuredInfo: injuredDTO.injuredInfo,
-        sinister: newSinister.id,
-      };
 
-      newInjured = await this.injuredService.createInjured(bodyInjured);
-
-      const allPeopleInjured = injuredDTO.injuredInfo;
-
-      for (let i = 0; i < allPeopleInjured.length; i++) {
-        const el = allPeopleInjured[i];
-
-        const bodyInjuredInfo: InjuredInfoDTO = {
-          ...el,
-          injured: newInjured,
+      if (thirdInjured && injuredDTO.amount) {
+        const bodyInjured: InjuredDTO = {
+          amount: injuredDTO.amount,
+          injuredInfo: injuredDTO.injuredInfo,
+          sinister: newSinister.id,
         };
-        await this.injuredInfoService.createInjuredInfo(bodyInjuredInfo);
-      }
-    }
-  } catch (error) {
-          throw ErrorManager.createSignaturError(error.message);
 
-  }
+        newInjured = await this.injuredService.createInjured(bodyInjured);
+
+        const allPeopleInjured = injuredDTO.injuredInfo;
+
+        for (let i = 0; i < allPeopleInjured.length; i++) {
+          const el = allPeopleInjured[i];
+
+          const bodyInjuredInfo: InjuredInfoDTO = {
+            ...el,
+            injured: newInjured,
+          };
+          await this.injuredInfoService.createInjuredInfo(bodyInjuredInfo);
+        }
+      }
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
   }
 
   // - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -235,45 +231,45 @@ export class SinisterService {
     theftTireDTO: TheftTireDTO,
   ) {
     try {
-      
-      const newTheft: TheftEntity = await this.theftService.createTheft(theftDTO);
-      
+      const newTheft: TheftEntity = await this.theftService.createTheft(
+        theftDTO,
+      );
+
       if (newTheft.isTire) {
-      const theftTire: TheftTireDTO = {
-        ...theftTireDTO,
+        const theftTire: TheftTireDTO = {
+          ...theftTireDTO,
+          theft: newTheft.id,
+        };
+
+        await this.theftTireService.createTheftTire(theftTire);
+      }
+
+      const bodySinisterType: SinisterTypeDTO = {
+        crash: undefined,
+        fire: undefined,
+        damage: undefined,
         theft: newTheft.id,
       };
 
-      await this.theftTireService.createTheftTire(theftTire);
-    }
-
-    const bodySinisterType: SinisterTypeDTO = {
-      crash: undefined,
-      fire: undefined,
-      damage: undefined,
-      theft: newTheft.id,
-    };
-
-    const newSinisterType: SinisterTypeEntity =
-      await this.sinisterTypeService.createSinisterType(bodySinisterType);
+      const newSinisterType: SinisterTypeEntity =
+        await this.sinisterTypeService.createSinisterType(bodySinisterType);
 
       const { date, location, time } = await this.sinisterInfo(theftDTO);
-      
+
       const bodySinister: SinisterDTO = {
         date,
         location,
-      time,
-      asset: asset,
-      sinisterType: newSinisterType,
-    };
-    
-    const newSinister = await this.createSinister(bodySinister);
-    
-    return newSinister;
-  } catch (error) {
-          throw ErrorManager.createSignaturError(error.message);
+        time,
+        asset: asset,
+        sinisterType: newSinisterType,
+      };
 
-  }
+      const newSinister = await this.createSinister(bodySinister);
+
+      return newSinister;
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
   }
 
   public async createSinisterTheft(
@@ -366,45 +362,43 @@ export class SinisterService {
     injuredDTO: InjuredData,
   ) {
     try {
-      
       const newFire = await this.fireService.createFire(fireDTO);
-      
+
       const bodySinisterType: SinisterTypeDTO = {
         crash: undefined,
         fire: newFire.id,
         damage: undefined,
-      theft: undefined,
-    };
+        theft: undefined,
+      };
 
-    //newSinisterType
-    const newSinisterType = await this.sinisterTypeService.createSinisterType(
-      bodySinisterType,
-    );
+      //newSinisterType
+      const newSinisterType = await this.sinisterTypeService.createSinisterType(
+        bodySinisterType,
+      );
 
-    const { date, location, time } = await this.sinisterInfo(fireDTO);
+      const { date, location, time } = await this.sinisterInfo(fireDTO);
 
-    const bodySinister: SinisterDTO = {
-      date,
-      location,
-      time,
-      asset: asset,
-      sinisterType: newSinisterType,
-    };
+      const bodySinister: SinisterDTO = {
+        date,
+        location,
+        time,
+        asset: asset,
+        sinisterType: newSinisterType,
+      };
 
-    const newSinister = await this.createSinister(bodySinister);
+      const newSinister = await this.createSinister(bodySinister);
 
-    if (injuredDTO) {
-      await this.createInjuredInSinister(
-        newFire.thirdInjured,
-        injuredDTO,
-        newSinister,
+      if (injuredDTO) {
+        await this.createInjuredInSinister(
+          newFire.thirdInjured,
+          injuredDTO,
+          newSinister,
         );
       }
     } catch (error) {
-            throw ErrorManager.createSignaturError(error.message);
-
+      throw ErrorManager.createSignaturError(error.message);
     }
-    }
+  }
 
   public async createSinisterFire(
     brokerId: string,
@@ -479,59 +473,57 @@ export class SinisterService {
     newSinister: SinisterEntity,
   ) {
     try {
-      
       const thirdPartyVehicleEmails: string[] = [];
-      
+
       const allThirdParty: ThirdParty =
-      thirdPartyVehicleDTO.thirdPartyVehicleInfo;
+        thirdPartyVehicleDTO.thirdPartyVehicleInfo;
       if (allThirdParty) {
-      for (let i = 0; i < allThirdParty.length; i++) {
-        const el = allThirdParty[i];
-        thirdPartyVehicleEmails.push(el.email);
+        for (let i = 0; i < allThirdParty.length; i++) {
+          const el = allThirdParty[i];
+          thirdPartyVehicleEmails.push(el.email);
 
-        const bodyThirdPartyDriver: ThirdPartyDriverDTO = {
-          name: el.name,
-          lastName: el.lastName,
-          dni: el.dni,
-          address: el.address,
-          phoneNumber: el.phoneNumber,
-          licensePhoto: el.licensePhoto,
-          email: el.email,
-          // thirdPartyVehicle: newThirdPartyVehicle,
-        };
-        
-        //newThirdPartyDriver
-        const newThirdPartyDriver =
-        await this.thirdPartyDriverService.createThirdPartyDriver(
-            bodyThirdPartyDriver,
-          );
+          const bodyThirdPartyDriver: ThirdPartyDriverDTO = {
+            name: el.name,
+            lastName: el.lastName,
+            dni: el.dni,
+            address: el.address,
+            phoneNumber: el.phoneNumber,
+            licensePhoto: el.licensePhoto,
+            email: el.email,
+            // thirdPartyVehicle: newThirdPartyVehicle,
+          };
 
-        const bodyThirdPartyVehicle: ThirdPartyVehicleDTO = {
-          brand: el.brand,
-          model: el.model,
-          year: el.year,
-          plate: el.plate,
-          insuranceCompany: el.insuranceCompany,
-          insurancePolicy: el.insurancePolicy,
-          ownerName: el.ownerLastName,
-          ownerLastName: el.ownerLastName,
-          ownerDni: el.ownerDni,
-          thirdPartyDriver: newThirdPartyDriver.id,
-          sinister: newSinister.id,
-        };
-        
-        //newThirdPartyVehicle
-        await this.thirdPartyVehicleService.createThirdPartyVehicle(
-          bodyThirdPartyVehicle,
+          //newThirdPartyDriver
+          const newThirdPartyDriver =
+            await this.thirdPartyDriverService.createThirdPartyDriver(
+              bodyThirdPartyDriver,
+            );
+
+          const bodyThirdPartyVehicle: ThirdPartyVehicleDTO = {
+            brand: el.brand,
+            model: el.model,
+            year: el.year,
+            plate: el.plate,
+            insuranceCompany: el.insuranceCompany,
+            insurancePolicy: el.insurancePolicy,
+            ownerName: el.ownerLastName,
+            ownerLastName: el.ownerLastName,
+            ownerDni: el.ownerDni,
+            thirdPartyDriver: newThirdPartyDriver.id,
+            sinister: newSinister.id,
+          };
+
+          //newThirdPartyVehicle
+          await this.thirdPartyVehicleService.createThirdPartyVehicle(
+            bodyThirdPartyVehicle,
           );
         }
       }
     } catch (error) {
-            throw ErrorManager.createSignaturError(error.message);
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
 
-    }
-    }
-    
   private async createCrashInSinister(
     asset: AssetEntity,
     crashDTO: CrashDTO,
@@ -539,48 +531,46 @@ export class SinisterService {
     thirdPartyVehicleDTO: ThirdPartyVehicleData,
   ) {
     try {
-      
       const newCrash = await this.crashService.createCrash(crashDTO);
-      
-    const bodySinisterType: SinisterTypeDTO = {
-      crash: newCrash.id,
-      fire: undefined,
-      damage: undefined,
-      theft: undefined,
-    };
 
-    //newSinisterType
-    const newSinisterType = await this.sinisterTypeService.createSinisterType(
-      bodySinisterType,
-    );
+      const bodySinisterType: SinisterTypeDTO = {
+        crash: newCrash.id,
+        fire: undefined,
+        damage: undefined,
+        theft: undefined,
+      };
 
-    const { date, location, time } = await this.sinisterInfo(crashDTO);
+      //newSinisterType
+      const newSinisterType = await this.sinisterTypeService.createSinisterType(
+        bodySinisterType,
+      );
 
-    const bodySinister: SinisterDTO = {
-      date,
-      location,
-      time,
-      asset: asset,
-      sinisterType: newSinisterType,
-    };
+      const { date, location, time } = await this.sinisterInfo(crashDTO);
 
-    const newSinister = await this.createSinister(bodySinister);
+      const bodySinister: SinisterDTO = {
+        date,
+        location,
+        time,
+        asset: asset,
+        sinisterType: newSinisterType,
+      };
 
-    if (injuredDTO) {
-      await this.createInjuredInSinister(
-        newCrash.thirdInjured,
-        injuredDTO,
-        newSinister,
+      const newSinister = await this.createSinister(bodySinister);
+
+      if (injuredDTO) {
+        await this.createInjuredInSinister(
+          newCrash.thirdInjured,
+          injuredDTO,
+          newSinister,
         );
+      }
+
+      await this.createThirdPartyInSinister(thirdPartyVehicleDTO, newSinister);
+
+      return newSinister;
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
     }
-
-    await this.createThirdPartyInSinister(thirdPartyVehicleDTO, newSinister);
-    
-    return newSinister;
-  } catch (error) {
-          throw ErrorManager.createSignaturError(error.message);
-
-  }
   }
 
   public async createSinisterCrash(
@@ -667,39 +657,37 @@ export class SinisterService {
     damageDTO: DamageDTO,
   ) {
     try {
-      
       const newDamage: DamageEntity = await this.damageService.createDamage(
         damageDTO,
-        );
+      );
 
-    const bodySinisterType: SinisterTypeDTO = {
-      crash: undefined,
-      fire: undefined,
-      damage: newDamage.id,
-      theft: undefined,
-    };
+      const bodySinisterType: SinisterTypeDTO = {
+        crash: undefined,
+        fire: undefined,
+        damage: newDamage.id,
+        theft: undefined,
+      };
 
-    //newSinisterType
-    const newSinisterType: SinisterTypeEntity =
-      await this.sinisterTypeService.createSinisterType(bodySinisterType);
+      //newSinisterType
+      const newSinisterType: SinisterTypeEntity =
+        await this.sinisterTypeService.createSinisterType(bodySinisterType);
 
-    const { date, location, time } = await this.sinisterInfo(damageDTO);
+      const { date, location, time } = await this.sinisterInfo(damageDTO);
 
-    const bodySinister: SinisterDTO = {
-      date,
-      location,
-      time,
-      asset: asset,
-      sinisterType: newSinisterType,
-    };
+      const bodySinister: SinisterDTO = {
+        date,
+        location,
+        time,
+        asset: asset,
+        sinisterType: newSinisterType,
+      };
 
-    const newSinister = await this.createSinister(bodySinister);
+      const newSinister = await this.createSinister(bodySinister);
 
-    return newSinister;
-  } catch (error) {
-          throw ErrorManager.createSignaturError(error.message);
-
-  }
+      return newSinister;
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
   }
 
   public async createSinisterDamage(
@@ -782,77 +770,71 @@ export class SinisterService {
 
   // Client
   public async getSinistersOfClient(clientId: string) {
-
     try {
-      
       const clientsBrokerAssets = (await this.userService.getUserById(clientId))
-      .brokerAssets as unknown as UserEntity[];
-      
-    const sinisters = clientsBrokerAssets.map(async (brokerAssets) => {
-      const sinister = await this.sinisterRepository
-        .createQueryBuilder('sinisters')
-        .where({ asset: brokerAssets.id })
-        .leftJoinAndSelect('sinisters.asset', 'asset')
-        .leftJoin('asset.vehicle', 'vehicle')
-        .addSelect('vehicle.brand')
-        .addSelect('vehicle.model')
-        .addSelect('vehicle.plate')
-        .addSelect('vehicle.type')
-        .leftJoin('asset.electronic', 'electronic')
-        .addSelect('electronic.brand')
-        .addSelect('electronic.model')
-        .addSelect('electronic.type')
-        .getOne();
-        
+        .brokerAssets as unknown as UserEntity[];
+
+      const sinisters = clientsBrokerAssets.map(async (brokerAssets) => {
+        const sinister = await this.sinisterRepository
+          .createQueryBuilder('sinisters')
+          .where({ asset: brokerAssets.id })
+          .leftJoinAndSelect('sinisters.asset', 'asset')
+          .leftJoin('asset.vehicle', 'vehicle')
+          .addSelect('vehicle.brand')
+          .addSelect('vehicle.model')
+          .addSelect('vehicle.plate')
+          .addSelect('vehicle.type')
+          .leftJoin('asset.electronic', 'electronic')
+          .addSelect('electronic.brand')
+          .addSelect('electronic.model')
+          .addSelect('electronic.type')
+          .getOne();
+
         return sinister;
       });
-      
+
       const sinistersWithoutNull = (await Promise.all(sinisters)).flatMap(
         (sinister) => (!sinister ? [] : sinister),
-        );
-        
-        return sinistersWithoutNull;
-      } catch (error) {
-              throw ErrorManager.createSignaturError(error.message);
+      );
 
-      }
+      return sinistersWithoutNull;
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
   }
 
   // Broker
   public async getSinistersOfBroker(brokerId: string) {
-
     try {
-      
       const brokerAssets = (await this.userService.getUserById(brokerId))
-      .assets as unknown as UserEntity[];
-      
+        .assets as unknown as UserEntity[];
+
       const sinisters = brokerAssets.map(async (brokerAssets) => {
-      const sinister = await this.sinisterRepository
-        .createQueryBuilder('sinisters')
-        .where({ asset: brokerAssets.id })
-        .leftJoinAndSelect('sinisters.asset', 'asset')
-        .leftJoin('asset.vehicle', 'vehicle')
-        .addSelect('vehicle.brand')
-        .addSelect('vehicle.model')
-        .addSelect('vehicle.plate')
-        .addSelect('vehicle.type')
-        .leftJoin('asset.electronic', 'electronic')
-        .addSelect('electronic.brand')
-        .addSelect('electronic.model')
-        .addSelect('electronic.type')
-        .getOne();
+        const sinister = await this.sinisterRepository
+          .createQueryBuilder('sinisters')
+          .where({ asset: brokerAssets.id })
+          .leftJoinAndSelect('sinisters.asset', 'asset')
+          .leftJoin('asset.vehicle', 'vehicle')
+          .addSelect('vehicle.brand')
+          .addSelect('vehicle.model')
+          .addSelect('vehicle.plate')
+          .addSelect('vehicle.type')
+          .leftJoin('asset.electronic', 'electronic')
+          .addSelect('electronic.brand')
+          .addSelect('electronic.model')
+          .addSelect('electronic.type')
+          .getOne();
 
-      return sinister;
-    });
+        return sinister;
+      });
 
-    const sinistersWithoutNull = (await Promise.all(sinisters)).flatMap(
-      (sinister) => (!sinister ? [] : sinister),
+      const sinistersWithoutNull = (await Promise.all(sinisters)).flatMap(
+        (sinister) => (!sinister ? [] : sinister),
       );
-      
+
       return sinistersWithoutNull;
     } catch (error) {
-            throw ErrorManager.createSignaturError(error.message);
-
+      throw ErrorManager.createSignaturError(error.message);
     }
   }
 
@@ -884,26 +866,23 @@ export class SinisterService {
     damageDTO: DamageDTO,
     thirdPartyVehicleDTO: ThirdPartyVehicleData,
   ) {
-
     try {
-      
       if (theftDTO) {
         return await this.createTheftInSinister(asset, theftDTO, theftTireDTO);
       } else if (fireDTO) {
         return await this.createFireInSinister(asset, fireDTO, injuredDTO);
       } else if (crashDTO) {
         return await this.createCrashInSinister(
-        asset,
-        crashDTO,
-        injuredDTO,
-        thirdPartyVehicleDTO,
+          asset,
+          crashDTO,
+          injuredDTO,
+          thirdPartyVehicleDTO,
         );
       } else if (damageDTO) {
         return await this.createDamageInSinister(asset, damageDTO);
       }
     } catch (error) {
-            throw ErrorManager.createSignaturError(error.message);
-
+      throw ErrorManager.createSignaturError(error.message);
     }
   }
 
@@ -966,4 +945,34 @@ export class SinisterService {
   }
 
   // - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  // Get Client Detail
+  // private async findSinistersByBrokerClient(
+  //   brokerId: string,
+  //   clientId: string,
+  // ) {
+  //       const sinisters = await this.sinisterRepository.find({
+  //         where: {
+  //           user: brokerId,
+  //           client: clientId,
+  //         },
+  //       });
+
+  //       return assets;
+  // }
+
+  public async getClientInBroker(brokerId: string, clientId: string) {
+    const client = await this.userService.getClientById(clientId);
+    const assetOfUser = await this.assetService.findAssetsByBrokerClient(
+      brokerId,
+      clientId,
+    );
+    
+    const {password, ...rest} = client
+
+    const assets = assetOfUser.filter((asset) => asset.inspection);
+    const sinisters = assetOfUser.filter((asset) => !asset.inspection);
+
+    return { ...rest, assets, sinisters };
+  }
 }

@@ -51,4 +51,9 @@ export class UserController {
   public getInspectionsOfClient(@Param('userId') userId: string) {
     return this.userService.getInspectionsOfClient(userId);
   }
+
+  @Get('client/:userId')
+  public getClientById(@Param('userId') userId: string) {
+    return this.userService.getClientById(userId);
+  }
 }

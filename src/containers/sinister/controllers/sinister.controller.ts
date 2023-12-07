@@ -200,6 +200,14 @@ export class SinisterController {
     return await this.sinisterService.getSinistersOfClient(clientId);
   }
 
+  @Get('client-detail/:brokerId/:clientId')
+  public async getClientInBroker(
+    @Param('brokerId') brokerId: string,
+    @Param('clientId') clientId: string,
+  ) {
+    return await this.sinisterService.getClientInBroker(brokerId, clientId);
+  }
+
   @PublicAccess()
   @Get('broker/:brokerId')
   public async getSinistersOfBroker(@Param('brokerId') brokerId: string) {

@@ -261,28 +261,45 @@ export class AssetService {
     }
   }
 
+  public async findAssetsByBrokerClient(brokerId: string, clientId: string) {
+    const assets = await this.assetRepository
+      .createQueryBuilder('assets')
+      .leftJoin('assets.vehicle', 'vehicle')
+      .addSelect('vehicle.brand')
+      .addSelect('vehicle.model')
+      .addSelect('vehicle.plate')
+      .addSelect('vehicle.type')
+      .leftJoin('assets.electronic', 'electronic')
+      .addSelect('electronic.brand')
+      .addSelect('electronic.model')
+      .addSelect('electronic.type')
+      .where({ user: brokerId })
+      .andWhere({ client: clientId })
+      .getMany();
+
+    return assets;
+  }
+
   // Elements in client
 
   public async getAllElementsFromClient(clientId: string) {
     try {
-      
       const clientAssets = (await this.userService.getUserById(clientId))
-      .brokerAssets as unknown as AssetEntity[];
-      
+        .brokerAssets as unknown as AssetEntity[];
+
       const promiseElement = clientAssets.map(async (el) => {
         const vehicle = await (await this.getAssetById(el.id)).vehicle;
-      const electronic = await (await this.getAssetById(el.id)).electronic;
-      return [vehicle, electronic];
-    });
-    
-    const elements = (await Promise.all(promiseElement)).flat().flatMap((el) =>
-    el === null ? [] : el,
-    );
-    
-    return elements;
-  } catch (error) {
-          throw ErrorManager.createSignaturError(error.message);
+        const electronic = await (await this.getAssetById(el.id)).electronic;
+        return [vehicle, electronic];
+      });
 
-  }
+      const elements = (await Promise.all(promiseElement))
+        .flat()
+        .flatMap((el) => (el === null ? [] : el));
+
+      return elements;
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
   }
 }
