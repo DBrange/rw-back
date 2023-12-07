@@ -61,7 +61,9 @@ export class AssetService {
         .leftJoinAndSelect('client.personalUser', 'personalUser')
         .leftJoinAndSelect('client.legalUser', 'legalUser')
         .leftJoinAndSelect('assets.vehicle', 'vehicle')
+        .leftJoinAndSelect('vehicle.gncId', 'gncId')
         .leftJoinAndSelect('assets.electronic', 'electronic')
+        .leftJoinAndSelect('electronic.smartphone', 'smartphone')
         .leftJoinAndSelect('assets.sinisters', 'sinisters')
         .getOne();
 
