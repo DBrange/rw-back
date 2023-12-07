@@ -18,7 +18,6 @@ import { VehicleDTO } from 'src/containers/vehicle/dto/vehicle.dto';
 import { VehicleService } from 'src/containers/vehicle/services/vehicle.service';
 import { GncEntity } from 'src/containers/gnc/entities/gnc.entity';
 import { VehicleEntity } from 'src/containers/vehicle/entities/vehicle.entity';
-import { UserEntity } from 'src/containers/user/entities/user.entity';
 
 @Injectable()
 export class AssetService {
@@ -229,9 +228,9 @@ export class AssetService {
     }
   }
 
-  public async getInspectionsOfClients(brokerId: string) {
+  public async getInspectionsOfClients(userBrokerId: string) {
     try {
-      const assets = (await this.userService.getUserById(brokerId))
+      const assets = (await this.userService.getUserById(userBrokerId))
         .assets as unknown as AssetEntity[];
 
       const inspections = assets.filter((asset) => asset.inspection);

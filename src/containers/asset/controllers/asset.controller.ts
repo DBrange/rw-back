@@ -16,7 +16,7 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @Controller('asset')
-@UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
+// @UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
 export class AssetController {
   constructor(private readonly assetService: AssetService) {}
 
@@ -67,9 +67,9 @@ export class AssetController {
     return result;
   }
 
-  @Get('inspections-client/:brokerId')
-  public async getInspectionsOfClients(@Param('brokerId') brokerId: string) {
-    return await this.assetService.getInspectionsOfClients(brokerId);
+  @Get('inspections-client/:userBrokerId')
+  public async getInspectionsOfClients(@Param('userBrokerId') userBrokerId: string) {
+    return await this.assetService.getInspectionsOfClients(userBrokerId);
   }
 
   @Get('broker-clients/:userBrokerId')
