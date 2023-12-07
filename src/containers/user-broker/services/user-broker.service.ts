@@ -38,6 +38,8 @@ export class UserBrokerService {
         .createQueryBuilder('users_broker')
         .where({ id })
         .leftJoinAndSelect('users_broker.clients', 'clients')
+        .leftJoinAndSelect('clients.legalUser', 'legalUser')
+        .leftJoinAndSelect('clients.personalUser', 'personalUser')
         .getOne();
 
       if (!user) {

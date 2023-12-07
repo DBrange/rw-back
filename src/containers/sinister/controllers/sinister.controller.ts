@@ -27,7 +27,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { PublicAccess } from 'src/auth/decorators/public.decorator';
 
 @Controller('sinister')
-@UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
+// @UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
 export class SinisterController {
   constructor(private readonly sinisterService: SinisterService) {}
 

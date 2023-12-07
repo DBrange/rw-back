@@ -7,11 +7,11 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { PublicAccess } from 'src/auth/decorators/public.decorator';
 
 @Controller('register')
-@UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
+// @UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
 export class RegisterController {
   constructor(private readonly registerService: RegisterService) {}
 
-  @PublicAccess()
+  // @PublicAccess()
   @Post('')
   public async registerUser(@Body() body: RegisterDTO) {
     return await this.registerService.registerUser(body);

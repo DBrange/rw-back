@@ -106,8 +106,10 @@ export class SinisterService {
         .leftJoinAndSelect('sinisters.asset', 'asset')
         .leftJoinAndSelect('asset.vehicle', 'vehicle')
         .leftJoinAndSelect('asset.electronic', 'electronic')
-        .leftJoinAndSelect('asset.sinisters', 'sinisters')
+        .leftJoinAndSelect('asset.sinisters', 'sinisterss')
         .leftJoinAndSelect('asset.client', 'client')
+        .leftJoinAndSelect('client.personalUser', 'personalUser')
+        .leftJoinAndSelect('client.legalUser', 'legalUser')
         .leftJoinAndSelect('sinisters.thirdPartyVehicle', 'thirdPartyVehicle')
         .leftJoinAndSelect(
           'thirdPartyVehicle.thirdPartyDriver',

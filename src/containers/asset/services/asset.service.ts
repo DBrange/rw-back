@@ -56,6 +56,10 @@ export class AssetService {
       const asset = await this.assetRepository
         .createQueryBuilder('assets')
         .where({ id })
+        // .leftJoinAndSelect('assets.user', 'user')
+        .leftJoinAndSelect('assets.client', 'client')
+        .leftJoinAndSelect('client.personalUser', 'personalUser')
+        .leftJoinAndSelect('client.legalUser', 'legalUser')
         .leftJoinAndSelect('assets.vehicle', 'vehicle')
         .leftJoinAndSelect('assets.electronic', 'electronic')
         .leftJoinAndSelect('assets.sinisters', 'sinisters')

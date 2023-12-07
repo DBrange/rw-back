@@ -52,6 +52,12 @@ export class VehicleEntity extends BaseEntity implements IVehicle {
   @Column()
   okm: boolean;
 
+  @Column()
+  explodedAirbag: boolean;
+
+  @Column()
+  noSpareTire: boolean;
+
   @OneToOne(() => GncEntity)
   @JoinColumn()
   gncId: string;

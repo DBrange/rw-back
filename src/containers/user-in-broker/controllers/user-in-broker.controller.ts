@@ -5,15 +5,15 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @Controller('user-in-broker')
-@UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
+// @UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
 export class UserInBrokerController {
   constructor(private readonly userInBrokerService: UserInBrokerService) {}
 
-  @Post(':userBrokerId/:clientId')
+  @Post(':brokerId/:clientId')
   public async addClient(
-    @Param('userBrokerId') userBrokerId: string,
+    @Param('brokerId') brokerId: string,
     @Param('clientId') clientId: string,
   ) {
-    return this.userInBrokerService.addClient(userBrokerId, clientId);
+    return this.userInBrokerService.addClient(brokerId, clientId);
   }
 }
