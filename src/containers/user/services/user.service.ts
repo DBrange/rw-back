@@ -5,6 +5,7 @@ import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { ErrorManager } from 'src/utils/error.manager';
 import { UserDTO, UpdateUserDTO } from '../dto/user.dto';
 import * as bcrypt from 'bcrypt';
+import { UserBrokerEntity } from 'src/containers/user-broker/entities/user-broker.entity';
 
 @Injectable()
 export class UserService {
@@ -71,7 +72,7 @@ export class UserService {
       throw new ErrorManager.createSignaturError(error.message);
     }
   }
-  
+
   public async getUserByIdForProfile(id: string) {
     try {
       const user = await this.userRepository
@@ -90,6 +91,18 @@ export class UserService {
           message: 'No users found',
         });
       }
+
+      if (user.role === 'CLIENT') {
+        const brokerEntity = user.broker as unknown as UserBrokerEntity;
+        const findUserBroker = await this.userRepository
+        .createQueryBuilder('users')
+          .where({ userBroker: brokerEntity.id })
+          .leftJoinAndSelect('users.legalUser','legalUser')
+          .leftJoinAndSelect('users.personalUser','personalUser')
+        .getOne();
+        return { ...user, brokerUser: findUserBroker };
+      }
+
       return user;
     } catch (error) {
       throw new ErrorManager.createSignaturError(error.message);
