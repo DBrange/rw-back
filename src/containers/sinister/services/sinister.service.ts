@@ -234,14 +234,21 @@ export class SinisterService {
       const newTheft: TheftEntity = await this.theftService.createTheft(
         theftDTO,
       );
-
+      let theftTireId: TheftTireEntity | null;
       if (newTheft.isTire) {
         const theftTire: TheftTireDTO = {
           ...theftTireDTO,
           theft: newTheft.id,
         };
 
-        await this.theftTireService.createTheftTire(theftTire);
+        theftTireId = await this.theftTireService.createTheftTire(theftTire);
+      }
+
+      if (theftTireId) {
+        await this.theftService.updateTheft(newTheft.id, {
+          ...newTheft,
+          theftTire: theftTireId.id,
+        });
       }
 
       const bodySinisterType: SinisterTypeDTO = {
@@ -341,7 +348,7 @@ export class SinisterService {
       }
 
       const asset = (await this.assetService.getAssets()).find(
-        (asset) => asset.id === assetId,
+        (asset) => asset?.id === assetId,
       );
 
       await this.createTheftInSinister(asset, theftDTO, theftTireDTO);
@@ -967,8 +974,8 @@ export class SinisterService {
       brokerId,
       clientId,
     );
-    
-    const {password, ...rest} = client
+
+    const { password, ...rest } = client;
 
     const assets = assetOfUser.filter((asset) => asset.inspection);
     const sinisters = assetOfUser.filter((asset) => !asset.inspection);

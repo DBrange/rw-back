@@ -1,4 +1,4 @@
-import { IsBoolean, IsDate, IsNotEmpty, IsString } from "class-validator";
+import { IsBoolean, IsDate, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
 
 
 export class TheftDTO {
@@ -24,23 +24,27 @@ export class TheftDTO {
 };
 
 export class UpdateTheftDTO {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   time: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsDate()
   date: Date;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   location: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   reportPhoto: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
   isTire: boolean;
+
+  @IsOptional()
+  @IsUUID()
+  theftTire: string;
 };
