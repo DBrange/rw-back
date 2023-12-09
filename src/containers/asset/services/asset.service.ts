@@ -162,22 +162,22 @@ export class AssetService {
     inspection?: boolean,
   ) {
     try {
-      let newSmartphone: SmartphoneEntity;
+      let newSmartphone: SmartphoneEntity | null;
       if (electronicDTO.type === 'CELULAR') {
-        const relatedSmartphone = {
+        const relatedSmartphone: SmartphoneDTO = {
           ...smartphoneDTO,
         };
-
+        console.log(1)
         newSmartphone = await this.smartphoneService.createSmartphone(
           relatedSmartphone,
         );
       }
-
+console.log(2);
       const newElectronic = await this.electronicService.createElectronic({
         ...electronicDTO,
-        smartphone: newSmartphone.id,
+        smartphone: newSmartphone ? newSmartphone.id : null,
       });
-
+console.log(3);
       const asset = {
         ...assetDTO,
         electronic: newElectronic.id,

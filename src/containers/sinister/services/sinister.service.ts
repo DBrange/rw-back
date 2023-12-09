@@ -331,7 +331,7 @@ export class SinisterService {
     }
   }
 
-  // With sinister
+  // With inspection
 
   public async createSinisterTheftInInspection(
     assetId: string,
@@ -736,6 +736,7 @@ export class SinisterService {
             assetDTO,
             brokerId,
             clientId,
+            false
           );
 
         return await this.createDamageInSinister(newAsset, damageDTO);
