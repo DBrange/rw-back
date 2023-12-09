@@ -10,13 +10,21 @@ export class NotificationDTO {
   @IsString()
   message: string;
 
-  @IsNotEmpty()
-  @IsString()
-  isRead: boolean;
+  // @IsOptional()
+  // @IsString()
+  // isRead: boolean;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsEnum(NotificationResponse)
   response: NotificationResponse;
+
+  @IsOptional()
+  @IsUUID()
+  sender: string
+
+  @IsNotEmpty()
+  @IsUUID()
+  receiver: string
 }
 
 export class UpdateNotificationDTO {

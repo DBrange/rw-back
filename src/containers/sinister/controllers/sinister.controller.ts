@@ -135,12 +135,16 @@ export class SinisterController {
     );
   }
 
-  @Post('theft-inspection/:assetId')
+  @Post('theft-inspection/:brokerId/:clientId/:assetId')
   public async createSinisterTheftInInspection(
+    @Param('brokerId') brokerId: string,
+    @Param('clientId') clientId: string,
     @Param('assetId') assetId: string,
     @Body() requestData: SinisterTheftInspection,
   ) {
     const result = await this.sinisterService.createSinisterTheftInInspection(
+      brokerId,
+      clientId,
       assetId,
       requestData.theftDTO,
       requestData.theftTireDTO,
@@ -150,12 +154,16 @@ export class SinisterController {
     return result;
   }
 
-  @Post('fire-inspection/:assetId')
+  @Post('fire-inspection/:brokerId/:clientId/:assetId')
   public async createSinisterFireInInspection(
+    @Param('brokerId') brokerId: string,
+    @Param('clientId') clientId: string,
     @Param('assetId') assetId: string,
     @Body() requestData: SinisterFireInspection,
   ) {
     const result = await this.sinisterService.createSinisterFireInInspection(
+      brokerId,
+      clientId,
       assetId,
       requestData.fireDTO,
       requestData.injuredDTO,
@@ -165,12 +173,16 @@ export class SinisterController {
     return result;
   }
 
-  @Post('fire-inspection/:assetId')
+  @Post('fire-inspection/:brokerId/:clientId/:assetId')
   public async createSinisterCrashInInspection(
+    @Param('brokerId') brokerId: string,
+    @Param('clientId') clientId: string,
     @Param('assetId') assetId: string,
     @Body() requestData: SinisterCrashInspection,
   ) {
     const result = await this.sinisterService.createSinisterCrashInInspection(
+      brokerId,
+      clientId,
       assetId,
       requestData.crashDTO,
       requestData.injuredDTO,
@@ -181,12 +193,16 @@ export class SinisterController {
     return result;
   }
 
-  @Post('damage-inspection/:assetId')
+  @Post('damage-inspection/:brokerId/:clientId/:assetId')
   public async createSinisterDamageInInspection(
+    @Param('brokerId') brokerId: string,
+    @Param('clientId') clientId: string,
     @Param('assetId') assetId: string,
     @Body() requestData: SinisterDamageInspection,
   ) {
     const result = await this.sinisterService.createSinisterDamageInInspection(
+      brokerId,
+      clientId,
       assetId,
       requestData.damageDTO,
       requestData.swornDeclaration,

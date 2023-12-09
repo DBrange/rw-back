@@ -52,6 +52,10 @@ import { DamageDTO } from 'src/containers/damage/dto/damage.dto';
 import { DamageService } from 'src/containers/damage/services/damage.service';
 import { UserEntity } from 'src/containers/user/entities/user.entity';
 import { UserBrokerEntity } from 'src/containers/user-broker/entities/user-broker.entity';
+import { NotificationService } from 'src/containers/notification/services/notification.service';
+import { NotificationDTO } from 'src/containers/notification/dto/notification.dto';
+import { ElectronicEntity } from 'src/containers/electronic/entities/electronic.entity';
+import { VehicleEntity } from 'src/containers/vehicle/entities/vehicle.entity';
 
 @Injectable()
 export class SinisterService {
@@ -76,6 +80,7 @@ export class SinisterService {
     private readonly thirdPartyDriverService: ThirdPartyDriverService,
     private readonly damageService: DamageService,
     private readonly userBrokerService: UserBrokerService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   public async createSinister(body: SinisterDTO) {
@@ -221,6 +226,58 @@ export class SinisterService {
     }
   }
 
+  private async vehicleSinisterNotification(
+    newVehicle: VehicleDTO,
+    clientId: string,
+    brokerId: string,
+    type: string,
+  ) {
+    const bodyNotificationClient: NotificationDTO = {
+      title: 'Denuncia',
+      message: `Se ha realizado una nueva denuncia por ${type} - ${newVehicle.plate}`,
+      response: null,
+      sender: null,
+      receiver: clientId,
+    };
+
+    const bodyNotificationBroker: NotificationDTO = {
+      title: 'Denuncia',
+      message: `Se ha realizado una nueva denuncia por ${type} - ${newVehicle.plate}`,
+      response: null,
+      sender: null,
+      receiver: brokerId,
+    };
+
+    await this.notificationService.createNotification(bodyNotificationClient);
+    await this.notificationService.createNotification(bodyNotificationBroker);
+  }
+
+  private async electronicSinisterNotification(
+    newElectronic: ElectronicDTO,
+    clientId: string,
+    brokerId: string,
+    type: string,
+  ) {
+    const bodyNotificationClient: NotificationDTO = {
+      title: 'Denuncia',
+      message: `Se ha realizado una nueva denuncia por ${type} - ${newElectronic.brand} ${newElectronic.model}`,
+      response: null,
+      sender: null,
+      receiver: clientId,
+    };
+
+    const bodyNotificationBroker: NotificationDTO = {
+      title: 'Denuncia',
+      message: `Se ha realizado una nueva denuncia por ${type} - ${newElectronic.brand} ${newElectronic.model}`,
+      response: null,
+      sender: null,
+      receiver: brokerId,
+    };
+
+    await this.notificationService.createNotification(bodyNotificationClient);
+    await this.notificationService.createNotification(bodyNotificationBroker);
+  }
+
   // - - - - - - - - - - - - - - - - - - - - - - - - -
 
   // Theft
@@ -311,6 +368,13 @@ export class SinisterService {
           );
 
         await this.createTheftInSinister(newAsset, theftDTO, theftTireDTO);
+
+        await this.vehicleSinisterNotification(
+          vehicleDTO,
+          clientId,
+          brokerId,
+          'robo',
+        );
       } else {
         const newAsset: AssetEntity =
           await this.assetService.createElectronicInAsset(
@@ -323,6 +387,13 @@ export class SinisterService {
           );
 
         await this.createTheftInSinister(newAsset, theftDTO, theftTireDTO);
+
+        await this.electronicSinisterNotification(
+          electronicDTO,
+          clientId,
+          brokerId,
+          'robo',
+        );
       }
 
       return { message: 'La denuncia ha sido creada con exito' };
@@ -334,6 +405,8 @@ export class SinisterService {
   // With inspection
 
   public async createSinisterTheftInInspection(
+    brokerId: string,
+    clientId: string,
     assetId: string,
     theftDTO: TheftDTO,
     theftTireDTO: TheftTireDTO,
@@ -352,6 +425,17 @@ export class SinisterService {
       );
 
       await this.createTheftInSinister(asset, theftDTO, theftTireDTO);
+      console.log(asset);
+
+      const vehicleEntity = (await this.assetService.getAssetById(asset.id))
+        .vehicle as unknown as VehicleEntity;
+
+      await this.vehicleSinisterNotification(
+        vehicleEntity,
+        clientId,
+        brokerId,
+        'robo',
+      );
 
       return { message: 'La denuncia ha sido creada con exito' };
     } catch (error) {
@@ -438,6 +522,13 @@ export class SinisterService {
       // NewSinister
       await this.createFireInSinister(newAsset, fireDTO, injuredDTO);
 
+      await this.vehicleSinisterNotification(
+        vehicleDTO,
+        clientId,
+        brokerId,
+        'incendio',
+      );
+
       return { message: 'La denuncia ha sido creada con exito' };
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
@@ -446,6 +537,8 @@ export class SinisterService {
 
   // With inspection
   public async createSinisterFireInInspection(
+    brokerId: string,
+    clientId: string,
     assetId: string,
     fireDTO: FireDTO,
     injuredDTO: InjuredData,
@@ -464,6 +557,16 @@ export class SinisterService {
       );
 
       await this.createFireInSinister(asset, fireDTO, injuredDTO);
+
+      const vehicleEntity = (await this.assetService.getAssetById(asset.id))
+        .vehicle as unknown as VehicleEntity;
+
+      await this.vehicleSinisterNotification(
+        vehicleEntity,
+        clientId,
+        brokerId,
+        'incendio',
+      );
 
       return { message: 'La denuncia ha sido creada con exito' };
     } catch (error) {
@@ -616,6 +719,12 @@ export class SinisterService {
         thirdPartyVehicleDTO,
       );
 
+      await this.vehicleSinisterNotification(
+        vehicleDTO,
+        clientId,
+        brokerId,
+        'choque',
+      );
       return { message: 'La denuncia a sido realizada con exito' };
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
@@ -624,6 +733,8 @@ export class SinisterService {
 
   // With inspection
   public async createSinisterCrashInInspection(
+    brokerId: string,
+    clientId: string,
     assetId: string,
     crashDTO: CrashDTO,
     injuredDTO: InjuredData,
@@ -647,6 +758,16 @@ export class SinisterService {
         crashDTO,
         injuredDTO,
         thirdPartyVehicleDTO,
+      );
+
+      const vehicleEntity = (await this.assetService.getAssetById(asset.id))
+        .vehicle as unknown as VehicleEntity;
+
+      await this.vehicleSinisterNotification(
+        vehicleEntity,
+        clientId,
+        brokerId,
+        'choque',
       );
 
       return { message: 'La denuncia ha sido creada con exito' };
@@ -726,8 +847,16 @@ export class SinisterService {
             clientId,
             false,
           );
+        const sinister = await this.createDamageInSinister(newAsset, damageDTO);
 
-        return await this.createDamageInSinister(newAsset, damageDTO);
+        await this.vehicleSinisterNotification(
+          vehicleDTO,
+          clientId,
+          brokerId,
+          'daño',
+        );
+
+        return sinister;
       } else {
         const newAsset: AssetEntity =
           await this.assetService.createElectronicInAsset(
@@ -736,10 +865,19 @@ export class SinisterService {
             assetDTO,
             brokerId,
             clientId,
-            false
+            false,
           );
 
-        return await this.createDamageInSinister(newAsset, damageDTO);
+        const sinister = await this.createDamageInSinister(newAsset, damageDTO);
+
+        await this.electronicSinisterNotification(
+          electronicDTO,
+          clientId,
+          brokerId,
+          'daño',
+        );
+
+        return sinister;
       }
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
@@ -748,6 +886,8 @@ export class SinisterService {
 
   // With inspection
   public async createSinisterDamageInInspection(
+    brokerId: string,
+    clientId: string,
     assetId: string,
     damageDTO: DamageDTO,
     swornDeclaration: boolean,
@@ -765,6 +905,16 @@ export class SinisterService {
       );
 
       await this.createDamageInSinister(asset, damageDTO);
+      
+      const vehicleEntity = (await this.assetService.getAssetById(asset.id))
+        .vehicle as unknown as VehicleEntity;
+
+      await this.vehicleSinisterNotification(
+        vehicleEntity,
+        clientId,
+        brokerId,
+        'daño',
+      );
 
       return { message: 'La denuncia ha sido creada con exito' };
     } catch (error) {

@@ -21,6 +21,6 @@ export class NotificationEntity extends BaseEntity implements INotification {
   @Column({ default: false })
   isRead: boolean;
 
-  @Column({ type: 'enum', enum: NotificationResponse })
+  @Column({ type: 'enum', enum: NotificationResponse, nullable: true })
   response: NotificationResponse;
 }

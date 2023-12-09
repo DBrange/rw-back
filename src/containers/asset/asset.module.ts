@@ -17,6 +17,8 @@ import { UserService } from '../user/services/user.service';
 import { VehicleEntity } from '../vehicle/entities/vehicle.entity';
 import { VehicleService } from '../vehicle/services/vehicle.service';
 import { AssetEntity } from './entities/asset.entity';
+import { NotificationService } from '../notification/services/notification.service';
+import { NotificationEntity } from '../notification/entities/notification.entity';
 
 @Module({
   providers: [
@@ -28,6 +30,7 @@ import { AssetEntity } from './entities/asset.entity';
     UserService,
     LegalUserService,
     UserBrokerService,
+    NotificationService,
   ],
   controllers: [AssetController],
   imports: [
@@ -40,6 +43,7 @@ import { AssetEntity } from './entities/asset.entity';
       UserEntity,
       LegalUserEntity,
       UserBrokerEntity,
+      NotificationEntity
     ]),
   ],
   exports: [AssetService],

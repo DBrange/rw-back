@@ -39,6 +39,8 @@ import { VehicleService } from '../vehicle/services/vehicle.service';
 import { UserService } from '../user/services/user.service';
 import { DamageService } from '../damage/services/damage.service';
 import { DamageEntity } from '../damage/entities/damage.entity';
+import { NotificationEntity } from '../notification/entities/notification.entity';
+import { NotificationService } from '../notification/services/notification.service';
 
 @Module({
   providers: [
@@ -61,6 +63,7 @@ import { DamageEntity } from '../damage/entities/damage.entity';
     ThirdPartyDriverService,
     DamageService,
     UserBrokerService,
+    NotificationService,
   ],
   controllers: [SinisterController],
   imports: [
@@ -84,6 +87,7 @@ import { DamageEntity } from '../damage/entities/damage.entity';
       ThirdPartyDriverEntity,
       DamageEntity,
       UserBrokerEntity,
+      NotificationEntity,
     ]),
   ],
   exports: [SinisterService],

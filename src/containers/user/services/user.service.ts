@@ -41,6 +41,10 @@ export class UserService {
         .createQueryBuilder('users')
         .where({ id })
         .leftJoinAndSelect('users.brokerAssets', 'brokerAssets')
+        .leftJoinAndSelect(
+          'users.receivedNotifications',
+          'notifications',
+        )
         // .leftJoinAndSelect('brokerAssets.vehicle', 'vehicle')
         // .leftJoinAndSelect('brokerAssets.electronic', 'electronic')
         // .leftJoinAndSelect('brokerAssets.sinisters', 'sinisters')

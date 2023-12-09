@@ -18,6 +18,9 @@ import { VehicleDTO } from 'src/containers/vehicle/dto/vehicle.dto';
 import { VehicleService } from 'src/containers/vehicle/services/vehicle.service';
 import { GncEntity } from 'src/containers/gnc/entities/gnc.entity';
 import { VehicleEntity } from 'src/containers/vehicle/entities/vehicle.entity';
+import { NotificationService } from 'src/containers/notification/services/notification.service';
+import { NotificationDTO } from 'src/containers/notification/dto/notification.dto';
+import { ElectronicEntity } from 'src/containers/electronic/entities/electronic.entity';
 
 @Injectable()
 export class AssetService {
@@ -31,6 +34,7 @@ export class AssetService {
     private readonly userService: UserService,
     private readonly legalUserService: LegalUserService,
     private readonly userBrokerService: UserBrokerService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   public async createAsset(body: AssetDTO) {
@@ -115,6 +119,56 @@ export class AssetService {
     }
   }
 
+  private async vehicleInspectionNotification(
+    newVehicle: VehicleEntity,
+    clientId: string,
+    brokerId: string,
+  ) {
+    const bodyNotificationClient: NotificationDTO = {
+      title: 'Inspeccion',
+      message: `Se ha realizado una nueva inspeccion - ${newVehicle.plate}`,
+      response: null,
+      sender: null,
+      receiver: clientId,
+    };
+
+    const bodyNotificationBroker: NotificationDTO = {
+      title: 'Inspeccion',
+      message: `Se ha realizado una nueva inspeccion - ${newVehicle.plate}`,
+      response: null,
+      sender: null,
+      receiver: brokerId,
+    };
+
+    await this.notificationService.createNotification(bodyNotificationClient);
+    await this.notificationService.createNotification(bodyNotificationBroker);
+  }
+
+  private async electronicInspectionNotification(
+    newElectronic: ElectronicEntity,
+    clientId: string,
+    brokerId: string,
+  ) {
+    const bodyNotificationClient: NotificationDTO = {
+      title: 'Inspeccion',
+      message: `Se ha realizado una nueva inspeccion - ${newElectronic.brand} ${newElectronic.model}`,
+      response: null,
+      sender: null,
+      receiver: clientId,
+    };
+
+    const bodyNotificationBroker: NotificationDTO = {
+      title: 'Inspeccion',
+      message: `Se ha realizado una nueva inspeccion - ${newElectronic.brand} ${newElectronic.model}`,
+      response: null,
+      sender: null,
+      receiver: brokerId,
+    };
+
+    await this.notificationService.createNotification(bodyNotificationClient);
+    await this.notificationService.createNotification(bodyNotificationBroker);
+  }
+
   public async createVehicleInAsset(
     vehicleDTO: VehicleDTO,
     gncDTO: GncDTO,
@@ -147,6 +201,14 @@ export class AssetService {
         inspection: inspection === false ? false : true,
       };
 
+      if (inspection !== false) {
+        await this.vehicleInspectionNotification(
+          newVehicle,
+          clientId,
+          brokerId,
+        );
+      }
+
       return await this.createAsset(asset);
     } catch (err) {
       throw ErrorManager.createSignaturError(err.message);
@@ -167,17 +229,17 @@ export class AssetService {
         const relatedSmartphone: SmartphoneDTO = {
           ...smartphoneDTO,
         };
-        console.log(1);
+
         newSmartphone = await this.smartphoneService.createSmartphone(
           relatedSmartphone,
         );
       }
-      console.log(2);
+
       const newElectronic = await this.electronicService.createElectronic({
         ...electronicDTO,
         smartphone: newSmartphone ? newSmartphone.id : null,
       });
-      console.log(3);
+
       const asset = {
         ...assetDTO,
         electronic: newElectronic.id,
@@ -185,6 +247,14 @@ export class AssetService {
         client: clientId,
         inspection: inspection === false ? false : true,
       };
+
+      if (inspection !== false) {
+        await this.electronicInspectionNotification(
+          newElectronic,
+          clientId,
+          brokerId,
+        );
+      }
 
       return await this.createAsset(asset);
     } catch (err) {
