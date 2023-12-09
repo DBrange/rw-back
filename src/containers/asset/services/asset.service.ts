@@ -167,17 +167,17 @@ export class AssetService {
         const relatedSmartphone: SmartphoneDTO = {
           ...smartphoneDTO,
         };
-        console.log(1)
+        console.log(1);
         newSmartphone = await this.smartphoneService.createSmartphone(
           relatedSmartphone,
         );
       }
-console.log(2);
+      console.log(2);
       const newElectronic = await this.electronicService.createElectronic({
         ...electronicDTO,
         smartphone: newSmartphone ? newSmartphone.id : null,
       });
-console.log(3);
+      console.log(3);
       const asset = {
         ...assetDTO,
         electronic: newElectronic.id,
@@ -281,6 +281,22 @@ console.log(3);
   }
 
   // Elements in client
+
+  private async getAssetByIdForElements(assetId: string) {
+    const asset = await this.assetRepository
+      .createQueryBuilder('assets')
+      .leftJoin('assets.vehicle', 'vehicle')
+      .addSelect('vehicle.brand')
+      .addSelect('vehicle.model')
+      .addSelect('vehicle.plate')
+      .addSelect('vehicle.type')
+      .leftJoin('assets.electronic', 'electronic')
+      .addSelect('electronic.brand')
+      .addSelect('electronic.model')
+      .addSelect('electronic.type')
+      .where({ user: assetId })
+      .getMany();
+  }
 
   public async getAllElementsFromClient(clientId: string) {
     try {
