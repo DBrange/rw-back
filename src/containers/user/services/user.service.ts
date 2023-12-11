@@ -41,10 +41,7 @@ export class UserService {
         .createQueryBuilder('users')
         .where({ id })
         .leftJoinAndSelect('users.brokerAssets', 'brokerAssets')
-        .leftJoinAndSelect(
-          'users.receivedNotifications',
-          'notifications',
-        )
+        .leftJoinAndSelect('users.receivedNotifications', 'notifications')
         // .leftJoinAndSelect('brokerAssets.vehicle', 'vehicle')
         // .leftJoinAndSelect('brokerAssets.electronic', 'electronic')
         // .leftJoinAndSelect('brokerAssets.sinisters', 'sinisters')
@@ -99,11 +96,11 @@ export class UserService {
       if (user.role === 'CLIENT') {
         const brokerEntity = user.broker as unknown as UserBrokerEntity;
         const findUserBroker = await this.userRepository
-        .createQueryBuilder('users')
+          .createQueryBuilder('users')
           .where({ userBroker: brokerEntity.id })
-          .leftJoinAndSelect('users.legalUser','legalUser')
-          .leftJoinAndSelect('users.personalUser','personalUser')
-        .getOne();
+          .leftJoinAndSelect('users.legalUser', 'legalUser')
+          .leftJoinAndSelect('users.personalUser', 'personalUser')
+          .getOne();
         return { ...user, brokerUser: findUserBroker };
       }
 
@@ -207,20 +204,52 @@ export class UserService {
   }
 
   public async getClientById(id: string) {
-    const user = await this.userRepository
-      .createQueryBuilder('users')
-      .where({ id })
-      .leftJoinAndSelect('users.personalUser', 'personalUser')
-      .leftJoinAndSelect('users.legalUser', 'legalUsers')
-      .getOne();
+    try {
+      const user = await this.userRepository
+        .createQueryBuilder('users')
+        .where({ id })
+        .leftJoinAndSelect('users.personalUser', 'personalUser')
+        .leftJoinAndSelect('users.legalUser', 'legalUsers')
+        .getOne();
 
-    if (!user) {
-      throw new ErrorManager({
-        type: 'BAD_REQUEST',
-        message: 'No users found',
-      });
+      if (!user) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+
+      return user;
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
     }
+  }
 
-    return user;
+  public async findUserByEmail(value: string) {
+    try {
+      const user = await this.userRepository
+        .createQueryBuilder('users')
+        .select('users.email')
+        .where({ email: value })
+        .leftJoin('users.personalUser', 'personalUser')
+        .addSelect('personalUser.name')
+        .addSelect('personalUser.lastName')
+        .addSelect('personalUser.dni')
+        .leftJoin('users.legalUser', 'legalUser')
+        .addSelect('legalUser.companyName')
+        .addSelect('legalUser.cuit')
+        .getOne();
+
+      if (!user) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+
+      return user;
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
   }
 }

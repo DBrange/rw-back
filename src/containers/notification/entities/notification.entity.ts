@@ -12,6 +12,12 @@ export class NotificationEntity extends BaseEntity implements INotification {
   @Column()
   message: string;
 
+  @Column({ default: false })
+  withOptions: boolean;
+
+  @Column({nullable: true})
+  additional: string
+
   @ManyToOne(() => UserEntity, (user) => user.sentNotifications)
   sender: string;
 

@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
+import { IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
 import { NotificationResponse } from "../types/response.enum";
 
 export class NotificationDTO {
@@ -10,9 +10,13 @@ export class NotificationDTO {
   @IsString()
   message: string;
 
-  // @IsOptional()
-  // @IsString()
-  // isRead: boolean;
+  @IsOptional()
+  @IsBoolean()
+  withOptions: boolean;
+  
+  @IsOptional()
+  @IsString()
+  additional: string;
 
   @IsOptional()
   @IsEnum(NotificationResponse)
@@ -20,11 +24,11 @@ export class NotificationDTO {
 
   @IsOptional()
   @IsUUID()
-  sender: string
+  sender: string;
 
   @IsNotEmpty()
   @IsUUID()
-  receiver: string
+  receiver: string;
 }
 
 export class UpdateNotificationDTO {
@@ -35,6 +39,18 @@ export class UpdateNotificationDTO {
   @IsOptional()
   @IsString()
   message: string;
+
+  @IsOptional()
+  @IsBoolean()
+  withOptions: boolean;
+
+  @IsOptional()
+  @IsString()
+  additional: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isRead: boolean;
 
   @IsOptional()
   @IsUUID()

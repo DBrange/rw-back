@@ -127,6 +127,8 @@ export class AssetService {
     const bodyNotificationClient: NotificationDTO = {
       title: 'Inspeccion',
       message: `Se ha realizado una nueva inspeccion - ${newVehicle.plate}`,
+      withOptions: false,
+      additional: null,
       response: null,
       sender: null,
       receiver: clientId,
@@ -135,6 +137,8 @@ export class AssetService {
     const bodyNotificationBroker: NotificationDTO = {
       title: 'Inspeccion',
       message: `Se ha realizado una nueva inspeccion - ${newVehicle.plate}`,
+      withOptions: false,
+      additional: null,
       response: null,
       sender: null,
       receiver: brokerId,
@@ -152,6 +156,8 @@ export class AssetService {
     const bodyNotificationClient: NotificationDTO = {
       title: 'Inspeccion',
       message: `Se ha realizado una nueva inspeccion - ${newElectronic.brand} ${newElectronic.model}`,
+      withOptions: false,
+      additional: null,
       response: null,
       sender: null,
       receiver: clientId,
@@ -160,6 +166,8 @@ export class AssetService {
     const bodyNotificationBroker: NotificationDTO = {
       title: 'Inspeccion',
       message: `Se ha realizado una nueva inspeccion - ${newElectronic.brand} ${newElectronic.model}`,
+      withOptions: false,
+      additional: null,
       response: null,
       sender: null,
       receiver: brokerId,

@@ -235,6 +235,8 @@ export class SinisterService {
     const bodyNotificationClient: NotificationDTO = {
       title: 'Denuncia',
       message: `Se ha realizado una nueva denuncia por ${type} - ${newVehicle.plate}`,
+      withOptions: false,
+      additional: null,
       response: null,
       sender: null,
       receiver: clientId,
@@ -243,6 +245,8 @@ export class SinisterService {
     const bodyNotificationBroker: NotificationDTO = {
       title: 'Denuncia',
       message: `Se ha realizado una nueva denuncia por ${type} - ${newVehicle.plate}`,
+      withOptions: false,
+      additional: null,
       response: null,
       sender: null,
       receiver: brokerId,
@@ -261,6 +265,8 @@ export class SinisterService {
     const bodyNotificationClient: NotificationDTO = {
       title: 'Denuncia',
       message: `Se ha realizado una nueva denuncia por ${type} - ${newElectronic.brand} ${newElectronic.model}`,
+      withOptions: false,
+      additional: null,
       response: null,
       sender: null,
       receiver: clientId,
@@ -269,6 +275,8 @@ export class SinisterService {
     const bodyNotificationBroker: NotificationDTO = {
       title: 'Denuncia',
       message: `Se ha realizado una nueva denuncia por ${type} - ${newElectronic.brand} ${newElectronic.model}`,
+      withOptions: false,
+      additional: null,
       response: null,
       sender: null,
       receiver: brokerId,

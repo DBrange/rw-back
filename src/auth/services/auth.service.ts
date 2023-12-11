@@ -47,7 +47,7 @@ export class AuthService {
       accessToken: this.signJWT({
         payload,
         secret: process.env.JWT_SECRET,
-        expires: '1h',
+        expires: '5h',
       }),
       user: userToken,
       exp,
