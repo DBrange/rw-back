@@ -1,8 +1,8 @@
-import { UserEntity } from "src/containers/user/entities/user.entity";
-import { INotification } from "src/interfaces/notification.interface";
-import { Entity, Column, ManyToOne } from "typeorm";
-import { NotificationResponse } from "../types/response.enum";
-import { BaseEntity } from "src/config/base.entity";
+import { UserEntity } from 'src/containers/user/entities/user.entity';
+import { INotification } from 'src/interfaces/notification.interface';
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { NotificationResponse } from '../types/response.enum';
+import { BaseEntity } from 'src/config/base.entity';
 
 @Entity({ name: 'notifications' })
 export class NotificationEntity extends BaseEntity implements INotification {
@@ -15,13 +15,15 @@ export class NotificationEntity extends BaseEntity implements INotification {
   @Column({ default: false })
   withOptions: boolean;
 
-  @Column({nullable: true})
-  additional: string
+  @Column({ nullable: true })
+  additional: string;
 
   @ManyToOne(() => UserEntity, (user) => user.sentNotifications)
+  @JoinColumn()
   sender: string;
 
   @ManyToOne(() => UserEntity, (user) => user.receivedNotifications)
+  @JoinColumn()
   receiver: string;
 
   @Column({ default: false })

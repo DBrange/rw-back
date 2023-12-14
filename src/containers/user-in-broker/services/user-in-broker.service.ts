@@ -58,7 +58,7 @@ export class UserInBrokerService {
       message: `La solicitud de broker para ${clientName} ${
         clientLastname && clientLastname
       } ha sido enviada`,
-      withOptions: true,
+      withOptions: false,
       additional: null,
       response: null,
       sender: null,

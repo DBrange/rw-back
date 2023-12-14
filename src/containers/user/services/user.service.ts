@@ -229,7 +229,7 @@ export class UserService {
     try {
       const user = await this.userRepository
         .createQueryBuilder('users')
-        .select('users.email')
+        .select(['users.email', 'users.id'])
         .where({ email: value })
         .leftJoin('users.personalUser', 'personalUser')
         .addSelect('personalUser.name')
