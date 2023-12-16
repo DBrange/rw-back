@@ -92,8 +92,8 @@ export class UserService {
           message: 'No users found',
         });
       }
-
-      if (user.role === 'CLIENT') {
+console.log('holas');
+      if (user.role === 'CLIENT' && user.broker) {
         const brokerEntity = user.broker as unknown as UserBrokerEntity;
         const findUserBroker = await this.userRepository
           .createQueryBuilder('users')
@@ -220,6 +220,27 @@ export class UserService {
       }
 
       return user;
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async getClientNotificationsById(id: string) {
+    try {
+      const user = await this.userRepository
+        .createQueryBuilder('users')
+        .where({ id })
+        .leftJoinAndSelect('users.receivedNotifications', 'notifiations')
+        .getOne();
+
+      if (!user) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+      
+      return user.receivedNotifications;
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
     }

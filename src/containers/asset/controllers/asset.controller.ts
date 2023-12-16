@@ -83,4 +83,9 @@ export class AssetController {
   public async getAllElementsFromClient(@Param('clientId') clientId: string) {
     return await this.assetService.getAllElementsFromClient(clientId);
   }
+
+  @Get('all-read/:userId')
+  public async allRead(@Param('userId') userId: string) {
+    return await this.assetService.allRead(userId);
+  }
 }

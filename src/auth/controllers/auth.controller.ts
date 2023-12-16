@@ -15,13 +15,13 @@ export class AuthController {
   @Post('login')
   async login(@Body() { email, password }: AuthDTO) {
     const userValidate = await this.authService.validateUser(email, password);
-
     if (!userValidate) {
       throw new UnauthorizedException('Data not valid');
     }
 
+    console.log('1')
     const jwt = await this.authService.generateJWT(userValidate);
-
+    
     return jwt;
   }
 }

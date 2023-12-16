@@ -21,6 +21,7 @@ import { VehicleEntity } from 'src/containers/vehicle/entities/vehicle.entity';
 import { NotificationService } from 'src/containers/notification/services/notification.service';
 import { NotificationDTO } from 'src/containers/notification/dto/notification.dto';
 import { ElectronicEntity } from 'src/containers/electronic/entities/electronic.entity';
+import { NotificationEntity } from 'src/containers/notification/entities/notification.entity';
 
 @Injectable()
 export class AssetService {
@@ -395,5 +396,33 @@ export class AssetService {
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
     }
+  }
+
+  public async allRead(userId: string) {
+    const user = await this.userService.getUserById(userId);
+    console.log('1');
+    const notifications =
+      user.receivedNotifications as unknown as NotificationEntity[];
+    console.log('2');
+
+    const promiseNotificationsRead = notifications.map(async (el) => {
+      el.isRead = true;
+      const notification = await this.notificationService.updateNotification(
+        el.id,
+        el,
+      );
+      return notification;
+    });
+    console.log('3');
+    
+    await Promise.all(promiseNotificationsRead)
+    
+    console.log('4');
+    const userr = (await this.userService.getUserById(userId)).receivedNotifications;
+
+
+    
+
+    return userr;
   }
 }
