@@ -249,4 +249,16 @@ export class SinisterController {
 
     return result;
   }
+  @Get('dashboard/:brokerId/:userBrokerId')
+  public async getBrokerDashboard(
+    @Param('brokerId') brokerId: string,
+    @Param('userBrokerId') userBrokerId: string,
+  ) {
+    const result = await this.sinisterService.getBrokerDashboard(
+      brokerId,
+      userBrokerId,
+    );
+
+    return result;
+  }
 }

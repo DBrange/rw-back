@@ -913,7 +913,7 @@ export class SinisterService {
       );
 
       await this.createDamageInSinister(asset, damageDTO);
-      
+
       const vehicleEntity = (await this.assetService.getAssetById(asset.id))
         .vehicle as unknown as VehicleEntity;
 
@@ -1141,4 +1141,90 @@ export class SinisterService {
 
     return { ...rest, assets, sinisters };
   }
+
+  private async getAssetForBroker(brokerId: string, userBrokerId: string) {
+    const clients = (await this.assetService.getAllClientsInBroker(
+      userBrokerId,
+    )) as unknown as UserEntity[];
+
+    const assetOfBroker = await this.assetService.findAssetsByBroker(brokerId);
+
+    const assets = assetOfBroker.filter((asset) => asset.inspection);
+    const sinisters = assetOfBroker.filter((asset) => !asset.inspection);
+
+    return { assets, sinisters, clients };
+  }
+
+  public async getBrokerDashboard(brokerId: string, userBrokerId: string) {
+    const { assets, sinisters, clients } = await this.getAssetForBroker(
+      brokerId,
+      userBrokerId,
+    );
+
+    // Obtén la fecha actual
+    const currentDate = new Date();
+    const newAsyncDate = new Date();
+
+    // Calcula la fecha de hace una semana
+    const lastWeekDate = new Date(currentDate);
+    lastWeekDate.setDate(currentDate.getDate() - 7);
+
+    // Función para obtener el timestamp de una fecha
+    const dateToTimestamp = (date: Date) => date.getTime();
+
+    // Filtra los assets creados en la última semana
+    const assetsLastWeek = assets.filter(
+      (el) =>
+        dateToTimestamp(new Date(el.created_at)) >=
+        dateToTimestamp(lastWeekDate),
+    );
+
+    const sinistersLastWeek = sinisters.filter(
+      (el) =>
+        dateToTimestamp(new Date(el.created_at)) >=
+        dateToTimestamp(lastWeekDate),
+    );
+
+    const clientsLastWeek = clients.filter(
+      (el) =>
+        dateToTimestamp(new Date(el.created_at)) >=
+        dateToTimestamp(lastWeekDate),
+    );
+
+    return { assetsLastWeek, sinistersLastWeek, clientsLastWeek, newAsyncDate };
+  }
+  // public async getBrokerDashboard(
+  //   brokerId: string,
+  //   userBrokerId: string,
+  //   lastSyncDate: Date,
+  // ) {
+  //   const { assets, sinisters, clients } = await this.getAssetForBroker(
+  //     brokerId,
+  //     userBrokerId,
+  //   );
+
+  //   // Obtén la fecha actual
+  //   const newAsyncDate = new Date();
+
+  //   // Filtra los assets creados o modificados después de la última sincronización
+  //   const assetsLastSync = assets.filter(
+  //     (el) =>
+  //       new Date(el.created_at) >= lastSyncDate ||
+  //       new Date(el.updated_at) >= lastSyncDate,
+  //   );
+
+  //   const sinistersLastSync = sinisters.filter(
+  //     (el) =>
+  //       new Date(el.created_at) >= lastSyncDate ||
+  //       new Date(el.updated_at) >= lastSyncDate,
+  //   );
+
+  //   const clientsLastSync = clients.filter(
+  //     (el) =>
+  //       new Date(el.created_at) >= lastSyncDate ||
+  //       new Date(el.updated_at) >= lastSyncDate,
+  //   );
+
+  //   return { assetsLastSync, sinistersLastSync, clientsLastSync };
+  // }
 }

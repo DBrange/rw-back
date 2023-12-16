@@ -359,6 +359,24 @@ export class AssetService {
     return assets;
   }
 
+  public async findAssetsByBroker(brokerId: string) {
+    const assets = await this.assetRepository
+      .createQueryBuilder('assets')
+      .leftJoin('assets.vehicle', 'vehicle')
+      .addSelect('vehicle.brand')
+      .addSelect('vehicle.model')
+      .addSelect('vehicle.plate')
+      .addSelect('vehicle.type')
+      .leftJoin('assets.electronic', 'electronic')
+      .addSelect('electronic.brand')
+      .addSelect('electronic.model')
+      .addSelect('electronic.type')
+      .where({ user: brokerId })
+      .getMany();
+
+    return assets;
+  }
+
   // Elements in client
 
   private async getAssetByIdForElements(assetId: string) {
@@ -414,14 +432,12 @@ export class AssetService {
       return notification;
     });
     console.log('3');
-    
-    await Promise.all(promiseNotificationsRead)
-    
+
+    await Promise.all(promiseNotificationsRead);
+
     console.log('4');
-    const userr = (await this.userService.getUserById(userId)).receivedNotifications;
-
-
-    
+    const userr = (await this.userService.getUserById(userId))
+      .receivedNotifications;
 
     return userr;
   }
