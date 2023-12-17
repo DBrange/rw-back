@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from '../services/user.service';
@@ -45,6 +46,15 @@ export class UserController {
   @Delete(':userId')
   public async deleteUser(@Param('userId') id: string) {
     return await this.userService.deleteUser(id);
+  }
+
+  @Post('last-record/:userId')
+  public async updateLastRecord(
+    @Param('userId') userId: string,
+    @Query('date') date?: Date,
+  ) {
+    console.log(date, '------------')
+    return await this.userService.updateLastRecord(userId, date);
   }
 
   @Get('inspections/:userId')

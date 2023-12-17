@@ -146,6 +146,13 @@ console.log('holas');
     }
   }
 
+  public async updateLastRecord(userId: string, date: Date) {
+    const user = await this.userRepository.findOneBy({id: userId})
+    await this.updateUser(userId, { ...user, lastRecord: date })
+    
+    return {message: 'lastRecord ha sido actualizado con exito'}
+  }
+
   public async verifyEmail(email: string | undefined) {
     try {
       const emailOrDni = await this.userRepository

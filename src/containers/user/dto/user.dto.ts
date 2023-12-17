@@ -1,13 +1,13 @@
 import {
+  IsDate,
   IsEmail,
   IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUUID,
+  IsUUID
 } from 'class-validator';
 import { AUTHORIZATION, ROLES } from '../../../constants/roles';
-import { UserBrokerEntity } from 'src/containers/user-broker/entities/user-broker.entity';
 
 export class UserDTO {
   @IsNotEmpty()
@@ -59,6 +59,10 @@ export class UpdateUserDTO {
   @IsOptional()
   @IsString()
   phoneNumber: string;
+
+  @IsOptional()
+  @IsDate()
+  lastRecord: Date;
 
   @IsOptional()
   @IsEnum(ROLES)

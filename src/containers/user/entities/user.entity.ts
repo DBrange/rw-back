@@ -35,6 +35,9 @@ export class UserEntity extends BaseEntity implements IUser {
   @Column()
   address: string;
 
+  @Column({nullable: true, default: null})
+  lastRecord: Date;
+
   @Column({ type: 'enum', enum: ROLES })
   role: ROLES;
 
