@@ -969,35 +969,41 @@ export class SinisterService {
   }
 
   // Broker
+
+  private async sinisterForArrayPromises(assetId: string) {
+    const sinister = await this.sinisterRepository
+      .createQueryBuilder('sinisters')
+      .where({ asset: assetId })
+      .leftJoinAndSelect('sinisters.sinisterType', 'sinisterType')
+      .leftJoin('sinisterType.theft', 'theft')
+      .addSelect('theft.id')
+      .leftJoin('sinisterType.fire', 'fire')
+      .addSelect('fire.id')
+      .leftJoin('sinisterType.crash', 'crash')
+      .addSelect('crash.id')
+      .leftJoin('sinisterType.damage', 'damage')
+      .addSelect('damage.id')
+      .leftJoinAndSelect('sinisters.asset', 'asset')
+      .leftJoin('asset.vehicle', 'vehicle')
+      .addSelect('vehicle.brand')
+      .addSelect('vehicle.model')
+      .addSelect('vehicle.plate')
+      .addSelect('vehicle.type')
+      .leftJoin('asset.electronic', 'electronic')
+      .addSelect('electronic.brand')
+      .addSelect('electronic.model')
+      .addSelect('electronic.type')
+      .getOne();
+
+    return sinister;
+  }
   public async getSinistersOfBroker(brokerId: string) {
     try {
       const brokerAssets = (await this.userService.getUserById(brokerId))
         .assets as unknown as UserEntity[];
 
       const sinisters = brokerAssets.map(async (brokerAssets) => {
-        const sinister = await this.sinisterRepository
-          .createQueryBuilder('sinisters')
-          .where({ asset: brokerAssets.id })
-          .leftJoinAndSelect('sinisters.sinisterType', 'sinisterType')
-          .leftJoin('sinisterType.theft', 'theft')
-          .addSelect('theft.id')
-          .leftJoin('sinisterType.fire', 'fire')
-          .addSelect('fire.id')
-          .leftJoin('sinisterType.crash', 'crash')
-          .addSelect('crash.id')
-          .leftJoin('sinisterType.damage', 'damage')
-          .addSelect('damage.id')
-          .leftJoinAndSelect('sinisters.asset', 'asset')
-          .leftJoin('asset.vehicle', 'vehicle')
-          .addSelect('vehicle.brand')
-          .addSelect('vehicle.model')
-          .addSelect('vehicle.plate')
-          .addSelect('vehicle.type')
-          .leftJoin('asset.electronic', 'electronic')
-          .addSelect('electronic.brand')
-          .addSelect('electronic.model')
-          .addSelect('electronic.type')
-          .getOne();
+        const sinister = await this.sinisterForArrayPromises(brokerAssets.id);
 
         return sinister;
       });
@@ -1145,7 +1151,17 @@ export class SinisterService {
     const { password, ...rest } = client;
 
     const assets = assetOfUser.filter((asset) => asset.inspection);
-    const sinisters = assetOfUser.filter((asset) => !asset.inspection);
+    const assetsForSinisters = assetOfUser.filter((asset) => !asset.inspection);
+
+    const sinisterPromises = assetsForSinisters.map(async (brokerAssets) => {
+      const sinister = await this.sinisterForArrayPromises(brokerAssets.id);
+
+      return sinister;
+    });
+
+    const sinisters = (await Promise.all(sinisterPromises)).flatMap(
+      (sinister) => (!sinister ? [] : sinister),
+    );
 
     return { ...rest, assets, sinisters };
   }
@@ -1158,7 +1174,19 @@ export class SinisterService {
     const assetOfBroker = await this.assetService.findAssetsByBroker(brokerId);
 
     const assets = assetOfBroker.filter((asset) => asset.inspection);
-    const sinisters = assetOfBroker.filter((asset) => !asset.inspection);
+    const assetsForSinisters = assetOfBroker.filter(
+      (asset) => !asset.inspection,
+    );
+
+    const sinisterPromises = assetsForSinisters.map(async (brokerAssets) => {
+      const sinister = await this.sinisterForArrayPromises(brokerAssets.id);
+
+      return sinister;
+    });
+
+    const sinisters = (await Promise.all(sinisterPromises)).flatMap(
+      (sinister) => (!sinister ? [] : sinister),
+    );
 
     return { assets, sinisters, clients };
   }
@@ -1168,7 +1196,7 @@ export class SinisterService {
       brokerId,
       userBrokerId,
     );
-
+    const date = (date: Date) => new Date(date).getTime();
     // Obtén la fecha actual
     const currentDate = new Date();
     const newAsyncDate = new Date();
@@ -1181,17 +1209,23 @@ export class SinisterService {
     const dateToTimestamp = (date: Date) => date.getTime();
 
     // Filtra los assets creados en la última semana
-    const assetsLastWeek = assets.filter(
-      (el) =>
-        dateToTimestamp(new Date(el.created_at)) >=
-        dateToTimestamp(lastWeekDate),
-    ).slice(0,5);
+    const assetsLastWeek = assets
+      .filter(
+        (el) =>
+          dateToTimestamp(new Date(el.created_at)) >=
+          dateToTimestamp(lastWeekDate),
+      )
+      .sort((a, b) => date(b.created_at) - date(a.created_at))
+      .slice(0, 5);
 
-    const sinistersLastWeek = sinisters.filter(
-      (el) =>
-        dateToTimestamp(new Date(el.created_at)) >=
-        dateToTimestamp(lastWeekDate),
-    ).slice(0,5);
+    const sinistersLastWeek = sinisters
+      .filter(
+        (el) =>
+          dateToTimestamp(new Date(el.created_at)) >=
+          dateToTimestamp(lastWeekDate),
+      )
+      .sort((a, b) => date(b.created_at) - date(a.created_at))
+      .slice(0, 5);
 
     const clientsLastWeek = clients
       .filter(
@@ -1199,6 +1233,7 @@ export class SinisterService {
           dateToTimestamp(new Date(el.created_at)) >=
           dateToTimestamp(lastWeekDate),
       )
+      .sort((a, b) => date(b.created_at) - date(a.created_at))
       .slice(0, 5);
 
     return { assetsLastWeek, sinistersLastWeek, clientsLastWeek, newAsyncDate };
