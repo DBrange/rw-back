@@ -25,7 +25,6 @@ export class AuthService {
 
       if (userByEmail) {
         const match = await bcrypt.compare(password, userByEmail.password);
-        // console.log(userByEmail);
         if (match) return userByEmail;
       }
     } catch (error) {
@@ -40,10 +39,10 @@ export class AuthService {
   public async generateJWT(user: UserEntity): Promise<AuthResponse> {
     try {
       const userToken = await this.userService.getUserByIdForProfile(user.id);
-      console.log('2');
+
       const date = new Date();
       const exp = Math.floor(date.getTime() / 1000) + 3600;
-console.log('3');
+
       const payload: PayloadToken = {
         role: userToken.role,
         sub: userToken.id,
@@ -59,7 +58,6 @@ console.log('3');
         exp,
       };
     } catch (error) {
-      console.log('4');
       throw new ErrorManager.createSignaturError(error.message);
     }
   }

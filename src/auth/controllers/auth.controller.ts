@@ -19,7 +19,6 @@ export class AuthController {
       throw new UnauthorizedException('Data not valid');
     }
 
-    console.log('1')
     const jwt = await this.authService.generateJWT(userValidate);
     
     return jwt;

@@ -92,7 +92,6 @@ export class UserService {
           message: 'No users found',
         });
       }
-console.log('holas');
       if (user.role === 'CLIENT' && user.broker) {
         const brokerEntity = user.broker as unknown as UserBrokerEntity;
         const findUserBroker = await this.userRepository
@@ -147,10 +146,10 @@ console.log('holas');
   }
 
   public async updateLastRecord(userId: string, date: Date) {
-    const user = await this.userRepository.findOneBy({id: userId})
-    await this.updateUser(userId, { ...user, lastRecord: date })
-    
-    return {message: 'lastRecord ha sido actualizado con exito'}
+    const user = await this.userRepository.findOneBy({ id: userId });
+    await this.updateUser(userId, { ...user, lastRecord: date });
+
+    return { message: 'lastRecord ha sido actualizado con exito' };
   }
 
   public async verifyEmail(email: string | undefined) {
@@ -210,6 +209,34 @@ console.log('holas');
     return client.assets;
   }
 
+  public async getInspectionsOfClients(id: string) {
+    const client = await this.userRepository
+      .createQueryBuilder('users')
+      .where({ id })
+      .leftJoinAndSelect('users.assets', 'assets')
+      .leftJoin('assets.vehicle', 'vehicle')
+      .addSelect('vehicle.brand')
+      .addSelect('vehicle.model')
+      .addSelect('vehicle.plate')
+      .addSelect('vehicle.type')
+      .leftJoin('assets.electronic', 'electronic')
+      .addSelect('electronic.brand')
+      .addSelect('electronic.model')
+      .addSelect('electronic.type')
+      .leftJoin('electronic.smartphone', 'smartphone')
+      .addSelect('smartphone.imei')
+      .getOne();
+
+    if (!client) {
+      throw new ErrorManager({
+        type: 'BAD_REQUEST',
+        message: 'No users found',
+      });
+    }
+
+    return client.assets;
+  }
+
   public async getClientById(id: string) {
     try {
       const user = await this.userRepository
@@ -246,7 +273,7 @@ console.log('holas');
           message: 'No users found',
         });
       }
-      
+
       return user.receivedNotifications;
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);

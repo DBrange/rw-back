@@ -22,6 +22,7 @@ import { NotificationService } from 'src/containers/notification/services/notifi
 import { NotificationDTO } from 'src/containers/notification/dto/notification.dto';
 import { ElectronicEntity } from 'src/containers/electronic/entities/electronic.entity';
 import { NotificationEntity } from 'src/containers/notification/entities/notification.entity';
+import { UserEntity } from 'src/containers/user/entities/user.entity';
 
 @Injectable()
 export class AssetService {
@@ -313,10 +314,9 @@ export class AssetService {
     }
   }
 
-  public async getInspectionsOfClients(userBrokerId: string) {
+  public async getInspectionsOfClients(brokerId: string) {
     try {
-      const assets = (await this.userService.getUserById(userBrokerId))
-        .assets as unknown as AssetEntity[];
+      const assets = (await this.userService.getInspectionsOfClients(brokerId)) as unknown as AssetEntity[]
 
       const inspections = assets.filter((asset) => asset.inspection);
 
@@ -418,10 +418,10 @@ export class AssetService {
 
   public async allRead(userId: string) {
     const user = await this.userService.getUserById(userId);
-    console.log('1');
+
     const notifications =
       user.receivedNotifications as unknown as NotificationEntity[];
-    console.log('2');
+
 
     const promiseNotificationsRead = notifications.map(async (el) => {
       el.isRead = true;
@@ -431,11 +431,10 @@ export class AssetService {
       );
       return notification;
     });
-    console.log('3');
+
 
     await Promise.all(promiseNotificationsRead);
 
-    console.log('4');
     const userr = (await this.userService.getUserById(userId))
       .receivedNotifications;
 

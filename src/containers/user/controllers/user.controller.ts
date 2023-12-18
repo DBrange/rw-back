@@ -53,7 +53,6 @@ export class UserController {
     @Param('userId') userId: string,
     @Query('date') date?: Date,
   ) {
-    console.log(date, '------------')
     return await this.userService.updateLastRecord(userId, date);
   }
 

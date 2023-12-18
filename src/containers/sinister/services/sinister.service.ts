@@ -433,7 +433,6 @@ export class SinisterService {
       );
 
       await this.createTheftInSinister(asset, theftDTO, theftTireDTO);
-      console.log(asset);
 
       const vehicleEntity = (await this.assetService.getAssetById(asset.id))
         .vehicle as unknown as VehicleEntity;
@@ -979,6 +978,15 @@ export class SinisterService {
         const sinister = await this.sinisterRepository
           .createQueryBuilder('sinisters')
           .where({ asset: brokerAssets.id })
+          .leftJoinAndSelect('sinisters.sinisterType', 'sinisterType')
+          .leftJoin('sinisterType.theft', 'theft')
+          .addSelect('theft.id')
+          .leftJoin('sinisterType.fire', 'fire')
+          .addSelect('fire.id')
+          .leftJoin('sinisterType.crash', 'crash')
+          .addSelect('crash.id')
+          .leftJoin('sinisterType.damage', 'damage')
+          .addSelect('damage.id')
           .leftJoinAndSelect('sinisters.asset', 'asset')
           .leftJoin('asset.vehicle', 'vehicle')
           .addSelect('vehicle.brand')
@@ -1177,19 +1185,21 @@ export class SinisterService {
       (el) =>
         dateToTimestamp(new Date(el.created_at)) >=
         dateToTimestamp(lastWeekDate),
-    );
+    ).slice(0,5);
 
     const sinistersLastWeek = sinisters.filter(
       (el) =>
         dateToTimestamp(new Date(el.created_at)) >=
         dateToTimestamp(lastWeekDate),
-    );
+    ).slice(0,5);
 
-    const clientsLastWeek = clients.filter(
-      (el) =>
-        dateToTimestamp(new Date(el.created_at)) >=
-        dateToTimestamp(lastWeekDate),
-    );
+    const clientsLastWeek = clients
+      .filter(
+        (el) =>
+          dateToTimestamp(new Date(el.created_at)) >=
+          dateToTimestamp(lastWeekDate),
+      )
+      .slice(0, 5);
 
     return { assetsLastWeek, sinistersLastWeek, clientsLastWeek, newAsyncDate };
   }

@@ -67,9 +67,9 @@ export class AssetController {
     return result;
   }
 
-  @Get('inspections-client/:userBrokerId')
-  public async getInspectionsOfClients(@Param('userBrokerId') userBrokerId: string) {
-    return await this.assetService.getInspectionsOfClients(userBrokerId);
+  @Get('inspections-client/:brokerId')
+  public async getInspectionsOfClients(@Param('brokerId') brokerId: string) {
+    return await this.assetService.getInspectionsOfClients(brokerId);
   }
 
   @Get('broker-clients/:userBrokerId')
