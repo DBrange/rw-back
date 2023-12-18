@@ -939,28 +939,15 @@ export class SinisterService {
       const clientsBrokerAssets = (await this.userService.getUserById(clientId))
         .brokerAssets as unknown as UserEntity[];
 
-      const sinisters = clientsBrokerAssets.map(async (brokerAssets) => {
-        const sinister = await this.sinisterRepository
-          .createQueryBuilder('sinisters')
-          .where({ asset: brokerAssets.id })
-          .leftJoinAndSelect('sinisters.asset', 'asset')
-          .leftJoin('asset.vehicle', 'vehicle')
-          .addSelect('vehicle.brand')
-          .addSelect('vehicle.model')
-          .addSelect('vehicle.plate')
-          .addSelect('vehicle.type')
-          .leftJoin('asset.electronic', 'electronic')
-          .addSelect('electronic.brand')
-          .addSelect('electronic.model')
-          .addSelect('electronic.type')
-          .getOne();
+    const sinisterPromises = clientsBrokerAssets.map(async (brokerAssets) => {
+      const sinister = await this.sinisterForArrayPromises(brokerAssets.id);
 
-        return sinister;
-      });
+      return sinister;
+    });
 
-      const sinistersWithoutNull = (await Promise.all(sinisters)).flatMap(
-        (sinister) => (!sinister ? [] : sinister),
-      );
+      const sinistersWithoutNull = (
+        await Promise.all(sinisterPromises)
+      ).flatMap((sinister) => (!sinister ? [] : sinister));
 
       return sinistersWithoutNull;
     } catch (error) {
