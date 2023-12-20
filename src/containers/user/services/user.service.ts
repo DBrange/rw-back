@@ -215,11 +215,13 @@ export class UserService {
       .where({ id })
       .leftJoinAndSelect('users.assets', 'assets')
       .leftJoin('assets.vehicle', 'vehicle')
+      .addSelect('vehicle.id')
       .addSelect('vehicle.brand')
       .addSelect('vehicle.model')
       .addSelect('vehicle.plate')
       .addSelect('vehicle.type')
       .leftJoin('assets.electronic', 'electronic')
+      .addSelect('electronic.id')
       .addSelect('electronic.brand')
       .addSelect('electronic.model')
       .addSelect('electronic.type')
@@ -286,6 +288,7 @@ export class UserService {
         .createQueryBuilder('users')
         .select(['users.email', 'users.id'])
         .where({ email: value })
+        .leftJoinAndSelect('users.userBroker', 'userBroker')
         .leftJoin('users.personalUser', 'personalUser')
         .addSelect('personalUser.name')
         .addSelect('personalUser.lastName')
@@ -302,6 +305,7 @@ export class UserService {
         });
       }
 
+      if(user.userBroker) return {}
       return user;
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);

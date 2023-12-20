@@ -6,14 +6,11 @@ import {
   Param,
   Post,
   Put,
-  UseGuards,
+  Query
 } from '@nestjs/common';
+import { AssetInspection } from '../dto/all-asset.dto';
 import { AssetDTO, UpdateAssetDTO } from '../dto/asset.dto';
 import { AssetService } from '../services/asset.service';
-import { AssetInspection } from '../dto/all-asset.dto';
-import { AccessLevelGuard } from 'src/auth/guards/access-level.guard';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @Controller('asset')
 // @UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
@@ -68,15 +65,37 @@ export class AssetController {
   }
 
   @Get('inspections-client/:brokerId')
-  public async getInspectionsOfClients(@Param('brokerId') brokerId: string) {
-    return await this.assetService.getInspectionsOfClients(brokerId);
+  public async getInspectionsOfClients(
+    @Param('brokerId') brokerId: string,
+    @Query('searchField') searchField?: string,
+    @Query('typeToFilter') typeToFilter?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return await this.assetService.getInspectionsOfClients(
+      brokerId,
+      searchField,
+      typeToFilter,
+      page,
+      limit,
+    );
   }
 
   @Get('broker-clients/:userBrokerId')
   public async getAllClientsInBroker(
     @Param('userBrokerId') userBrokerId: string,
+    @Query('searchField') searchField?: string,
+    @Query('typeToFilter') typeToFilter?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
   ) {
-    return await this.assetService.getAllClientsInBroker(userBrokerId);
+    return await this.assetService.getAllClientsInBroker(
+      userBrokerId,
+      searchField,
+      typeToFilter,
+      page,
+      limit,
+    );
   }
 
   @Get('client-elements/:clientId')

@@ -1,61 +1,59 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm/dist';
-import { ErrorManager } from 'src/utils/error.manager';
-import { Repository, UpdateResult, DeleteResult } from 'typeorm';
-import { SinisterDTO, UpdateSinisterDTO } from '../dto/sinister.dto';
-import { SinisterEntity } from '../entities/sinister.entity';
+import { AssetDTO } from 'src/containers/asset/dto/asset.dto';
+import { AssetEntity } from 'src/containers/asset/entities/asset.entity';
 import { AssetService } from 'src/containers/asset/services/asset.service';
+import { CrashDTO } from 'src/containers/crash/dto/crash.dto';
 import { CrashService } from 'src/containers/crash/services/crash.service';
+import { DamageDTO } from 'src/containers/damage/dto/damage.dto';
+import { DamageEntity } from 'src/containers/damage/entities/damage.entity';
+import { DamageService } from 'src/containers/damage/services/damage.service';
+import { ElectronicDTO } from 'src/containers/electronic/dto/electronic.dto';
+import { ElectronicEntity } from 'src/containers/electronic/entities/electronic.entity';
 import { ElectronicService } from 'src/containers/electronic/services/electronic.service';
+import { FireDTO } from 'src/containers/fire/dto/fire.dto';
 import { FireService } from 'src/containers/fire/services/fire.service';
+import { GncDTO } from 'src/containers/gnc/dto/gnc.dto';
 import { GncService } from 'src/containers/gnc/services/gnc.service';
+import { InjuredInfoDTO } from 'src/containers/injured-info/dto/injured-info.dto';
 import { InjuredInfoService } from 'src/containers/injured-info/services/injured-info.service';
+import { InjuredDTO } from 'src/containers/injured/dto/injured.dto';
+import { InjuredEntity } from 'src/containers/injured/entities/injured.entity';
 import { InjuredService } from 'src/containers/injured/services/injured.service';
 import { LegalUserService } from 'src/containers/legal-user/services/legal-user.service';
-import { SinisterTypeService } from 'src/containers/sinister-type/services/sinister-type.service';
-import { SmartphoneService } from 'src/containers/smartphone/services/smartphone.service';
-import { TheftTireService } from 'src/containers/theft-tire/services/theft-tire.service';
-import { TheftService } from 'src/containers/theft/services/theft.service';
-import { ThirdPartyDriverService } from 'src/containers/third-party-driver/services/third-party-driver.service';
-import { ThirdPartyVehicleService } from 'src/containers/third-party-vehicle/services/third-party-vehicle.service';
-import { UserBrokerService } from 'src/containers/user-broker/services/user-broker.service';
-import { UserService } from 'src/containers/user/services/user.service';
-import { VehicleService } from 'src/containers/vehicle/services/vehicle.service';
-import { AssetDTO } from 'src/containers/asset/dto/asset.dto';
-import { ElectronicDTO } from 'src/containers/electronic/dto/electronic.dto';
-import { GncDTO } from 'src/containers/gnc/dto/gnc.dto';
-import { SmartphoneDTO } from 'src/containers/smartphone/dto/smartphone.dto';
-import { TheftTireDTO } from 'src/containers/theft-tire/dto/theft-tire.dto';
-import { TheftDTO } from 'src/containers/theft/dto/theft.dto';
-import { VehicleDTO } from 'src/containers/vehicle/dto/vehicle.dto';
-import { TheftEntity } from 'src/containers/theft/entities/theft.entity';
-import { TheftTireEntity } from 'src/containers/theft-tire/entities/theft-tire.entity';
+import { NotificationDTO } from 'src/containers/notification/dto/notification.dto';
+import { NotificationService } from 'src/containers/notification/services/notification.service';
 import { SinisterTypeDTO } from 'src/containers/sinister-type/dto/sinister-type.dto';
 import { SinisterTypeEntity } from 'src/containers/sinister-type/entities/sinister-type.entity';
-import { AssetEntity } from 'src/containers/asset/entities/asset.entity';
-import { InjuredEntity } from 'src/containers/injured/entities/injured.entity';
-import { InjuredDTO } from 'src/containers/injured/dto/injured.dto';
-import { InjuredInfoDTO } from 'src/containers/injured-info/dto/injured-info.dto';
-import { FireDTO } from 'src/containers/fire/dto/fire.dto';
+import { SinisterTypeService } from 'src/containers/sinister-type/services/sinister-type.service';
+import { SmartphoneDTO } from 'src/containers/smartphone/dto/smartphone.dto';
+import { SmartphoneEntity } from 'src/containers/smartphone/entities/smartphone.entity';
+import { SmartphoneService } from 'src/containers/smartphone/services/smartphone.service';
+import { TheftTireDTO } from 'src/containers/theft-tire/dto/theft-tire.dto';
+import { TheftTireEntity } from 'src/containers/theft-tire/entities/theft-tire.entity';
+import { TheftTireService } from 'src/containers/theft-tire/services/theft-tire.service';
+import { TheftDTO } from 'src/containers/theft/dto/theft.dto';
+import { TheftEntity } from 'src/containers/theft/entities/theft.entity';
+import { TheftService } from 'src/containers/theft/services/theft.service';
+import { ThirdPartyDriverDTO } from 'src/containers/third-party-driver/dto/third-party-driver.dto';
+import { ThirdPartyDriverService } from 'src/containers/third-party-driver/services/third-party-driver.service';
+import { ThirdPartyVehicleDTO } from 'src/containers/third-party-vehicle/dto/third-party-vehicle.dto';
+import { ThirdPartyVehicleService } from 'src/containers/third-party-vehicle/services/third-party-vehicle.service';
+import { UserBrokerService } from 'src/containers/user-broker/services/user-broker.service';
+import { UserEntity } from 'src/containers/user/entities/user.entity';
+import { UserService } from 'src/containers/user/services/user.service';
+import { VehicleDTO } from 'src/containers/vehicle/dto/vehicle.dto';
+import { VehicleEntity } from 'src/containers/vehicle/entities/vehicle.entity';
+import { VehicleService } from 'src/containers/vehicle/services/vehicle.service';
+import { ErrorManager } from 'src/utils/error.manager';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import {
   InjuredData,
   ThirdParty,
   ThirdPartyVehicleData,
 } from '../dto/all-sinister.dto';
-import { FireEntity } from 'src/containers/fire/entities/fire.entity';
-import { CrashEntity } from 'src/containers/crash/entities/crash.entity';
-import { DamageEntity } from 'src/containers/damage/entities/damage.entity';
-import { CrashDTO } from 'src/containers/crash/dto/crash.dto';
-import { ThirdPartyVehicleDTO } from 'src/containers/third-party-vehicle/dto/third-party-vehicle.dto';
-import { ThirdPartyDriverDTO } from 'src/containers/third-party-driver/dto/third-party-driver.dto';
-import { DamageDTO } from 'src/containers/damage/dto/damage.dto';
-import { DamageService } from 'src/containers/damage/services/damage.service';
-import { UserEntity } from 'src/containers/user/entities/user.entity';
-import { UserBrokerEntity } from 'src/containers/user-broker/entities/user-broker.entity';
-import { NotificationService } from 'src/containers/notification/services/notification.service';
-import { NotificationDTO } from 'src/containers/notification/dto/notification.dto';
-import { ElectronicEntity } from 'src/containers/electronic/entities/electronic.entity';
-import { VehicleEntity } from 'src/containers/vehicle/entities/vehicle.entity';
+import { SinisterDTO, UpdateSinisterDTO } from '../dto/sinister.dto';
+import { SinisterEntity } from '../entities/sinister.entity';
 
 @Injectable()
 export class SinisterService {
@@ -934,22 +932,73 @@ export class SinisterService {
   //Get sinsiters
 
   // Client
-  public async getSinistersOfClient(clientId: string) {
+  public async getSinistersOfClient(
+    clientId: string,
+    searchField: string,
+    typeToFilter: string,
+    typeToFilterReport: string,
+    page: number,
+    limit: number,
+  ) {
     try {
       const clientsBrokerAssets = (await this.userService.getUserById(clientId))
         .brokerAssets as unknown as UserEntity[];
 
-    const sinisterPromises = clientsBrokerAssets.map(async (brokerAssets) => {
-      const sinister = await this.sinisterForArrayPromises(brokerAssets.id);
+      const sinisterPromises = clientsBrokerAssets.map(async (brokerAssets) => {
+        const sinister = await this.sinisterForArrayPromises(brokerAssets.id);
 
-      return sinister;
-    });
+        return sinister;
+      });
 
       const sinistersWithoutNull = (
         await Promise.all(sinisterPromises)
       ).flatMap((sinister) => (!sinister ? [] : sinister));
 
-      return sinistersWithoutNull;
+      const regex = new RegExp(`^${searchField}`, 'i');
+
+      const filteredSinisters = sinistersWithoutNull.filter((sinister) => {
+        if (typeToFilter === 'vehicle' && sinister.asset.vehicle) {
+          const filterByTypeReport =
+            !typeToFilterReport ||
+            (typeToFilterReport === 'theft' && sinister.sinisterType.theft) ||
+            (typeToFilterReport === 'fire' && sinister.sinisterType.fire) ||
+            (typeToFilterReport === 'crash' && sinister.sinisterType.crash) ||
+            (typeToFilterReport === 'damage' && sinister.sinisterType.damage);
+          return (
+            filterByTypeReport &&
+            sinister.asset.vehicle.plate
+              .toLowerCase()
+              .includes(searchField.toLowerCase())
+          );
+        } else if (typeToFilter === 'electronic' && sinister.asset.electronic) {
+          const filterByTypeReport =
+            !typeToFilterReport ||
+            (typeToFilterReport === 'theft' && sinister.sinisterType.theft) ||
+            (typeToFilterReport === 'damage' && sinister.sinisterType.damage);
+
+          const electronic = sinister.asset
+            .electronic as unknown as ElectronicEntity;
+
+          return (
+            filterByTypeReport &&
+            (electronic.model
+              .toLowerCase()
+              .includes(searchField.toLowerCase()) ||
+              (electronic.smartphone as unknown as SmartphoneEntity).imei
+                .toLowerCase()
+                .includes(searchField.toLowerCase()))
+          );
+        }
+
+        return false;
+      });
+
+      const pageSize = limit;
+      const start = (page - 1) * pageSize;
+      const end = start + pageSize;
+      const paginatedSinisters = filteredSinisters.slice(start, end);
+
+      return paginatedSinisters;
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
     }
@@ -972,11 +1021,13 @@ export class SinisterService {
       .addSelect('damage.id')
       .leftJoinAndSelect('sinisters.asset', 'asset')
       .leftJoin('asset.vehicle', 'vehicle')
+      .addSelect('vehicle.id')
       .addSelect('vehicle.brand')
       .addSelect('vehicle.model')
       .addSelect('vehicle.plate')
       .addSelect('vehicle.type')
       .leftJoin('asset.electronic', 'electronic')
+      .addSelect('electronic.id')
       .addSelect('electronic.brand')
       .addSelect('electronic.model')
       .addSelect('electronic.type')
@@ -984,22 +1035,68 @@ export class SinisterService {
 
     return sinister;
   }
-  public async getSinistersOfBroker(brokerId: string) {
+  public async getSinistersOfBroker(
+    brokerId: string,
+    searchField: string,
+    typeToFilter: string,
+    typeToFilterReport: string,
+    page: number,
+    limit: number,
+  ) {
     try {
       const brokerAssets = (await this.userService.getUserById(brokerId))
         .assets as unknown as UserEntity[];
 
-      const sinisters = brokerAssets.map(async (brokerAssets) => {
-        const sinister = await this.sinisterForArrayPromises(brokerAssets.id);
-
-        return sinister;
-      });
-
-      const sinistersWithoutNull = (await Promise.all(sinisters)).flatMap(
-        (sinister) => (!sinister ? [] : sinister),
+      const sinisters = await Promise.all(
+        brokerAssets.map(async (brokerAsset) => {
+          return await this.sinisterForArrayPromises(brokerAsset.id);
+        }),
       );
 
-      return sinistersWithoutNull;
+      const sinistersWithoutNull = sinisters.flat().filter(Boolean);
+
+      const filteredSinisters = sinistersWithoutNull.filter((sinister) => {
+        if (typeToFilter === 'vehicle' && sinister.asset.vehicle) {
+          const vehicle = sinister.asset.vehicle as unknown as VehicleEntity;
+
+          const filterByTypeReport =
+            !typeToFilterReport ||
+            (typeToFilterReport === 'theft' && sinister.sinisterType.theft) ||
+            (typeToFilterReport === 'fire' && sinister.sinisterType.fire) ||
+            (typeToFilterReport === 'crash' && sinister.sinisterType.crash) ||
+            (typeToFilterReport === 'damage' && sinister.sinisterType.damage);
+          return (
+            filterByTypeReport &&
+            vehicle.plate.toLowerCase().includes(searchField.toLowerCase())
+          );
+        } else if (typeToFilter === 'electronic' && sinister.asset.electronic) {
+          const electronic = sinister.asset
+            .electronic as unknown as ElectronicEntity;
+          const filterByTypeReport =
+            typeToFilterReport === undefined ||
+            (typeToFilterReport === 'theft' && sinister.sinisterType.theft) ||
+            (typeToFilterReport === 'damage' && sinister.sinisterType.damage);
+
+          return (
+            filterByTypeReport &&
+            (electronic.model
+              .toLowerCase()
+              .includes(searchField.toLowerCase()) ||
+              (electronic.smartphone as unknown as SmartphoneEntity).imei
+                .toLowerCase()
+                .includes(searchField.toLowerCase()))
+          );
+        }
+
+        return false;
+      });
+
+      const pageSize = limit;
+      const start = (page - 1) * pageSize;
+      const end = start + pageSize;
+      const paginatedSinisters = filteredSinisters.slice(start, end);
+
+      return paginatedSinisters;
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
     }
@@ -1154,7 +1251,7 @@ export class SinisterService {
   }
 
   private async getAssetForBroker(brokerId: string, userBrokerId: string) {
-    const clients = (await this.assetService.getAllClientsInBroker(
+    const clients = (await this.assetService.getAllClientsInBrokerr(
       userBrokerId,
     )) as unknown as UserEntity[];
 

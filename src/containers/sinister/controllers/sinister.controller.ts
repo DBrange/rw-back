@@ -6,8 +6,9 @@ import {
   Param,
   Post,
   Put,
-  UseGuards,
+  Query
 } from '@nestjs/common';
+import { PublicAccess } from 'src/auth/decorators/public.decorator';
 import {
   SinisterCrash,
   SinisterCrashInspection,
@@ -21,10 +22,6 @@ import {
 } from '../dto/all-sinister.dto';
 import { SinisterDTO, UpdateSinisterDTO } from '../dto/sinister.dto';
 import { SinisterService } from '../services/sinister.service';
-import { AccessLevelGuard } from 'src/auth/guards/access-level.guard';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { PublicAccess } from 'src/auth/decorators/public.decorator';
 
 @Controller('sinister')
 // @UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
@@ -212,8 +209,22 @@ export class SinisterController {
   }
 
   @Get('client/:clientId')
-  public async getSinistersOfClient(@Param('clientId') clientId: string) {
-    return await this.sinisterService.getSinistersOfClient(clientId);
+  public async getSinistersOfClient(
+    @Param('clientId') clientId: string,
+    @Query('searchField') searchField?: string,
+    @Query('typeToFilter') typeToFilter?: string,
+    @Query('typeToFilterReport') typeToFilterReport?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return await this.sinisterService.getSinistersOfClient(
+      clientId,
+      searchField,
+      typeToFilter,
+      typeToFilterReport,
+      page,
+      limit,
+    );
   }
 
   @Get('client-detail/:brokerId/:clientId')
@@ -226,8 +237,22 @@ export class SinisterController {
 
   @PublicAccess()
   @Get('broker/:brokerId')
-  public async getSinistersOfBroker(@Param('brokerId') brokerId: string) {
-    return await this.sinisterService.getSinistersOfBroker(brokerId);
+  public async getSinistersOfBroker(
+    @Param('brokerId') brokerId: string,
+    @Query('searchField') searchField?: string,
+    @Query('typeToFilter') typeToFilter?: string,
+    @Query('typeToFilterReport') typeToFilterReport?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return await this.sinisterService.getSinistersOfBroker(
+      brokerId,
+      searchField,
+      typeToFilter,
+      typeToFilterReport,
+      page,
+      limit,
+    );
   }
 
   @Post('element/:elementId')

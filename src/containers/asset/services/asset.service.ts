@@ -1,28 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm/dist';
-import { ErrorManager } from 'src/utils/error.manager';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
-import { AssetEntity } from '../entities/asset.entity';
-import { AssetDTO, UpdateAssetDTO } from '../dto/asset.dto';
 import { ElectronicDTO } from 'src/containers/electronic/dto/electronic.dto';
+import { ElectronicEntity } from 'src/containers/electronic/entities/electronic.entity';
 import { ElectronicService } from 'src/containers/electronic/services/electronic.service';
 import { GncDTO } from 'src/containers/gnc/dto/gnc.dto';
+import { GncEntity } from 'src/containers/gnc/entities/gnc.entity';
 import { GncService } from 'src/containers/gnc/services/gnc.service';
 import { LegalUserService } from 'src/containers/legal-user/services/legal-user.service';
+import { NotificationDTO } from 'src/containers/notification/dto/notification.dto';
+import { NotificationEntity } from 'src/containers/notification/entities/notification.entity';
+import { NotificationService } from 'src/containers/notification/services/notification.service';
 import { SmartphoneDTO } from 'src/containers/smartphone/dto/smartphone.dto';
 import { SmartphoneEntity } from 'src/containers/smartphone/entities/smartphone.entity';
 import { SmartphoneService } from 'src/containers/smartphone/services/smartphone.service';
 import { UserBrokerService } from 'src/containers/user-broker/services/user-broker.service';
+import { UserEntity } from 'src/containers/user/entities/user.entity';
 import { UserService } from 'src/containers/user/services/user.service';
 import { VehicleDTO } from 'src/containers/vehicle/dto/vehicle.dto';
-import { VehicleService } from 'src/containers/vehicle/services/vehicle.service';
-import { GncEntity } from 'src/containers/gnc/entities/gnc.entity';
 import { VehicleEntity } from 'src/containers/vehicle/entities/vehicle.entity';
-import { NotificationService } from 'src/containers/notification/services/notification.service';
-import { NotificationDTO } from 'src/containers/notification/dto/notification.dto';
-import { ElectronicEntity } from 'src/containers/electronic/entities/electronic.entity';
-import { NotificationEntity } from 'src/containers/notification/entities/notification.entity';
-import { UserEntity } from 'src/containers/user/entities/user.entity';
+import { VehicleService } from 'src/containers/vehicle/services/vehicle.service';
+import { ErrorManager } from 'src/utils/error.manager';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { AssetDTO, UpdateAssetDTO } from '../dto/asset.dto';
+import { AssetEntity } from '../entities/asset.entity';
 
 @Injectable()
 export class AssetService {
@@ -314,19 +314,101 @@ export class AssetService {
     }
   }
 
-  public async getInspectionsOfClients(brokerId: string) {
+  public async getInspectionsOfClients(
+    brokerId: string,
+    searchField: string,
+    typeToFilter: string,
+    page: number,
+    limit: number,
+  ) {
     try {
-      const assets = (await this.userService.getInspectionsOfClients(brokerId)) as unknown as AssetEntity[]
+      const assets = (await this.userService.getInspectionsOfClients(
+        brokerId,
+      )) as unknown as AssetEntity[];
 
-      const inspections = assets.filter((asset) => asset.inspection);
+      // Aplicar el filtro según el tipo
+      const filteredAssets = assets.filter((asset) => {
+        if (typeToFilter === 'vehicle') {
+          return asset.vehicle;
+        } else if (typeToFilter === 'electronic') {
+          return asset.electronic;
+        }
+        return false;
+      });
 
-      return inspections;
+      // Aplicar el filtro según el campo de búsqueda
+      const regex = new RegExp(`^${searchField}`, 'i');
+      const filteredAndSearchedAssets = filteredAssets.filter((asset) => {
+        if (typeToFilter === 'vehicle') {
+          const vehicle = asset.vehicle as unknown as VehicleEntity;
+          return regex.test(vehicle?.plate as string);
+        } else if (typeToFilter === 'electronic') {
+          const electronic = asset.electronic as unknown as ElectronicEntity;
+          return (
+            regex.test(electronic?.model) ||
+            regex.test(
+              (electronic?.smartphone as unknown as SmartphoneEntity)?.imei,
+            )
+          );
+        }
+        return false;
+      });
+
+      // Aplicar paginación
+      const pageSize = limit;
+      const start = (page - 1) * pageSize;
+      const end = start + pageSize;
+      const paginatedInspections = filteredAndSearchedAssets.slice(start, end);
+
+      return paginatedInspections;
     } catch (err) {
       throw ErrorManager.createSignaturError(err.message);
     }
   }
 
-  public async getAllClientsInBroker(userBrokerId: string) {
+  public async getAllClientsInBroker(
+    userBrokerId: string,
+    searchField: string,
+    typeToFilter: string,
+    page: number,
+    limit: number,
+  ) {
+    try {
+      const { clients } = await this.userBrokerService.getUserBrokerById(
+        userBrokerId,
+      );
+
+      const regex = new RegExp(`^${searchField}`, 'i');
+      const filteredClients = (clients as unknown as UserEntity[]).filter(
+        (client) => {
+          console.log(client);
+          if (typeToFilter === 'user' && client.personalUser?.dni) {
+            return client.personalUser?.dni
+              .toLowerCase()
+              .includes(searchField.toLowerCase());
+          } else if (typeToFilter === 'legalUser' && client.legalUser?.cuit) {
+            return client.legalUser.cuit
+              .toLowerCase()
+              .includes(searchField.toLowerCase());
+          }
+
+          return false;
+        },
+      );
+
+      const pageSize = limit;
+      const start = (page - 1) * pageSize;
+      const end = start + pageSize;
+
+      const paginatedClients = filteredClients.slice(start, end);
+
+      return paginatedClients;
+    } catch (err) {
+      throw ErrorManager.createSignaturError(err.message);
+    }
+  }
+
+  public async getAllClientsInBrokerr(userBrokerId: string) {
     try {
       const clients = (
         await this.userBrokerService.getUserBrokerById(userBrokerId)
@@ -422,7 +504,6 @@ export class AssetService {
     const notifications =
       user.receivedNotifications as unknown as NotificationEntity[];
 
-
     const promiseNotificationsRead = notifications.map(async (el) => {
       el.isRead = true;
       const notification = await this.notificationService.updateNotification(
@@ -431,7 +512,6 @@ export class AssetService {
       );
       return notification;
     });
-
 
     await Promise.all(promiseNotificationsRead);
 
