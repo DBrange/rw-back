@@ -22,7 +22,7 @@ export class AuthService {
         key: 'email',
         value: email,
       });
-
+ 
       if (userByEmail) {
         const match = await bcrypt.compare(password, userByEmail.password);
         if (match) return userByEmail;

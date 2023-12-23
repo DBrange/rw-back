@@ -305,10 +305,56 @@ export class UserService {
         });
       }
 
-      if(user.userBroker) return {}
+      if (user.userBroker) return {};
       return user;
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async updateMyProfile(
+    userId: string,
+    phoneNumber: string,
+    address: string,
+  ) {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (phoneNumber !== 'undefined') user.phoneNumber = phoneNumber;
+    if (address !== 'undefined') user.address = address;
+
+    await this.updateUser(userId, user);
+
+    return { message: 'El usuario ha sido actualizado con exito' };
+  }
+
+  public async updatePassword(
+    userId: string,
+    oldPassword: string,
+    newPassword: string,
+  ) {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    
+      if (!user) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+    
+    const validPassword = await bcrypt.compare(oldPassword, user.password);
+
+      if (!validPassword) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No passwords match',
+        });
+      }
+    
+    if (validPassword) {
+      const password = await bcrypt.hash(newPassword, +process.env.HASH_SALT);
+
+      await this.updateUser(userId, { ...user, password });
+
+      return { message: 'La contraseña a sido modificada con exito' };
     }
   }
 }

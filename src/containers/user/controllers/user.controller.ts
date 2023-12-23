@@ -70,4 +70,25 @@ export class UserController {
   public async findUserByEmail(@Param('email') email: string) {
     return await this.userService.findUserByEmail(email);
   }
+
+  @Get('profile/:userId')
+  public async updateMyProfile(
+    @Param('userId') userId: string,
+    @Query('phoneNumber') phoneNumber: string,
+    @Query('address') address: string,
+  ) {
+    return await this.userService.updateMyProfile(userId, phoneNumber, address);
+  }
+
+  @Post('password/:userId')
+  public async updatePassword(
+    @Param('userId') userId: string,
+    @Body() body: { oldPassword: string; newPassword: string },
+  ) {
+    return await this.userService.updatePassword(
+      userId,
+      body.oldPassword,
+      body.newPassword,
+    );
+  }
 }
