@@ -91,4 +91,9 @@ export class UserController {
       body.newPassword,
     );
   }
+
+  @Post('forgottem-password')
+  public async newPasswordForMissingEmail(@Query('email') email: string) {
+    return await this.userService.newPasswordForForgottem(email);
+  }
 }

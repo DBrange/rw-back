@@ -6,6 +6,8 @@ import { ErrorManager } from 'src/utils/error.manager';
 import { UserDTO, UpdateUserDTO } from '../dto/user.dto';
 import * as bcrypt from 'bcrypt';
 import { UserBrokerEntity } from 'src/containers/user-broker/entities/user-broker.entity';
+import { ConfigService } from '@nestjs/config';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class UserService {
@@ -332,29 +334,140 @@ export class UserService {
     newPassword: string,
   ) {
     const user = await this.userRepository.findOneBy({ id: userId });
-    
-      if (!user) {
-        throw new ErrorManager({
-          type: 'BAD_REQUEST',
-          message: 'No users found',
-        });
-      }
-    
+
+    if (!user) {
+      throw new ErrorManager({
+        type: 'BAD_REQUEST',
+        message: 'No users found',
+      });
+    }
+
     const validPassword = await bcrypt.compare(oldPassword, user.password);
 
-      if (!validPassword) {
-        throw new ErrorManager({
-          type: 'BAD_REQUEST',
-          message: 'No passwords match',
-        });
-      }
-    
+    if (!validPassword) {
+      throw new ErrorManager({
+        type: 'BAD_REQUEST',
+        message: 'No passwords match',
+      });
+    }
+
     if (validPassword) {
       const password = await bcrypt.hash(newPassword, +process.env.HASH_SALT);
 
       await this.updateUser(userId, { ...user, password });
 
       return { message: 'La contraseña a sido modificada con exito' };
+    }
+  }
+
+  public getTemplateForForgottemPassword(email: string, password: string) {
+    return `
+      <head>
+        <link rel="stylesheet" href="./style.css">
+      </head>
+      <div id="email___content">
+        <h3>Aqui tienes tu nueva contraseña para poder ingresar a tu cuenta</h3>
+        <p>Email: ${email}</p>
+        <p>Contraseña: ${password}</p>
+
+        <h4>Ingrese por aqui: http://localhost:5173/public/login</h4>
+      </div>
+`;
+  }
+
+  public async newPasswordForForgottem(email: string) {
+    try {
+      const user = await this.userRepository.findOneBy({ email });
+
+      if (!user) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No user found',
+        });
+      }
+
+      const lowercaseLetters = 'abcdefghijklmnopqrstuvwxyz';
+      const uppercaseLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const numbers = '0123456789';
+      const specialChars = '.';
+
+      // Combina los conjuntos de caracteres
+      const allChars =
+        lowercaseLetters + uppercaseLetters + numbers + specialChars;
+
+      // Función para obtener un carácter aleatorio
+      const getRandomChar = (set) =>
+        set[Math.floor(Math.random() * set.length)];
+
+      // Genera la contraseña con al menos un carácter de cada conjunto
+      const password =
+        getRandomChar(lowercaseLetters) +
+        getRandomChar(uppercaseLetters) +
+        getRandomChar(numbers) +
+        getRandomChar(specialChars) +
+        Array.from({ length: 8 }, () => getRandomChar(allChars)).join('');
+
+      // Mezcla los caracteres para mayor aleatoriedad
+      const shuffledPassword = password
+        .split('')
+        .sort(() => Math.random() - 0.5)
+        .join('');
+
+      const newPassword = await bcrypt.hash(
+        shuffledPassword,
+        +process.env.HASH_SALT,
+      );
+
+      await this.updateUser(user.id, {
+        ...user,
+        password: newPassword,
+      });
+
+      await this.sendEmailForForgottemPassword(
+        email,
+        this.getTemplateForForgottemPassword(email, shuffledPassword),
+      );
+
+      return { message: 'Su contraseña ha sido actualizada con exito' };
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async sendEmailForForgottemPassword(
+    email: string,
+    html: any,
+  ): Promise<void> {
+    try {
+      // process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+      const configService = new ConfigService();
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: `${configService.get('EMAIL_USER')}`,
+          pass: `${configService.get('EMAIL_PASSWORD')}`,
+        },
+        tls: {
+          rejectUnauthorized: false,
+        },
+        requireTLS: true,
+      });
+
+      const mailOptions = {
+        from: `Recuperar contraseña <${configService.get('EMAIL_USER')}>`,
+        to: email,
+        subject: 'Recuperar contraseña',
+        text: 'Nueva contraseña',
+        html,
+      };
+
+      await transporter.sendMail(mailOptions);
+
+      // delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+    } catch (err) {
+      throw ErrorManager.createSignaturError(err.message);
     }
   }
 }
