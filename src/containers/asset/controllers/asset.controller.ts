@@ -6,7 +6,7 @@ import {
   Param,
   Post,
   Put,
-  Query
+  Query,
 } from '@nestjs/common';
 import { AssetInspection } from '../dto/all-asset.dto';
 import { AssetDTO, UpdateAssetDTO } from '../dto/asset.dto';
@@ -25,6 +25,21 @@ export class AssetController {
   @Get('')
   public async getAssets() {
     return await this.assetService.getAssets();
+  }
+
+  @Get('inspections')
+  public async getAssetsForAdmin(
+    @Query('searchField') searchField?: string,
+    @Query('typeToFilter') typeToFilter?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return await this.assetService.getAssetsForAdmin(
+      searchField,
+      typeToFilter,
+      page,
+      limit,
+    );
   }
 
   @Get(':assetId')
@@ -107,4 +122,22 @@ export class AssetController {
   public async allRead(@Param('userId') userId: string) {
     return await this.assetService.allRead(userId);
   }
+
+  //----------------------------
+  // Admin
+
+  // @Get('inspections')
+  // public async getAssetsForAdmin(
+  //   @Query('searchField') searchField?: string,
+  //   @Query('typeToFilter') typeToFilter?: string,
+  //   @Query('page') page?: number,
+  //   @Query('limit') limit?: number,
+  // ) {
+  //   return await this.assetService.getAssetsForAdmin(
+  //     searchField,
+  //     typeToFilter,
+  //     page,
+  //     limit,
+  //   );
+  // }
 }

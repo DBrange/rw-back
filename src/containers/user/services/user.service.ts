@@ -43,11 +43,10 @@ export class UserService {
         .createQueryBuilder('users')
         .where({ id })
         .leftJoinAndSelect('users.brokerAssets', 'brokerAssets')
+        .leftJoinAndSelect('brokerAssets.sinisters', 'brokerAssetsSinisters')
         .leftJoinAndSelect('users.receivedNotifications', 'notifications')
         // .leftJoinAndSelect('brokerAssets.vehicle', 'vehicle')
         // .leftJoinAndSelect('brokerAssets.electronic', 'electronic')
-        // .leftJoinAndSelect('brokerAssets.sinisters', 'sinisters')
-
         .leftJoinAndSelect('users.assets', 'assets')
         .leftJoinAndSelect('assets.vehicle', 'vehicle')
         .leftJoinAndSelect('assets.electronic', 'electronic')
@@ -249,6 +248,61 @@ export class UserService {
         .leftJoinAndSelect('users.personalUser', 'personalUser')
         .leftJoinAndSelect('users.legalUser', 'legalUsers')
         .getOne();
+
+      if (!user) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+
+      return user;
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async getBrokerById(id: string) {
+    try {
+      const user = await this.userRepository
+        .createQueryBuilder('users')
+        .where({ id })
+        .leftJoinAndSelect('users.assets', 'assets')
+        .leftJoin('assets.vehicle', 'vehicle')
+        .addSelect('vehicle.brand')
+        .addSelect('vehicle.model')
+        .addSelect('vehicle.plate')
+        .addSelect('vehicle.type')
+        .leftJoin('assets.electronic', 'electronic')
+        .addSelect('electronic.brand')
+        .addSelect('electronic.model')
+        .addSelect('electronic.type')
+        .leftJoin('assets.sinisters', 'sinisters')
+        .addSelect('sinisters.id')
+        .leftJoinAndSelect('assets.client', 'client')
+        .leftJoinAndSelect('client.personalUser', 'clientPersonalUser')
+        .leftJoinAndSelect('client.legalUser', 'clientLegalUser')
+        .leftJoinAndSelect('users.personalUser', 'personalUser')
+        .leftJoinAndSelect('users.legalUser', 'legalUsers')
+        .leftJoinAndSelect('users.broker', 'brokers')
+        .leftJoinAndSelect('users.userBroker', 'userBroker')
+        .leftJoinAndSelect('userBroker.clients', 'clients')
+        .leftJoinAndSelect('clients.personalUser', 'clientsPersonalUser')
+        .leftJoinAndSelect('clients.legalUser', 'clientsLegalUsers')
+        .getOne();
+
+      // createQueryBuilder('assets')
+      //   .leftJoin('assets.vehicle', 'vehicle')
+      //   .addSelect('vehicle.brand')
+      //   .addSelect('vehicle.model')
+      //   .addSelect('vehicle.plate')
+      //   .addSelect('vehicle.type')
+      //   .leftJoin('assets.electronic', 'electronic')
+      //   .addSelect('electronic.brand')
+      //   .addSelect('electronic.model')
+      //   .addSelect('electronic.type')
+      //   .leftJoin('assets.sinisters', 'sinisters')
+      //   .addSelect('sinisters.id');
 
       if (!user) {
         throw new ErrorManager({
@@ -468,6 +522,73 @@ export class UserService {
       // delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
     } catch (err) {
       throw ErrorManager.createSignaturError(err.message);
+    }
+  }
+
+  //------------------------------
+
+  // Admin
+
+  public async getUsersForAdmin(
+    searchField: string,
+    typeToFilter: string,
+    typeToFilterUser: string,
+    page: number,
+    limit: number,
+  ): Promise<UserEntity[]> {
+    try {
+      const users: UserEntity[] = await this.userRepository
+        .createQueryBuilder('users')
+        .select(['users.id'])
+        .leftJoin('users.personalUser', 'personalUser')
+        .addSelect('personalUser.name')
+        .addSelect('personalUser.lastName')
+        .addSelect('personalUser.dni')
+        .leftJoin('users.legalUser', 'legalUser')
+        .addSelect('legalUser.companyName')
+        .addSelect('legalUser.cuit')
+        .leftJoin('users.userBroker', 'userBroker')
+        .addSelect('userBroker.id')
+        .getMany();
+      
+      const regex = new RegExp(`^${searchField}`, 'i');
+      const filteredAndSearchUsers = users.filter((user) => {
+        if (typeToFilterUser === 'broker' && user.userBroker) {
+          if (typeToFilter === 'user' && user.personalUser?.dni) {
+            return regex.test(user.personalUser?.dni);
+          } else if (typeToFilter === 'legalUser' && user.legalUser?.cuit) {
+            return regex.test(user.legalUser.cuit);
+          } else if (typeToFilter === '') {
+            return (
+              regex.test(user.personalUser?.dni) ||
+              regex.test(user.legalUser.cuit)
+            );
+          }
+        } else if (typeToFilterUser === 'client' && !user.userBroker) {
+          if (typeToFilter === 'user' && user.personalUser?.dni) {
+            return regex.test(user.personalUser?.dni);
+          } else if (typeToFilter === 'legalUser' && user.legalUser?.cuit) {
+            console.log('hola?');
+            return regex.test(user.legalUser.cuit);
+          } else if (typeToFilter === '') {
+            return (
+              regex.test(user.personalUser?.dni) ||
+              regex.test(user.legalUser.cuit)
+            );
+          }
+        } else {
+          return false;
+        }
+      });
+
+      const pageSize = limit;
+      const start = (page - 1) * pageSize;
+      const end = start + pageSize;
+      const paginatedInspections = filteredAndSearchUsers.slice(start, end);
+
+      return paginatedInspections;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
     }
   }
 }

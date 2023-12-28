@@ -54,6 +54,7 @@ import {
 } from '../dto/all-sinister.dto';
 import { SinisterDTO, UpdateSinisterDTO } from '../dto/sinister.dto';
 import { SinisterEntity } from '../entities/sinister.entity';
+import { UserBrokerEntity } from 'src/containers/user-broker/entities/user-broker.entity';
 
 @Injectable()
 export class SinisterService {
@@ -942,10 +943,28 @@ export class SinisterService {
   ) {
     try {
       const clientsBrokerAssets = (await this.userService.getUserById(clientId))
-        .brokerAssets as unknown as UserEntity[];
+        .brokerAssets as unknown as AssetEntity[];
 
-      const sinisterPromises = clientsBrokerAssets.map(async (brokerAssets) => {
-        const sinister = await this.sinisterForArrayPromises(brokerAssets.id);
+      const assetsForSinisters: AssetEntity[] = clientsBrokerAssets
+        .map((asset) => {
+          if (asset.sinisters?.length) {
+            let assets = [];
+
+            for (let i = 0; i < asset.sinisters.length; i++) {
+              assets = [...assets, asset.sinisters[i]];
+            }
+
+            return assets;
+          } else if (!asset.inspection) {
+            return asset;
+          }
+        })
+        .flat();
+
+      const sinisterPromises = assetsForSinisters.map(async (brokerAssets) => {
+        const sinister = await this.sinisterForArrayPromisesBySinisterId(
+          brokerAssets?.id,
+        );
 
         return sinister;
       });
@@ -1009,6 +1028,7 @@ export class SinisterService {
   private async sinisterForArrayPromises(assetId: string) {
     const sinister = await this.sinisterRepository
       .createQueryBuilder('sinisters')
+      // .where({ id: sinisterId })
       .where({ asset: assetId })
       .leftJoinAndSelect('sinisters.sinisterType', 'sinisterType')
       .leftJoin('sinisterType.theft', 'theft')
@@ -1035,6 +1055,37 @@ export class SinisterService {
 
     return sinister;
   }
+  private async sinisterForArrayPromisesBySinisterId(sinisterId: string) {
+    const sinister = await this.sinisterRepository
+      .createQueryBuilder('sinisters')
+      .where({ id: sinisterId })
+      // .where({ asset: assetId })
+      .leftJoinAndSelect('sinisters.sinisterType', 'sinisterType')
+      .leftJoin('sinisterType.theft', 'theft')
+      .addSelect('theft.id')
+      .leftJoin('sinisterType.fire', 'fire')
+      .addSelect('fire.id')
+      .leftJoin('sinisterType.crash', 'crash')
+      .addSelect('crash.id')
+      .leftJoin('sinisterType.damage', 'damage')
+      .addSelect('damage.id')
+      .leftJoinAndSelect('sinisters.asset', 'asset')
+      .leftJoin('asset.vehicle', 'vehicle')
+      .addSelect('vehicle.id')
+      .addSelect('vehicle.brand')
+      .addSelect('vehicle.model')
+      .addSelect('vehicle.plate')
+      .addSelect('vehicle.type')
+      .leftJoin('asset.electronic', 'electronic')
+      .addSelect('electronic.id')
+      .addSelect('electronic.brand')
+      .addSelect('electronic.model')
+      .addSelect('electronic.type')
+      .getOne();
+
+    return sinister;
+  }
+
   public async getSinistersOfBroker(
     brokerId: string,
     searchField: string,
@@ -1045,12 +1096,34 @@ export class SinisterService {
   ) {
     try {
       const brokerAssets = (await this.userService.getUserById(brokerId))
-        .assets as unknown as UserEntity[];
+        .assets as unknown as AssetEntity[];
 
-      const sinisters = await Promise.all(
-        brokerAssets.map(async (brokerAsset) => {
-          return await this.sinisterForArrayPromises(brokerAsset.id);
-        }),
+      const assetsForSinisters: AssetEntity[] = brokerAssets
+        .map((asset) => {
+          if (asset.sinisters.length) {
+            let assets = [];
+
+            for (let i = 0; i < asset.sinisters.length; i++) {
+              assets = [...assets, asset.sinisters[i]];
+            }
+
+            return assets;
+          } else if (!asset.inspection) {
+            return asset;
+          }
+        })
+        .flat();
+
+      const sinisterPromises = assetsForSinisters.map(async (brokerAssets) => {
+        const sinister = await this.sinisterForArrayPromisesBySinisterId(
+          brokerAssets?.id,
+        );
+
+        return sinister;
+      });
+
+      const sinisters = (await Promise.all(sinisterPromises)).flatMap(
+        (sinister) => (!sinister ? [] : sinister),
       );
 
       const sinistersWithoutNull = sinisters.flat().filter(Boolean);
@@ -1235,10 +1308,26 @@ export class SinisterService {
     const { password, ...rest } = client;
 
     const assets = assetOfUser.filter((asset) => asset.inspection);
-    const assetsForSinisters = assetOfUser.filter((asset) => !asset.inspection);
+    const assetsForSinisters: AssetEntity[] = assetOfUser
+      .map((asset) => {
+        if (asset.sinisters.length) {
+          let assets = [];
+
+          for (let i = 0; i < asset.sinisters.length; i++) {
+            assets = [...assets, asset.sinisters[i]];
+          }
+
+          return assets;
+        } else if (!asset.inspection) {
+          return asset;
+        }
+      })
+      .flat();
 
     const sinisterPromises = assetsForSinisters.map(async (brokerAssets) => {
-      const sinister = await this.sinisterForArrayPromises(brokerAssets.id);
+      const sinister = await this.sinisterForArrayPromisesBySinisterId(
+        brokerAssets?.id,
+      );
 
       return sinister;
     });
@@ -1258,12 +1347,26 @@ export class SinisterService {
     const assetOfBroker = await this.assetService.findAssetsByBroker(brokerId);
 
     const assets = assetOfBroker.filter((asset) => asset.inspection);
-    const assetsForSinisters = assetOfBroker.filter(
-      (asset) => !asset.inspection,
-    );
+    const assetsForSinisters: AssetEntity[] = assetOfBroker
+      .map((asset) => {
+        if (asset.sinisters?.length) {
+          let assets = [];
+
+          for (let i = 0; i < asset.sinisters?.length; i++) {
+            assets = [...assets, asset.sinisters[i]];
+          }
+
+          return assets;
+        } else if (!asset.inspection) {
+          return asset;
+        }
+      })
+      .flat();
 
     const sinisterPromises = assetsForSinisters.map(async (brokerAssets) => {
-      const sinister = await this.sinisterForArrayPromises(brokerAssets.id);
+      const sinister = await this.sinisterForArrayPromisesBySinisterId(
+        brokerAssets?.id,
+      );
 
       return sinister;
     });
@@ -1271,7 +1374,6 @@ export class SinisterService {
     const sinisters = (await Promise.all(sinisterPromises)).flatMap(
       (sinister) => (!sinister ? [] : sinister),
     );
-
     return { assets, sinisters, clients };
   }
 
@@ -1322,38 +1424,144 @@ export class SinisterService {
 
     return { assetsLastWeek, sinistersLastWeek, clientsLastWeek, newAsyncDate };
   }
-  // public async getBrokerDashboard(
-  //   brokerId: string,
-  //   userBrokerId: string,
-  //   lastSyncDate: Date,
-  // ) {
-  //   const { assets, sinisters, clients } = await this.getAssetForBroker(
-  //     brokerId,
-  //     userBrokerId,
-  //   );
 
-  //   // Obtén la fecha actual
-  //   const newAsyncDate = new Date();
+  //-----------------------------------------
+  // Admin
+  public async getBrokerDetailForAdmin(userId: string) {
+    const broker = await this.userService.getBrokerById(userId);
+    const brokerAssets = broker.assets as unknown as AssetEntity[];
 
-  //   // Filtra los assets creados o modificados después de la última sincronización
-  //   const assetsLastSync = assets.filter(
-  //     (el) =>
-  //       new Date(el.created_at) >= lastSyncDate ||
-  //       new Date(el.updated_at) >= lastSyncDate,
-  //   );
+    const { password, assets: brokerAsset, ...rest } = broker;
 
-  //   const sinistersLastSync = sinisters.filter(
-  //     (el) =>
-  //       new Date(el.created_at) >= lastSyncDate ||
-  //       new Date(el.updated_at) >= lastSyncDate,
-  //   );
+    const assets = brokerAssets?.filter((asset) => asset.inspection);
+    const assetsForSinisters: AssetEntity[] = brokerAssets
+      ?.map((asset) => {
+        if (asset.sinisters.length) {
+          let assets = [];
 
-  //   const clientsLastSync = clients.filter(
-  //     (el) =>
-  //       new Date(el.created_at) >= lastSyncDate ||
-  //       new Date(el.updated_at) >= lastSyncDate,
-  //   );
+          for (let i = 0; i < asset.sinisters.length; i++) {
+            assets = [...assets, asset.sinisters[i]];
+          }
 
-  //   return { assetsLastSync, sinistersLastSync, clientsLastSync };
-  // }
+          return assets;
+        } else if (!asset.inspection) {
+          return asset;
+        }
+      })
+      .flat();
+
+    const sinisterPromises = assetsForSinisters?.map(async (brokerAssets) => {
+      const sinister = await this.sinisterForArrayPromisesBySinisterId(
+        brokerAssets?.id,
+      );
+
+      return sinister;
+    });
+
+    const sinisters = (await Promise.all(sinisterPromises))?.flatMap(
+      (sinister) => (!sinister ? [] : sinister),
+    );
+
+    return { ...rest, assets, sinisters };
+  }
+
+  private async geSinisterOfUsers() {
+    const client = await this.sinisterRepository
+      .createQueryBuilder('sinisters')
+      .leftJoin('sinisters.asset', 'asset')
+      .leftJoin('asset.vehicle', 'vehicle')
+      .addSelect('vehicle.id')
+      .addSelect('vehicle.brand')
+      .addSelect('vehicle.model')
+      .addSelect('vehicle.plate')
+      .addSelect('vehicle.type')
+      .leftJoin('asset.electronic', 'electronic')
+      .addSelect('electronic.id')
+      .addSelect('electronic.brand')
+      .addSelect('electronic.model')
+      .addSelect('electronic.type')
+      .leftJoin('electronic.smartphone', 'smartphone')
+      .addSelect('smartphone.imei')
+      .getMany();
+
+    if (!client) {
+      throw new ErrorManager({
+        type: 'BAD_REQUEST',
+        message: 'No users found',
+      });
+    }
+
+    return client;
+  }
+
+  public async getSinistersForAdmin(
+    searchField: string,
+    typeToFilter: string,
+    typeToFilterReport: string,
+    page: number,
+    limit: number,
+  ) {
+    try {
+      const sinisterss = await this.geSinisterOfUsers();
+console.log(sinisterss)
+      const sinisterPromises = sinisterss.map(async (sin) => {
+        const sinister = await this.sinisterForArrayPromisesBySinisterId(
+          sin?.id,
+        );
+
+        return sinister;
+      });
+
+      const sinisters = (await Promise.all(sinisterPromises)).flatMap(
+        (sinister) => (!sinister ? [] : sinister),
+      );
+
+      const sinistersWithoutNull = sinisters.flat().filter(Boolean);
+
+      const filteredSinisters = sinistersWithoutNull.filter((sinister) => {
+        if (typeToFilter === 'vehicle' && sinister.asset.vehicle) {
+          const vehicle = sinister.asset.vehicle as unknown as VehicleEntity;
+
+          const filterByTypeReport =
+            !typeToFilterReport ||
+            (typeToFilterReport === 'theft' && sinister.sinisterType.theft) ||
+            (typeToFilterReport === 'fire' && sinister.sinisterType.fire) ||
+            (typeToFilterReport === 'crash' && sinister.sinisterType.crash) ||
+            (typeToFilterReport === 'damage' && sinister.sinisterType.damage);
+          return (
+            filterByTypeReport &&
+            vehicle.plate.toLowerCase().includes(searchField.toLowerCase())
+          );
+        } else if (typeToFilter === 'electronic' && sinister.asset.electronic) {
+          const electronic = sinister.asset
+            .electronic as unknown as ElectronicEntity;
+          const filterByTypeReport =
+            typeToFilterReport === undefined ||
+            (typeToFilterReport === 'theft' && sinister.sinisterType.theft) ||
+            (typeToFilterReport === 'damage' && sinister.sinisterType.damage);
+
+          return (
+            filterByTypeReport &&
+            (electronic.model
+              .toLowerCase()
+              .includes(searchField.toLowerCase()) ||
+              (electronic.smartphone as unknown as SmartphoneEntity).imei
+                .toLowerCase()
+                .includes(searchField.toLowerCase()))
+          );
+        }
+
+        return false;
+      });
+
+      const pageSize = limit;
+      const start = (page - 1) * pageSize;
+      const end = start + pageSize;
+      const paginatedSinisters = filteredSinisters.slice(start, end);
+
+      return paginatedSinisters;
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
 }

@@ -38,10 +38,28 @@ export class SinisterController {
     return await this.sinisterService.getSinisters();
   }
 
+  @PublicAccess()
+  @Get('sinisters')
+  public async getSinistersForAdmin(
+    @Query('searchField') searchField?: string,
+    @Query('typeToFilter') typeToFilter?: string,
+    @Query('typeToFilterReport') typeToFilterReport?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return await this.sinisterService.getSinistersForAdmin(
+      searchField,
+      typeToFilter,
+      typeToFilterReport,
+      page,
+      limit,
+    );
+  }
   @Get(':sinisterId')
   public async getSinisterById(@Param('sinisterId') id: string) {
     return await this.sinisterService.getSinisterById(id);
   }
+
 
   @Put(':sinisterId')
   public async updateSinister(
@@ -283,6 +301,13 @@ export class SinisterController {
       brokerId,
       userBrokerId,
     );
+
+    return result;
+  }
+
+  @Get('broker-detail/:userId')
+  public async getBrokerDetailForAdmin(@Param('userId') userId: string) {
+    const result = await this.sinisterService.getBrokerDetailForAdmin(userId);
 
     return result;
   }

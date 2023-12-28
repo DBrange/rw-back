@@ -30,6 +30,23 @@ export class UserController {
     return await this.userService.getUsers();
   }
 
+  @Get('admin')
+  public async getUsersForAdmin(
+    @Query('searchField') searchField?: string,
+    @Query('typeToFilter') typeToFilter?: string,
+    @Query('typeToFilterUser') typeToFilterUser?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return await this.userService.getUsersForAdmin(
+      searchField,
+      typeToFilter,
+      typeToFilterUser,
+      page,
+      limit,
+    );
+  }
+
   @Get(':userId')
   public async getUserById(@Param('userId') id: string) {
     return await this.userService.getUserById(id);
@@ -96,4 +113,7 @@ export class UserController {
   public async newPasswordForMissingEmail(@Query('email') email: string) {
     return await this.userService.newPasswordForForgottem(email);
   }
+
+  //-------------------------------
+  // Admin
 }

@@ -63,6 +63,9 @@ export class AssetService {
         .createQueryBuilder('assets')
         .where({ id })
         // .leftJoinAndSelect('assets.user', 'user')
+        .leftJoinAndSelect('assets.user', 'user')
+        .leftJoinAndSelect('user.personalUser', 'userPersonalUser')
+        .leftJoinAndSelect('user.legalUser', 'userLegalUser')
         .leftJoinAndSelect('assets.client', 'client')
         .leftJoinAndSelect('client.personalUser', 'personalUser')
         .leftJoinAndSelect('client.legalUser', 'legalUser')
@@ -326,8 +329,9 @@ export class AssetService {
         brokerId,
       )) as unknown as AssetEntity[];
 
+      const assetsInspection = assets.filter((el) => el.inspection);
       // Aplicar el filtro según el tipo
-      const filteredAssets = assets.filter((asset) => {
+      const filteredAssets = assetsInspection.filter((asset) => {
         if (typeToFilter === 'vehicle') {
           return asset.vehicle;
         } else if (typeToFilter === 'electronic') {
@@ -423,6 +427,14 @@ export class AssetService {
   }
 
   public async findAssetsByBrokerClient(brokerId: string, clientId: string) {
+    // const assets = await this.assetRepository
+    //   .createQueryBuilder('assets')
+    //   .leftJoinAndSelect('assets.vehicle', 'vehicle')
+    //   .leftJoinAndSelect('assets.electronic', 'electronic')
+    //   .leftJoinAndSelect('assets.sinisters', 'sinisters')
+    //   .where({ user: brokerId })
+    //   .andWhere({ client: clientId })
+    //   .getMany();
     const assets = await this.assetRepository
       .createQueryBuilder('assets')
       .leftJoin('assets.vehicle', 'vehicle')
@@ -434,6 +446,18 @@ export class AssetService {
       .addSelect('electronic.brand')
       .addSelect('electronic.model')
       .addSelect('electronic.type')
+      .leftJoin('assets.sinisters', 'sinisters')
+      .addSelect('sinisters.id')
+      // .leftJoin('sinisters.asset', 'asset')
+      // .leftJoin('asset.vehicle', 'assetVehicle')
+      // .addSelect('assetVehicle.brand')
+      // .addSelect('assetVehicle.model')
+      // .addSelect('assetVehicle.plate')
+      // .addSelect('assetVehicle.type')
+      // .leftJoin('asset.electronic', 'assetElectronic')
+      // .addSelect('assetElectronic.brand')
+      // .addSelect('assetElectronic.model')
+      // .addSelect('assetElectronic.type')
       .where({ user: brokerId })
       .andWhere({ client: clientId })
       .getMany();
@@ -453,6 +477,8 @@ export class AssetService {
       .addSelect('electronic.brand')
       .addSelect('electronic.model')
       .addSelect('electronic.type')
+      .leftJoin('assets.sinisters', 'sinisters')
+      .addSelect('sinisters.id')
       .where({ user: brokerId })
       .getMany();
 
@@ -519,5 +545,86 @@ export class AssetService {
       .receivedNotifications;
 
     return userr;
+  }
+
+  //-----------------------------
+  // Admin
+
+  private async getInspectionsOfUsers() {
+    const client = await this.assetRepository
+      .createQueryBuilder('assets')
+      .leftJoin('assets.vehicle', 'vehicle')
+      .addSelect('vehicle.id')
+      .addSelect('vehicle.brand')
+      .addSelect('vehicle.model')
+      .addSelect('vehicle.plate')
+      .addSelect('vehicle.type')
+      .leftJoin('assets.electronic', 'electronic')
+      .addSelect('electronic.id')
+      .addSelect('electronic.brand')
+      .addSelect('electronic.model')
+      .addSelect('electronic.type')
+      .leftJoin('electronic.smartphone', 'smartphone')
+      .addSelect('smartphone.imei')
+      .getMany();
+
+    if (!client) {
+      throw new ErrorManager({
+        type: 'BAD_REQUEST',
+        message: 'No users found',
+      });
+    }
+
+    return client;
+  }
+
+  public async getAssetsForAdmin(
+    searchField: string,
+    typeToFilter: string,
+    page: number,
+    limit: number,
+  ) {
+    try {
+      const assets: AssetEntity[] = await this.getInspectionsOfUsers();
+
+      const assetsInspection = assets.filter((el) => el.inspection);
+      // Aplicar el filtro según el tipo
+      const filteredAssets = assetsInspection.filter((asset) => {
+        if (typeToFilter === 'vehicle') {
+          return asset.vehicle;
+        } else if (typeToFilter === 'electronic') {
+          return asset.electronic;
+        }
+        return false;
+      });
+
+      // Aplicar el filtro según el campo de búsqueda
+      const regex = new RegExp(`^${searchField}`, 'i');
+      const filteredAndSearchedAssets = filteredAssets.filter((asset) => {
+        if (typeToFilter === 'vehicle') {
+          const vehicle = asset.vehicle as unknown as VehicleEntity;
+          return regex.test(vehicle?.plate as string);
+        } else if (typeToFilter === 'electronic') {
+          const electronic = asset.electronic as unknown as ElectronicEntity;
+          return (
+            regex.test(electronic?.model) ||
+            regex.test(
+              (electronic?.smartphone as unknown as SmartphoneEntity)?.imei,
+            )
+          );
+        }
+        return false;
+      });
+
+      // Aplicar paginación
+      const pageSize = limit;
+      const start = (page - 1) * pageSize;
+      const end = start + pageSize;
+      const paginatedInspections = filteredAndSearchedAssets.slice(start, end);
+
+      return paginatedInspections;
+    } catch (err) {
+      throw ErrorManager.createSignaturError(err.message);
+    }
   }
 }
