@@ -1131,7 +1131,8 @@ export class SinisterService {
       const filteredSinisters = sinistersWithoutNull.filter((sinister) => {
         if (typeToFilter === 'vehicle' && sinister.asset.vehicle) {
           const vehicle = sinister.asset.vehicle as unknown as VehicleEntity;
-
+          
+          
           const filterByTypeReport =
             !typeToFilterReport ||
             (typeToFilterReport === 'theft' && sinister.sinisterType.theft) ||
@@ -1145,8 +1146,9 @@ export class SinisterService {
         } else if (typeToFilter === 'electronic' && sinister.asset.electronic) {
           const electronic = sinister.asset
             .electronic as unknown as ElectronicEntity;
+          
           const filterByTypeReport =
-            typeToFilterReport === undefined ||
+            !typeToFilterReport ||
             (typeToFilterReport === 'theft' && sinister.sinisterType.theft) ||
             (typeToFilterReport === 'damage' && sinister.sinisterType.damage);
 
@@ -1458,7 +1460,7 @@ export class SinisterService {
 
         return sinister;
       });
-      console.log(assetsForSinisters);
+      // console.log(assetsForSinisters);
       const sinisters = (await Promise.all(sinisterPromises))?.flatMap(
         (sinister) => (!sinister ? [] : sinister),
         );
@@ -1539,7 +1541,7 @@ export class SinisterService {
   ) {
     try {
       const sinisterss = await this.geSinisterOfUsers();
-      console.log(sinisterss);
+      // console.log(sinisterss);
       const sinisterPromises = sinisterss.map(async (sin) => {
         const sinister = await this.sinisterForArrayPromisesBySinisterId(
           sin?.id,
@@ -1572,7 +1574,7 @@ export class SinisterService {
           const electronic = sinister.asset
             .electronic as unknown as ElectronicEntity;
           const filterByTypeReport =
-            typeToFilterReport === undefined ||
+            !typeToFilterReport||
             (typeToFilterReport === 'theft' && sinister.sinisterType.theft) ||
             (typeToFilterReport === 'damage' && sinister.sinisterType.damage);
 
