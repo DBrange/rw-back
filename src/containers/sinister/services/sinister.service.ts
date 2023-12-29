@@ -1428,18 +1428,54 @@ export class SinisterService {
   //-----------------------------------------
   // Admin
   public async getBrokerDetailForAdmin(userId: string) {
-    const broker = await this.userService.getBrokerById(userId);
-    const brokerAssets = broker.assets as unknown as AssetEntity[];
+    const user = await this.userService.getBrokerById(userId);
+    
 
-    const { password, assets: brokerAsset, ...rest } = broker;
+    if (!user.userBroker) {
+      const broAssets = user?.brokerAssets as unknown as AssetEntity[];
+      const { password,brokerAssets, ...rest } = user;
 
-    const assets = brokerAssets?.filter((asset) => asset.inspection);
-    const assetsForSinisters: AssetEntity[] = brokerAssets
+      const assetsForSinisters: AssetEntity[] = broAssets
+        ?.map((asset) => {
+          if (asset.sinisters?.length) {
+            let assets = [];
+
+            for (let i = 0; i < asset.sinisters?.length; i++) {
+              assets = [...assets, asset.sinisters[i]];
+            }
+
+            return assets;
+          } else if (!asset.inspection) {
+            return asset;
+          }
+        })
+        .flat();
+
+      const sinisterPromises = assetsForSinisters?.map(async (brokerAssets) => {
+        const sinister = await this.sinisterForArrayPromisesBySinisterId(
+          brokerAssets?.id,
+        );
+
+        return sinister;
+      });
+      console.log(assetsForSinisters);
+      const sinisters = (await Promise.all(sinisterPromises))?.flatMap(
+        (sinister) => (!sinister ? [] : sinister),
+        );
+        
+      return { ...rest, sinisters };
+    }
+    const broAssets = user.assets as unknown as AssetEntity[];
+
+    const { password, assets: brokerAsset,brokerAssets, ...rest } = user;
+
+    const assets = broAssets?.filter((asset) => asset.inspection);
+    const assetsForSinisters: AssetEntity[] = broAssets
       ?.map((asset) => {
-        if (asset.sinisters.length) {
+        if (asset.sinisters?.length) {
           let assets = [];
 
-          for (let i = 0; i < asset.sinisters.length; i++) {
+          for (let i = 0; i < asset.sinisters?.length; i++) {
             assets = [...assets, asset.sinisters[i]];
           }
 
@@ -1503,7 +1539,7 @@ export class SinisterService {
   ) {
     try {
       const sinisterss = await this.geSinisterOfUsers();
-console.log(sinisterss)
+      console.log(sinisterss);
       const sinisterPromises = sinisterss.map(async (sin) => {
         const sinister = await this.sinisterForArrayPromisesBySinisterId(
           sin?.id,

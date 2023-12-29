@@ -106,4 +106,26 @@ export class UserBrokerService {
       throw ErrorManager.createSignaturError(error.message);
     }
   }
+
+  // public async brokerOfClient(id: string): Promise<UserBrokerEntity> {
+  //   try {
+  //     const user = await this.userBrokerRepository
+  //       .createQueryBuilder('users_broker')
+  //       .where({  })
+  //       .leftJoinAndSelect('users_broker.clients', 'clients')
+  //       .leftJoinAndSelect('clients.legalUser', 'legalUser')
+  //       .leftJoinAndSelect('clients.personalUser', 'personalUser')
+  //       .getOne();
+
+  //     if (!user) {
+  //       throw new ErrorManager({
+  //         type: 'BAD_REQUEST',
+  //         message: 'No users found',
+  //       });
+  //     }
+  //     return user;
+  //   } catch (error) {
+  //     throw new ErrorManager.createSignaturError(error.message);
+  //   }
+  // }
 }

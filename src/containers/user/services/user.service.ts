@@ -285,6 +285,8 @@ export class UserService {
         .leftJoinAndSelect('users.personalUser', 'personalUser')
         .leftJoinAndSelect('users.legalUser', 'legalUsers')
         .leftJoinAndSelect('users.broker', 'brokers')
+        .leftJoinAndSelect('users.brokerAssets', 'brokerAssets')
+        .leftJoinAndSelect('brokerAssets.sinisters', 'brokerAssetsSinisters')
         .leftJoinAndSelect('users.userBroker', 'userBroker')
         .leftJoinAndSelect('userBroker.clients', 'clients')
         .leftJoinAndSelect('clients.personalUser', 'clientsPersonalUser')
@@ -539,7 +541,7 @@ export class UserService {
     try {
       const users: UserEntity[] = await this.userRepository
         .createQueryBuilder('users')
-        .select(['users.id'])
+        .select(['users.id', 'users.created_at', 'users.updated_at'])
         .leftJoin('users.personalUser', 'personalUser')
         .addSelect('personalUser.name')
         .addSelect('personalUser.lastName')
@@ -550,7 +552,7 @@ export class UserService {
         .leftJoin('users.userBroker', 'userBroker')
         .addSelect('userBroker.id')
         .getMany();
-      
+
       const regex = new RegExp(`^${searchField}`, 'i');
       const filteredAndSearchUsers = users.filter((user) => {
         if (typeToFilterUser === 'broker' && user.userBroker) {
@@ -591,4 +593,6 @@ export class UserService {
       throw new ErrorManager.createSignaturError(error.message);
     }
   }
+
+
 }
