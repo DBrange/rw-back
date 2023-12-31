@@ -55,11 +55,16 @@ export class SinisterController {
       limit,
     );
   }
+
+  @Get('admin/dashboard/documents')
+  public async dashboardDocuments() {
+    return await this.sinisterService.dashboardDocuments();
+  }
+
   @Get(':sinisterId')
   public async getSinisterById(@Param('sinisterId') id: string) {
     return await this.sinisterService.getSinisterById(id);
   }
-
 
   @Put(':sinisterId')
   public async updateSinister(

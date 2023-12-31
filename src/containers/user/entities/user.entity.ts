@@ -44,7 +44,7 @@ export class UserEntity extends BaseEntity implements IUser {
   @Column({
     type: 'enum',
     enum: ACCESS_LEVEL,
-    default: ACCESS_LEVEL.BASIC,
+    default: ACCESS_LEVEL.FREE,
   })
   accessLevel: ACCESS_LEVEL;
 

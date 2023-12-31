@@ -4,10 +4,11 @@ export enum ROLES {
     CLIENT = 'CLIENT',
   }
  
-export enum ACCESS_LEVEL{
-    BASIC = 10,
-    STANDARD = 20,
-    PREMIUM = 30
+export enum ACCESS_LEVEL {
+  FREE = 0,
+  BASIC = 10,
+  PREMIUM = 20,
+  PRO = 30,
 }  
 
 export enum AUTHORIZATION{

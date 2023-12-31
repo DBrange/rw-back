@@ -8,6 +8,8 @@ import * as bcrypt from 'bcrypt';
 import { UserBrokerEntity } from 'src/containers/user-broker/entities/user-broker.entity';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
+import { DateData, QuantityData } from '../interfaces/user.interface';
+import { ACCESS_LEVEL, ROLES } from 'src/constants/roles';
 
 @Injectable()
 export class UserService {
@@ -292,19 +294,6 @@ export class UserService {
         .leftJoinAndSelect('clients.personalUser', 'clientsPersonalUser')
         .leftJoinAndSelect('clients.legalUser', 'clientsLegalUsers')
         .getOne();
-
-      // createQueryBuilder('assets')
-      //   .leftJoin('assets.vehicle', 'vehicle')
-      //   .addSelect('vehicle.brand')
-      //   .addSelect('vehicle.model')
-      //   .addSelect('vehicle.plate')
-      //   .addSelect('vehicle.type')
-      //   .leftJoin('assets.electronic', 'electronic')
-      //   .addSelect('electronic.brand')
-      //   .addSelect('electronic.model')
-      //   .addSelect('electronic.type')
-      //   .leftJoin('assets.sinisters', 'sinisters')
-      //   .addSelect('sinisters.id');
 
       if (!user) {
         throw new ErrorManager({
@@ -594,5 +583,302 @@ export class UserService {
     }
   }
 
+  public async dashboardIncome() {
+    try {
+      const users: UserEntity[] = await this.getUsers(); // Ajusta según tu lógica de obtener usuarios
 
+      // Obtén la fecha actual
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth(); // Mes actual (0-11)
+      const currentWeek = Math.ceil(currentDate.getDate() / 7); // Semana actual
+
+      // Inicializa arrays para las ganancias mensuales y semanales
+      const lastMonths: number[] = Array(12).fill(0);
+      const lastWeeks: number[] = Array(12).fill(0);
+
+      const accessLevelRates: Record<ACCESS_LEVEL, number> = {
+        [ACCESS_LEVEL.FREE]: 0,
+        [ACCESS_LEVEL.BASIC]: 5,
+        [ACCESS_LEVEL.PREMIUM]: 10,
+        [ACCESS_LEVEL.PRO]: 15,
+      };
+      // Recorre los usuarios y cuenta las ganancias en los últimos 12 meses y semanas
+      users.forEach((user) => {
+        const userDate = user.created_at; // Ajusta a la propiedad de fecha de registro en tu entidad
+        const userMonth = userDate.getMonth();
+        const userWeek = Math.ceil(userDate.getDate() / 7);
+
+        // Incrementa las ganancias mensuales y semanales basadas en el nivel de acceso del usuario
+        if (userMonth >= currentMonth - 11 && userMonth <= currentMonth) {
+          lastMonths[currentMonth - userMonth] +=
+            accessLevelRates[user.accessLevel];
+        }
+
+        if (userWeek >= currentWeek - 11 && userWeek <= currentWeek) {
+          lastWeeks[currentWeek - userWeek] +=
+            accessLevelRates[user.accessLevel];
+        }
+      });
+
+      // Devuelve el resultado
+      return {
+        label: 'Ganancias',
+        months: lastMonths.reverse(), // Invierte el array para representar correctamente los últimos 12 meses
+        weeks: lastWeeks.reverse(), // Invierte el array para representar correctamente las últimas 12 semanas
+      };
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async dashboardNewUser() {
+    try {
+      const users: UserEntity[] = await this.userRepository.find();
+
+      // Obtener la fecha actual
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth(); // Mes actual (0-11)
+      const currentWeek = Math.ceil(currentDate.getDate() / 7); // Semana actual
+
+      // Inicializar arrays para los últimos 12 meses y semanas
+      const lastMonths: number[] = Array(12).fill(0);
+      const lastWeeks: number[] = Array(12).fill(0);
+
+      // Recorrer los usuarios y contar nuevos usuarios en los últimos 12 meses y semanas
+      users.forEach((user) => {
+        const userDate = user.created_at; // Ajusta a la propiedad de fecha de registro en tu entidad
+
+        if (userDate instanceof Date) {
+          const userMonth = userDate.getMonth();
+          const userWeek = Math.ceil(userDate.getDate() / 7);
+
+          // Contar en los últimos 12 meses
+          if (userMonth >= currentMonth - 11 && userMonth <= currentMonth) {
+            lastMonths[currentMonth - userMonth] += 1;
+          }
+
+          // Contar en las últimas 12 semanas
+          if (userWeek >= currentWeek - 11 && userWeek <= currentWeek) {
+            lastWeeks[currentWeek - userWeek] += 1;
+          }
+        }
+      });
+
+      // Devolver el resultado
+      return {
+        label: 'Usuarios',
+        months: lastMonths.reverse(), // Invertir el array para que represente correctamente los últimos 12 meses
+        weeks: lastWeeks.reverse(), // Invertir el array para que represente correctamente las últimas 12 semanas
+      };
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async dashboardUserRole() {
+    try {
+      const users: UserEntity[] = await this.userRepository.find();
+
+      // Obtener la fecha actual
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth(); // Mes actual (0-11)
+      const currentWeek = Math.ceil(currentDate.getDate() / 7); // Semana actual
+
+      // Inicializar objetos para almacenar los resultados
+      const userCountData: DateData[] = [
+        {
+          label: 'Brokers',
+          months: Array(12).fill(0),
+          weeks: Array(12).fill(0),
+        },
+        {
+          label: 'Clients',
+          months: Array(12).fill(0),
+          weeks: Array(12).fill(0),
+        },
+      ];
+
+      // Recorrer los usuarios y contar usuarios con roles en los últimos 12 meses y semanas
+      users.forEach((user) => {
+        const userDate = user.created_at; // Ajusta a la propiedad de fecha de registro en tu entidad
+        const userRole = user.role; // Ajusta a la propiedad de role en tu entidad
+
+        if (userDate instanceof Date && typeof userRole === 'string') {
+          const userMonth = userDate.getMonth();
+          const userWeek = Math.ceil(userDate.getDate() / 7);
+
+          // Contar en los últimos 12 meses
+          if (userMonth >= currentMonth - 11 && userMonth <= currentMonth) {
+            switch (userRole) {
+              case 'BROKER':
+                userCountData[0].months[currentMonth - userMonth] += 1;
+                break;
+              case 'CLIENT':
+                userCountData[1].months[currentMonth - userMonth] += 1;
+                break;
+              // Agrega otros roles según sea necesario
+              default:
+                break;
+            }
+          }
+
+          // Contar en las últimas 12 semanas
+          if (userWeek >= currentWeek - 11 && userWeek <= currentWeek) {
+            switch (userRole) {
+              case 'BROKER':
+                userCountData[0].weeks[currentWeek - userWeek] += 1;
+                break;
+              case 'CLIENT':
+                userCountData[1].weeks[currentWeek - userWeek] += 1;
+                break;
+              // Agrega otros roles según sea necesario
+              default:
+                break;
+            }
+          }
+        }
+      });
+
+      // Devolver el resultado
+      return userCountData;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async dashboardLevelBrokers() {
+    try {
+      const users: UserEntity[] = await this.userRepository.find();
+
+      // Obtener la fecha actual
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth(); // Mes actual (0-11)
+      const currentWeek = Math.ceil(currentDate.getDate() / 7); // Semana actual
+
+      // Inicializar el objeto para almacenar los resultados por nivel de acceso
+      const accessLevelData: DateData[] = [
+        {
+          label: 'Free',
+          months: Array(12).fill(0),
+          weeks: Array(12).fill(0),
+        },
+        { label: 'Basic', months: Array(12).fill(0), weeks: Array(12).fill(0) },
+        {
+          label: 'Premium',
+          months: Array(12).fill(0),
+          weeks: Array(12).fill(0),
+        },
+        { label: 'Pro', months: Array(12).fill(0), weeks: Array(12).fill(0) },
+      ];
+
+      // Recorrer los usuarios y contar usuarios por nivel de acceso en los últimos 12 meses y semanas
+      users.forEach((user) => {
+        const userDate = user.created_at; // Ajusta a la propiedad de fecha de registro en tu entidad
+        const userAccessLevel = user.accessLevel; // Ajusta a la propiedad de nivel de acceso en tu entidad
+
+        if (userDate instanceof Date && userAccessLevel !== undefined) {
+          const userMonth = userDate.getMonth();
+          const userWeek = Math.ceil(userDate.getDate() / 7);
+
+          // Contar en los últimos 12 meses
+          if (userMonth >= currentMonth - 11 && userMonth <= currentMonth) {
+            accessLevelData[userAccessLevel].months[
+              currentMonth - userMonth
+            ] += 1;
+          }
+
+          // Contar en las últimas 12 semanas
+          if (userWeek >= currentWeek - 11 && userWeek <= currentWeek) {
+            accessLevelData[userAccessLevel].weeks[currentWeek - userWeek] += 1;
+          }
+        }
+      });
+
+      // Devolver el resultado
+      return accessLevelData;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async  dashboardCurrentServices() {
+  try {
+    const users: UserEntity[] = await this.getUsers();
+
+    // Inicializar el objeto para almacenar los resultados por nivel de acceso
+    const serviceData: QuantityData = {
+      label: 'Servicios',
+      numbers: [0, 0, 0, 0],
+    };
+
+    // Contar usuarios por nivel de acceso
+    users.forEach((user) => {
+      const userAccessLevel = user.accessLevel; // Ajusta a la propiedad de nivel de acceso en tu entidad
+
+      if (userAccessLevel !== undefined) {
+        // Incrementar el contador correspondiente al nivel de acceso
+        switch (userAccessLevel) {
+          case ACCESS_LEVEL.FREE:
+            serviceData.numbers[0]++;
+            break;
+          case ACCESS_LEVEL.BASIC:
+            serviceData.numbers[1]++;
+            break;
+          case ACCESS_LEVEL.PREMIUM:
+            serviceData.numbers[2]++;
+            break;
+          case ACCESS_LEVEL.PRO:
+            serviceData.numbers[3]++;
+            break;
+          default:
+            // Tratar otros casos si es necesario
+            break;
+        }
+      }
+    });
+
+    // Devolver el resultado
+    return serviceData;
+  } catch (error) {
+    throw new ErrorManager.createSignaturError(error.message);
+  }
+  }
+  
+  public async dashboardUsersQuantity() {
+    try {
+      const users: UserEntity[] = await this.getUsers();
+
+      // Inicializar el objeto para almacenar los resultados por rol
+      const userData: QuantityData = {
+        label: 'Usuarios',
+        numbers: [0, 0],
+      };
+
+      // Contar usuarios por rol
+      users.forEach((user) => {
+        const userRole = user.role; // Ajusta a la propiedad de rol en tu entidad
+
+        if (userRole !== undefined) {
+          // Incrementar el contador correspondiente al rol
+          switch (userRole) {
+            case ROLES.CLIENT:
+              userData.numbers[0]++;
+              break;
+            case ROLES.BROKER:
+              userData.numbers[1]++;
+              break;
+            // Puedes agregar más roles según sea necesario
+            default:
+              // Tratar otros casos si es necesario
+              break;
+          }
+        }
+      });
+
+      // Devolver el resultado
+      return userData;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
 }

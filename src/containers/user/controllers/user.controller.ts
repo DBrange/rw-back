@@ -47,6 +47,31 @@ export class UserController {
     );
   }
 
+  @Get('admin/dashboard/new')
+  public async dashboardNewUser() {
+    return await this.userService.dashboardNewUser();
+  }
+  @Get('admin/dashboard/role')
+  public async dashboardUserRole() {
+    return await this.userService.dashboardUserRole();
+  }
+  @Get('admin/dashboard/level')
+  public async dashboardLevelBrokers() {
+    return await this.userService.dashboardLevelBrokers();
+  }
+  @Get('admin/dashboard/services')
+  public async dashboardCurrentServices() {
+    return await this.userService.dashboardCurrentServices();
+  }
+  @Get('admin/dashboard/user-quantity')
+  public async dashboardUsersQuantity() {
+    return await this.userService.dashboardUsersQuantity();
+  }
+  @Get('admin/dashboard/income')
+  public async dashboardIncome() {
+    return await this.userService.dashboardIncome();
+  }
+
   @Get(':userId')
   public async getUserById(@Param('userId') id: string) {
     return await this.userService.getUserById(id);

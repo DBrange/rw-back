@@ -55,6 +55,7 @@ import {
 import { SinisterDTO, UpdateSinisterDTO } from '../dto/sinister.dto';
 import { SinisterEntity } from '../entities/sinister.entity';
 import { UserBrokerEntity } from 'src/containers/user-broker/entities/user-broker.entity';
+import { DateData } from 'src/containers/user/interfaces/user.interface';
 
 @Injectable()
 export class SinisterService {
@@ -1131,8 +1132,7 @@ export class SinisterService {
       const filteredSinisters = sinistersWithoutNull.filter((sinister) => {
         if (typeToFilter === 'vehicle' && sinister.asset.vehicle) {
           const vehicle = sinister.asset.vehicle as unknown as VehicleEntity;
-          
-          
+
           const filterByTypeReport =
             !typeToFilterReport ||
             (typeToFilterReport === 'theft' && sinister.sinisterType.theft) ||
@@ -1146,7 +1146,7 @@ export class SinisterService {
         } else if (typeToFilter === 'electronic' && sinister.asset.electronic) {
           const electronic = sinister.asset
             .electronic as unknown as ElectronicEntity;
-          
+
           const filterByTypeReport =
             !typeToFilterReport ||
             (typeToFilterReport === 'theft' && sinister.sinisterType.theft) ||
@@ -1431,11 +1431,10 @@ export class SinisterService {
   // Admin
   public async getBrokerDetailForAdmin(userId: string) {
     const user = await this.userService.getBrokerById(userId);
-    
 
     if (!user.userBroker) {
       const broAssets = user?.brokerAssets as unknown as AssetEntity[];
-      const { password,brokerAssets, ...rest } = user;
+      const { password, brokerAssets, ...rest } = user;
 
       const assetsForSinisters: AssetEntity[] = broAssets
         ?.map((asset) => {
@@ -1463,13 +1462,13 @@ export class SinisterService {
       // console.log(assetsForSinisters);
       const sinisters = (await Promise.all(sinisterPromises))?.flatMap(
         (sinister) => (!sinister ? [] : sinister),
-        );
-        
+      );
+
       return { ...rest, sinisters };
     }
     const broAssets = user.assets as unknown as AssetEntity[];
 
-    const { password, assets: brokerAsset,brokerAssets, ...rest } = user;
+    const { password, assets: brokerAsset, brokerAssets, ...rest } = user;
 
     const assets = broAssets?.filter((asset) => asset.inspection);
     const assetsForSinisters: AssetEntity[] = broAssets
@@ -1574,7 +1573,7 @@ export class SinisterService {
           const electronic = sinister.asset
             .electronic as unknown as ElectronicEntity;
           const filterByTypeReport =
-            !typeToFilterReport||
+            !typeToFilterReport ||
             (typeToFilterReport === 'theft' && sinister.sinisterType.theft) ||
             (typeToFilterReport === 'damage' && sinister.sinisterType.damage);
 
@@ -1601,5 +1600,110 @@ export class SinisterService {
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
     }
+  }
+
+  private async getBrokerDetailForDashboarDocuments(userId: string) {
+    const user = await this.userService.getBrokerById(userId);
+
+    if (!user.userBroker) return undefined
+
+    const broAssets = user.assets as unknown as AssetEntity[];
+
+    const assets = broAssets?.filter((asset) => asset.inspection);
+    const assetsForSinisters: AssetEntity[] = broAssets
+      ?.map((asset) => {
+        if (asset.sinisters?.length) {
+          let assets = [];
+
+          for (let i = 0; i < asset.sinisters?.length; i++) {
+            assets = [...assets, asset.sinisters[i]];
+          }
+
+          return assets;
+        } else if (!asset.inspection) {
+          return asset;
+        }
+      })
+      .flat();
+
+    const sinisterPromises = assetsForSinisters?.map(async (brokerAssets) => {
+      const sinister = await this.sinisterForArrayPromisesBySinisterId(
+        brokerAssets?.id,
+      );
+
+      return sinister;
+    });
+
+    const sinisters: SinisterEntity[] = (await Promise.all(sinisterPromises))?.flatMap(
+      (sinister) => (!sinister ? [] : sinister),
+    );
+
+    return { assets, sinisters };
+  }
+
+  public async dashboardDocuments() {
+ try {
+   const users: UserEntity[] = await this.userService.getUsers();
+
+   // Obtener la fecha actual
+   const currentDate = new Date();
+   const currentMonth = currentDate.getMonth(); // Mes actual (0-11)
+   const currentWeek = Math.ceil(currentDate.getDate() / 7); // Semana actual
+
+   // Inicializar el objeto para almacenar los resultados por propiedad (assets y sinisters)
+   const assetSinisterData: DateData[] = [
+     {
+       label: 'Inspecciones',
+       months: Array(12).fill(0),
+       weeks: Array(12).fill(0),
+     },
+     {
+       label: 'Siniestros',
+       months: Array(12).fill(0),
+       weeks: Array(12).fill(0),
+     },
+   ];
+
+   // Recorrer los usuarios y contar documentos por propiedad en los últimos 12 meses y semanas
+   for (const user of users) {
+     const documents = await this.getBrokerDetailForDashboarDocuments(
+       user.id,
+     );
+
+     documents?.assets.forEach((asset) => {
+       const assetMonth = asset.created_at.getMonth();
+       const assetWeek = Math.ceil(asset.created_at.getDate() / 7);
+
+       if (assetMonth >= currentMonth - 11 && assetMonth <= currentMonth) {
+         assetSinisterData[0].months[currentMonth - assetMonth] += 1; // Inspecciones
+       }
+
+       if (assetWeek >= currentWeek - 11 && assetWeek <= currentWeek) {
+         assetSinisterData[0].weeks[currentWeek - assetWeek] += 1; // Inspecciones
+       }
+     });
+
+     documents?.sinisters.forEach((sinister) => {
+       const sinisterMonth = sinister.created_at.getMonth();
+       const sinisterWeek = Math.ceil(sinister.created_at.getDate() / 7);
+
+       if (
+         sinisterMonth >= currentMonth - 11 &&
+         sinisterMonth <= currentMonth
+       ) {
+         assetSinisterData[1].months[currentMonth - sinisterMonth] += 1; // Siniestros
+       }
+
+       if (sinisterWeek >= currentWeek - 11 && sinisterWeek <= currentWeek) {
+         assetSinisterData[1].weeks[currentWeek - sinisterWeek] += 1; // Siniestros
+       }
+     });
+   }
+
+   // Devolver el resultado
+   return assetSinisterData;
+ } catch (error) {
+   throw new ErrorManager.createSignaturError(error.message);
+ }
   }
 }
