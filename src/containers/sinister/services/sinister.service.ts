@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm/dist';
+import { differenceInMonths, differenceInWeeks, startOfWeek } from 'date-fns';
 import { AssetDTO } from 'src/containers/asset/dto/asset.dto';
 import { AssetEntity } from 'src/containers/asset/entities/asset.entity';
 import { AssetService } from 'src/containers/asset/services/asset.service';
@@ -41,6 +42,7 @@ import { ThirdPartyVehicleDTO } from 'src/containers/third-party-vehicle/dto/thi
 import { ThirdPartyVehicleService } from 'src/containers/third-party-vehicle/services/third-party-vehicle.service';
 import { UserBrokerService } from 'src/containers/user-broker/services/user-broker.service';
 import { UserEntity } from 'src/containers/user/entities/user.entity';
+import { DateData } from 'src/containers/user/interfaces/user.interface';
 import { UserService } from 'src/containers/user/services/user.service';
 import { VehicleDTO } from 'src/containers/vehicle/dto/vehicle.dto';
 import { VehicleEntity } from 'src/containers/vehicle/entities/vehicle.entity';
@@ -54,9 +56,6 @@ import {
 } from '../dto/all-sinister.dto';
 import { SinisterDTO, UpdateSinisterDTO } from '../dto/sinister.dto';
 import { SinisterEntity } from '../entities/sinister.entity';
-import { UserBrokerEntity } from 'src/containers/user-broker/entities/user-broker.entity';
-import { DateData } from 'src/containers/user/interfaces/user.interface';
-
 @Injectable()
 export class SinisterService {
   constructor(
@@ -1285,21 +1284,6 @@ export class SinisterService {
 
   // - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  // Get Client Detail
-  // private async findSinistersByBrokerClient(
-  //   brokerId: string,
-  //   clientId: string,
-  // ) {
-  //       const sinisters = await this.sinisterRepository.find({
-  //         where: {
-  //           user: brokerId,
-  //           client: clientId,
-  //         },
-  //       });
-
-  //       return assets;
-  // }
-
   public async getClientInBroker(brokerId: string, clientId: string) {
     const client = await this.userService.getClientById(clientId);
     const assetOfUser = await this.assetService.findAssetsByBrokerClient(
@@ -1605,7 +1589,7 @@ export class SinisterService {
   private async getBrokerDetailForDashboarDocuments(userId: string) {
     const user = await this.userService.getBrokerById(userId);
 
-    if (!user.userBroker) return undefined
+    if (!user.userBroker) return undefined;
 
     const broAssets = user.assets as unknown as AssetEntity[];
 
@@ -1634,76 +1618,81 @@ export class SinisterService {
       return sinister;
     });
 
-    const sinisters: SinisterEntity[] = (await Promise.all(sinisterPromises))?.flatMap(
-      (sinister) => (!sinister ? [] : sinister),
-    );
+    const sinisters: SinisterEntity[] = (
+      await Promise.all(sinisterPromises)
+    )?.flatMap((sinister) => (!sinister ? [] : sinister));
 
     return { assets, sinisters };
   }
 
   public async dashboardDocuments() {
- try {
-   const users: UserEntity[] = await this.userService.getUsers();
+    try {
+      const users: UserEntity[] = await this.userService.getUsers();
 
-   // Obtener la fecha actual
-   const currentDate = new Date();
-   const currentMonth = currentDate.getMonth(); // Mes actual (0-11)
-   const currentWeek = Math.ceil(currentDate.getDate() / 7); // Semana actual
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth();
+      const currentWeek = Math.ceil(currentDate.getDate() / 7);
 
-   // Inicializar el objeto para almacenar los resultados por propiedad (assets y sinisters)
-   const assetSinisterData: DateData[] = [
-     {
-       label: 'Inspecciones',
-       months: Array(12).fill(0),
-       weeks: Array(12).fill(0),
-     },
-     {
-       label: 'Siniestros',
-       months: Array(12).fill(0),
-       weeks: Array(12).fill(0),
-     },
-   ];
+      const assetSinisterData: DateData[] = [
+        {
+          label: 'Inspecciones',
+          months: Array(12).fill(0),
+          weeks: Array(12).fill(0),
+        },
+        {
+          label: 'Siniestros',
+          months: Array(12).fill(0),
+          weeks: Array(12).fill(0),
+        },
+      ];
 
-   // Recorrer los usuarios y contar documentos por propiedad en los últimos 12 meses y semanas
-   for (const user of users) {
-     const documents = await this.getBrokerDetailForDashboarDocuments(
-       user.id,
-     );
+      for (const user of users) {
+        const documents = await this.getBrokerDetailForDashboarDocuments(
+          user.id,
+        );
 
-     documents?.assets.forEach((asset) => {
-       const assetMonth = asset.created_at.getMonth();
-       const assetWeek = Math.ceil(asset.created_at.getDate() / 7);
+        documents?.assets.forEach((asset) => {
+          const assetMonthIndex = differenceInMonths(
+            currentDate,
+            asset.created_at,
+          );
+          const assetWeekIndex = differenceInWeeks(
+            currentDate,
+            startOfWeek(asset.created_at),
+          );
 
-       if (assetMonth >= currentMonth - 11 && assetMonth <= currentMonth) {
-         assetSinisterData[0].months[currentMonth - assetMonth] += 1; // Inspecciones
-       }
+          if (assetMonthIndex >= 0 && assetMonthIndex < 12) {
+            assetSinisterData[0].months[11 - assetMonthIndex] += 1; // Inspecciones
+          }
 
-       if (assetWeek >= currentWeek - 11 && assetWeek <= currentWeek) {
-         assetSinisterData[0].weeks[currentWeek - assetWeek] += 1; // Inspecciones
-       }
-     });
+          if (assetWeekIndex >= 0 && assetWeekIndex < 12) {
+            assetSinisterData[0].weeks[11 - assetWeekIndex] += 1; // Inspecciones
+          }
+        });
 
-     documents?.sinisters.forEach((sinister) => {
-       const sinisterMonth = sinister.created_at.getMonth();
-       const sinisterWeek = Math.ceil(sinister.created_at.getDate() / 7);
+        documents?.sinisters.forEach((sinister) => {
+          const sinisterMonthIndex = differenceInMonths(
+            currentDate,
+            sinister.created_at,
+          );
+          const sinisterWeekIndex = differenceInWeeks(
+            currentDate,
+            startOfWeek(sinister.created_at),
+          );
 
-       if (
-         sinisterMonth >= currentMonth - 11 &&
-         sinisterMonth <= currentMonth
-       ) {
-         assetSinisterData[1].months[currentMonth - sinisterMonth] += 1; // Siniestros
-       }
+          if (sinisterMonthIndex >= 0 && sinisterMonthIndex < 12) {
+            assetSinisterData[1].months[11 - sinisterMonthIndex] += 1;
+          }
 
-       if (sinisterWeek >= currentWeek - 11 && sinisterWeek <= currentWeek) {
-         assetSinisterData[1].weeks[currentWeek - sinisterWeek] += 1; // Siniestros
-       }
-     });
-   }
+          if (sinisterWeekIndex >= 0 && sinisterWeekIndex < 12) {
+            assetSinisterData[1].weeks[11 - sinisterWeekIndex] += 1; 
+          }
+        });
+      }
 
-   // Devolver el resultado
-   return assetSinisterData;
- } catch (error) {
-   throw new ErrorManager.createSignaturError(error.message);
- }
+      return assetSinisterData;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
   }
 }
