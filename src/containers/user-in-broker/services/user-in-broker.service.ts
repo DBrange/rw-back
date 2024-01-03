@@ -6,6 +6,7 @@ import { UserEntity } from 'src/containers/user/entities/user.entity';
 import { UserService } from 'src/containers/user/services/user.service';
 import { ErrorManager } from 'src/utils/error.manager';
 import { NotificationService } from '../../notification/services/notification.service';
+import { BrokerEntity } from 'src/containers/broker/entities/broker.entity';
 
 @Injectable()
 export class UserInBrokerService {
@@ -17,14 +18,37 @@ export class UserInBrokerService {
 
   public async addClient(userBrokerId: string, clientId: string) {
     try {
-      const client = (await this.userService.getUsers()).find(
-        (client) => client.id === clientId,
-      );
+      const client = await this.userService.getUserByIdForOnlyBroker(clientId);
+      // const filterRepeatedId: string[] = (
+      //   client.broker as unknown as BrokerEntity[]
+      // ).map((broker) => {
+      //   if (broker.id !== userBrokerId) {
+      //     return broker.id;
+      //   }
+      //   return 
+      // });
+      // console.log({
+      //   ...client,
+      //   broker: [...filterRepeatedId, userBrokerId],
+      // });
 
-      await this.userService.updateUser(clientId, {
+      await this.userService.updateOnlyBroker(clientId, {
         ...client,
-        broker: userBrokerId,
+        broker: [userBrokerId],
       });
+
+      // const userBroker = await this.userBrokerService.getUserBrokerById(
+      //   userBrokerId,
+      // );
+
+      // const filterRepeatedIdUserBroker = userBroker.clients.filter(
+      //   (broker) => broker !== userBrokerId,
+      //   );
+
+      // await this.userBrokerService.updateUserBroker(userBrokerId, {
+      //   ...userBroker,
+      //   clients: [...filterRepeatedIdUserBroker, clientId],
+      // });
 
       return { message: 'A client has been added to the broker successfully' };
     } catch (err) {

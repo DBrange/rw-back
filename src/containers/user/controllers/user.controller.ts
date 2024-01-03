@@ -78,11 +78,11 @@ export class UserController {
   }
 
   @Put(':userId')
-  public async updateUser(
+  public async updateOnlyBroker(
     @Param('userId') id: string,
     @Body() body: UpdateUserDTO,
   ) {
-    return await this.userService.updateUser(id, body);
+    return await this.userService.updateOnlyBroker(id, body);
   }
 
   @Delete(':userId')

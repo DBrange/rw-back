@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsDate,
   IsEmail,
   IsEnum,
@@ -36,7 +37,7 @@ export class UserDTO {
 
   @IsOptional()
   @IsUUID()
-  broker: string;
+  broker: string[];
 }
 
 export class UpdateUserDTO {
@@ -77,8 +78,8 @@ export class UpdateUserDTO {
   authorization: AUTHORIZATION;
 
   @IsOptional()
-  @IsUUID()
-  broker: string;
+  @IsUUID(4, { each: true }) // <- Cada item es UUID
+  broker: string[];
 }
 
 // export class UserToAssetDTO {

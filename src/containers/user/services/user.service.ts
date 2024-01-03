@@ -43,6 +43,25 @@ export class UserService {
     }
   }
 
+  public async getUserByIdForOnlyBroker(id: string) {
+    try {
+      const user = await this.userRepository
+        .createQueryBuilder('users')
+        .where({ id })
+        .leftJoinAndSelect('users.broker', 'brokers')
+        .getOne();
+
+      if (!user) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+      return user;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
   public async getUserById(id: string) {
     try {
       const user = await this.userRepository
@@ -62,9 +81,9 @@ export class UserService {
         .leftJoinAndSelect('client.legalUser', 'clientLegalUser')
         .leftJoinAndSelect('users.personalUser', 'personalUser')
         .leftJoinAndSelect('users.legalUser', 'legalUsers')
-        .leftJoinAndSelect('users.broker', 'brokers')
         .leftJoinAndSelect('users.userBroker', 'userBroker')
         .leftJoinAndSelect('userBroker.clients', 'clients')
+        .leftJoinAndSelect('users.broker', 'brokers')
         .leftJoinAndSelect('clients.personalUser', 'clientsPersonalUser')
         .leftJoinAndSelect('clients.legalUser', 'clientsLegalUsers')
         .getOne();
@@ -100,17 +119,41 @@ export class UserService {
         });
       }
       if (user.role === 'CLIENT' && user.broker) {
-        const brokerEntity = user.broker as unknown as UserBrokerEntity;
-        const findUserBroker = await this.userRepository
-          .createQueryBuilder('users')
-          .where({ userBroker: brokerEntity.id })
-          .leftJoinAndSelect('users.legalUser', 'legalUser')
-          .leftJoinAndSelect('users.personalUser', 'personalUser')
-          .getOne();
-        return { ...user, brokerUser: findUserBroker };
+        const allBrokers = user.broker as unknown as UserBrokerEntity[];
+
+        const userBrokersPromises = allBrokers.map(async (brokerEntity) => {
+          const findUserBroker = await this.userRepository
+            .createQueryBuilder('users')
+            .where({ userBroker: brokerEntity.id })
+            .leftJoinAndSelect('users.legalUser', 'legalUser')
+            .leftJoinAndSelect('users.personalUser', 'personalUser')
+            .getOne();
+
+          return findUserBroker;
+        });
+
+        const borkers = await Promise.all(userBrokersPromises);
+
+        return { ...user, brokerUser: borkers };
       }
 
       return user;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async updateOnlyBroker(id: string, body: UpdateUserDTO) {
+    try {
+
+      await this.userRepository
+        .createQueryBuilder()
+        .relation(UserEntity, 'broker')
+        .of(id)
+        .add(body.broker);
+
+
+      return { msg: 'Ha sido actualizado con exito' };
     } catch (error) {
       throw new ErrorManager.createSignaturError(error.message);
     }

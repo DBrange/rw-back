@@ -3,6 +3,8 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -35,7 +37,7 @@ export class UserEntity extends BaseEntity implements IUser {
   @Column()
   address: string;
 
-  @Column({nullable: true, default: null})
+  @Column({ nullable: true, default: null })
   lastRecord: Date;
 
   @Column({ type: 'enum', enum: ROLES })
@@ -63,11 +65,9 @@ export class UserEntity extends BaseEntity implements IUser {
   })
   authorization: AUTHORIZATION;
 
-  @ManyToOne(() => UserBrokerEntity, (userBroker) => userBroker.clients, {
-    nullable: true,
-  })
-  @JoinColumn()
-  broker: string;
+  @ManyToMany(() => UserBrokerEntity, (broker) => broker.clients)
+  @JoinTable()
+  broker: string[] 
 
   @OneToOne(() => UserBrokerEntity)
   @JoinColumn()
