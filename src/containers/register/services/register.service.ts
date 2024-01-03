@@ -50,4 +50,8 @@ export class RegisterService {
 
     return await this.userService.createUser(userObj);
   }
+
+  // public async verifyDataEmailDniEnrolment(email: string, dni: string,enrollment: string) {
+    
+  // }
 }

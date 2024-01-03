@@ -29,12 +29,12 @@ export class VerifyEmailDniService {
       let emaill: boolean;
       let dni: boolean;
       let cuit: boolean;
-
+console.log(dniOrCuit);
       if (email) emaill = await this.userService.verifyEmail(email);
 
-      if (dni) dni = await this.personalUserService.verifyDni(dniOrCuit);
+      if (dniOrCuit) dni = await this.personalUserService.verifyDni(dniOrCuit);
       
-      if (cuit) cuit = await this.legalUserService.verifyCuit(dniOrCuit);
+      if (dniOrCuit) cuit = await this.legalUserService.verifyCuit(dniOrCuit);
 
       if (emaill || dni || cuit) {
         return true;

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AuthDTO } from '../dto/auth.dto';
 import { AuthService } from '../services/auth.service';
 import { AccessLevelGuard } from '../guards/access-level.guard';
@@ -19,8 +19,13 @@ export class AuthController {
       throw new UnauthorizedException('Data not valid');
     }
 
-    const jwt = await this.authService.generateJWT(userValidate);
-    
+    const jwt = await this.authService.generateJWT(userValidate.id);
+
     return jwt;
+  }
+
+  @Post('refresh-token/:userId')
+  async generateRefreshJWT(@Param('userId') userId: string) {
+    return await this.authService.generateRefreshJWT(userId);
   }
 }

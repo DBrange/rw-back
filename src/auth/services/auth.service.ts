@@ -36,9 +36,34 @@ export class AuthService {
     return jwt.sign(payload, secret, { expiresIn: expires });
   }
 
-  public async generateJWT(user: UserEntity): Promise<AuthResponse> {
+  public async generateJWT(userId: string): Promise<AuthResponse> {
     try {
-      const userToken = await this.userService.getUserByIdForProfile(user.id);
+      const userToken = await this.userService.getUserByIdForProfile(userId);
+console.log('aaaaa')
+      const date = new Date();
+      const exp = Math.floor(date.getTime() / 1000) + 3600;
+
+      const payload: PayloadToken = {
+        role: userToken.role,
+        sub: userToken.id,
+      };
+
+      return {
+        accessToken: this.signJWT({
+          payload,
+          secret: process.env.JWT_SECRET,
+          expires: '1h',
+        }),
+        user: userToken,
+        exp,
+      };
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+  public async generateRefreshJWT(userId: string){
+    try {
+      const userToken = await this.userService.getUserByIdForProfile(userId);
 
       const date = new Date();
       const exp = Math.floor(date.getTime() / 1000) + 3600;
@@ -52,9 +77,8 @@ export class AuthService {
         accessToken: this.signJWT({
           payload,
           secret: process.env.JWT_SECRET,
-          expires: '5h',
+          expires: '1h',
         }),
-        user: userToken,
         exp,
       };
     } catch (error) {
