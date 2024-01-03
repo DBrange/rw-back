@@ -143,15 +143,95 @@ export class UserService {
     }
   }
 
+  public async getBrokers(
+    id: string,
+    searchField: string,
+    typeToFilter: string,
+    page: number,
+    limit: number,
+  ) {
+    try {
+      const user = await this.userRepository
+        .createQueryBuilder('users')
+        .where({ id })
+        .leftJoinAndSelect('users.personalUser', 'personalUser')
+        .leftJoinAndSelect('users.legalUser', 'legalUsers')
+        .leftJoinAndSelect('users.broker', 'brokers')
+        .leftJoinAndSelect('users.userBroker', 'userBroker')
+        .leftJoinAndSelect('users.receivedNotifications', 'notifications')
+        .getOne();
+
+      if (!user) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+      if (user.role === 'CLIENT' && user.broker) {
+        const allBrokers = user.broker as unknown as UserBrokerEntity[];
+
+        const userBrokersPromises = allBrokers.map(async (brokerEntity) => {
+          const findUserBroker = await this.userRepository
+            .createQueryBuilder('users')
+            .where({ userBroker: brokerEntity.id })
+            .leftJoinAndSelect('users.legalUser', 'legalUser')
+            .leftJoinAndSelect('users.personalUser', 'personalUser')
+            .getOne();
+
+          return findUserBroker;
+        });
+
+        const brokers = await Promise.all(userBrokersPromises);
+
+              const regex = new RegExp(`^${searchField}`, 'i');
+              const filteredBrokers = (
+                brokers as unknown as UserEntity[]
+              ).filter((broker) => {
+                console.log(broker);
+                if (typeToFilter === 'user' && broker.personalUser?.dni) {
+                  return broker.personalUser?.dni
+                    .toLowerCase()
+                    .includes(searchField.toLowerCase());
+                } else if (
+                  typeToFilter === 'legalUser' &&
+                  broker.legalUser?.cuit
+                ) {
+                  return broker.legalUser.cuit
+                    .toLowerCase()
+                    .includes(searchField.toLowerCase());
+                }
+
+                return false;
+              });
+
+              const pageSize = limit;
+              const start = (page - 1) * pageSize;
+              const end = start + pageSize;
+
+              const paginatedBrokers = filteredBrokers.slice(start, end);
+
+              return paginatedBrokers;
+        // return { brokerUser: borkers };
+      }
+
+      return user;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+
+
+
+
+
   public async updateOnlyBroker(id: string, body: UpdateUserDTO) {
     try {
-
       await this.userRepository
         .createQueryBuilder()
         .relation(UserEntity, 'broker')
         .of(id)
         .add(body.broker);
-
 
       return { msg: 'Ha sido actualizado con exito' };
     } catch (error) {

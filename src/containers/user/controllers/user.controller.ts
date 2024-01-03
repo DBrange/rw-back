@@ -30,6 +30,23 @@ export class UserController {
     return await this.userService.getUsers();
   }
 
+  @Get('brokers/:id')
+  public async getBrokers(
+    @Param('id') id: string,
+    @Query('searchField') searchField?: string,
+    @Query('typeToFilter') typeToFilter?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return await this.userService.getBrokers(
+      id,
+      searchField,
+      typeToFilter,
+      page,
+      limit,
+    );
+  }
+
   @Get('admin')
   public async getUsersForAdmin(
     @Query('searchField') searchField?: string,
