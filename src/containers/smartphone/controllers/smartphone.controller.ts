@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { SmartphoneDTO, UpdateSmartphoneDTO } from '../dto/smartphone.dto';
 import { SmartphoneService } from '../services/smartphone.service';
 
@@ -15,6 +24,11 @@ export class SmartphoneController {
   @Get('')
   public async getSmartphones() {
     return await this.smartphoneService.getSmartphones();
+  }
+
+  @Get('verify-imei')
+  public async verifyImei(@Query('imei') imei: string) {
+    return await this.smartphoneService.verifyImei(imei);
   }
 
   @Get(':smartphoneId')

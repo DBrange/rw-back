@@ -24,7 +24,8 @@ export class SmartphoneService {
 
   public async getSmartphones(): Promise<SmartphoneEntity[]> {
     try {
-      const smartphones: SmartphoneEntity[] = await this.smartphoneRepository.find();
+      const smartphones: SmartphoneEntity[] =
+        await this.smartphoneRepository.find();
 
       return smartphones;
     } catch (error) {
@@ -57,7 +58,10 @@ export class SmartphoneService {
     body: UpdateSmartphoneDTO,
   ): Promise<UpdateResult> {
     try {
-      const updatedSmartphone = await this.smartphoneRepository.update(id, body);
+      const updatedSmartphone = await this.smartphoneRepository.update(
+        id,
+        body,
+      );
       if (updatedSmartphone.affected === 0) {
         throw new ErrorManager({
           type: 'BAD_REQUEST',
@@ -73,7 +77,9 @@ export class SmartphoneService {
 
   public async deleteSmartphone(id: string): Promise<DeleteResult> {
     try {
-      const smartphone: DeleteResult = await this.smartphoneRepository.delete(id);
+      const smartphone: DeleteResult = await this.smartphoneRepository.delete(
+        id,
+      );
 
       if (!smartphone) {
         throw new ErrorManager({
@@ -85,6 +91,22 @@ export class SmartphoneService {
       return smartphone;
     } catch (err) {
       throw ErrorManager.createSignaturError(err.message);
+    }
+  }
+
+  public async verifyImei(imei: string) {
+    try {
+      const smartphone = await this.smartphoneRepository
+        .createQueryBuilder('smartphone')
+        .where({ imei })
+        .getOne();
+
+      if (smartphone) return true;
+      else return false;
+
+      return smartphone;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
     }
   }
 }
