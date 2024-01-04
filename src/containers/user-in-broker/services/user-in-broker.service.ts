@@ -37,6 +37,8 @@ export class UserInBrokerService {
         broker: [userBrokerId],
       });
 
+      const brokers = await this.userService.getUserForBrokers(clientId)
+
       // const userBroker = await this.userBrokerService.getUserBrokerById(
       //   userBrokerId,
       // );
@@ -50,7 +52,7 @@ export class UserInBrokerService {
       //   clients: [...filterRepeatedIdUserBroker, clientId],
       // });
 
-      return { message: 'A client has been added to the broker successfully' };
+      return brokers;
     } catch (err) {
       throw ErrorManager.createSignaturError(err.message);
     }

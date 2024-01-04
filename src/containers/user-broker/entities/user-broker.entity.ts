@@ -8,7 +8,7 @@ export class UserBrokerEntity extends BaseEntity implements IUserBroker {
   @Column()
   bussinesName: string;
 
-  @Column({ unique: true })
+  @Column()
   enrollment: string;
 
   @Column()

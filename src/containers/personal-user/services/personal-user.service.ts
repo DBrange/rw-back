@@ -4,6 +4,7 @@ import { PersonalUserDTO, UpdatePersonalUserDTO } from '../dto/personal-user.dto
 import { InjectRepository } from '@nestjs/typeorm/dist';
 import { ErrorManager } from 'src/utils/error.manager';
 import { Repository, UpdateResult, DeleteResult } from 'typeorm';
+import { AUTHORIZATION } from 'src/constants/roles';
 
 @Injectable()
 export class PersonalUserService {
@@ -89,6 +90,7 @@ export class PersonalUserService {
       const emailOrDni = await this.personalUserRepository
         .createQueryBuilder('personal_users')
         .where({ dni })
+        .andWhere({ authorization: AUTHORIZATION.AUTHORIZED })
         .getOne();
 
       if (emailOrDni) {

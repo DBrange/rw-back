@@ -7,6 +7,6 @@ export class LegalUserEntity extends BaseEntity implements ILegalUser {
   @Column()
   companyName: string;
 
-  @Column({ unique: true })
+  @Column()
   cuit: string;
 };

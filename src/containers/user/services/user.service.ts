@@ -13,7 +13,7 @@ import {
   DateData,
   QuantityData,
 } from '../interfaces/user.interface';
-import { ACCESS_LEVEL, ROLES } from 'src/constants/roles';
+import { ACCESS_LEVEL, AUTHORIZATION, ROLES } from 'src/constants/roles';
 import { differenceInWeeks, startOfWeek, differenceInMonths } from 'date-fns';
 @Injectable()
 export class UserService {
@@ -62,6 +62,7 @@ export class UserService {
       throw new ErrorManager.createSignaturError(error.message);
     }
   }
+
   public async getUserById(id: string) {
     try {
       const user = await this.userRepository
@@ -105,6 +106,7 @@ export class UserService {
       const user = await this.userRepository
         .createQueryBuilder('users')
         .where({ id })
+        .andWhere({ authorization: AUTHORIZATION.AUTHORIZED })
         .leftJoinAndSelect('users.personalUser', 'personalUser')
         .leftJoinAndSelect('users.legalUser', 'legalUsers')
         .leftJoinAndSelect('users.broker', 'brokers')
@@ -135,6 +137,49 @@ export class UserService {
         const borkers = await Promise.all(userBrokersPromises);
 
         return { ...user, brokerUser: borkers };
+      }
+
+      return user;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async getUserForBrokers(id: string) {
+    try {
+      const user = await this.userRepository
+        .createQueryBuilder('users')
+        .where({ id })
+        .leftJoinAndSelect('users.personalUser', 'personalUser')
+        .leftJoinAndSelect('users.legalUser', 'legalUsers')
+        .leftJoinAndSelect('users.broker', 'brokers')
+        .leftJoinAndSelect('users.userBroker', 'userBroker')
+        .leftJoinAndSelect('users.receivedNotifications', 'notifications')
+        .getOne();
+
+      if (!user) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+      if (user.role === 'CLIENT' && user.broker) {
+        const allBrokers = user.broker as unknown as UserBrokerEntity[];
+
+        const userBrokersPromises = allBrokers.map(async (brokerEntity) => {
+          const findUserBroker = await this.userRepository
+            .createQueryBuilder('users')
+            .where({ userBroker: brokerEntity.id })
+            .leftJoinAndSelect('users.legalUser', 'legalUser')
+            .leftJoinAndSelect('users.personalUser', 'personalUser')
+            .getOne();
+
+          return findUserBroker;
+        });
+
+        const borkers = await Promise.all(userBrokersPromises);
+
+        return borkers;
       }
 
       return user;
@@ -183,34 +228,31 @@ export class UserService {
 
         const brokers = await Promise.all(userBrokersPromises);
 
-              const regex = new RegExp(`^${searchField}`, 'i');
-              const filteredBrokers = (
-                brokers as unknown as UserEntity[]
-              ).filter((broker) => {
-                console.log(broker);
-                if (typeToFilter === 'user' && broker.personalUser?.dni) {
-                  return broker.personalUser?.dni
-                    .toLowerCase()
-                    .includes(searchField.toLowerCase());
-                } else if (
-                  typeToFilter === 'legalUser' &&
-                  broker.legalUser?.cuit
-                ) {
-                  return broker.legalUser.cuit
-                    .toLowerCase()
-                    .includes(searchField.toLowerCase());
-                }
+        const regex = new RegExp(`^${searchField}`, 'i');
+        const filteredBrokers = (brokers as unknown as UserEntity[]).filter(
+          (broker) => {
+            console.log(broker);
+            if (typeToFilter === 'user' && broker.personalUser?.dni) {
+              return broker.personalUser?.dni
+                .toLowerCase()
+                .includes(searchField.toLowerCase());
+            } else if (typeToFilter === 'legalUser' && broker.legalUser?.cuit) {
+              return broker.legalUser.cuit
+                .toLowerCase()
+                .includes(searchField.toLowerCase());
+            }
 
-                return false;
-              });
+            return false;
+          },
+        );
 
-              const pageSize = limit;
-              const start = (page - 1) * pageSize;
-              const end = start + pageSize;
+        const pageSize = limit;
+        const start = (page - 1) * pageSize;
+        const end = start + pageSize;
 
-              const paginatedBrokers = filteredBrokers.slice(start, end);
+        const paginatedBrokers = filteredBrokers.slice(start, end);
 
-              return paginatedBrokers;
+        return paginatedBrokers;
         // return { brokerUser: borkers };
       }
 
@@ -219,11 +261,6 @@ export class UserService {
       throw new ErrorManager.createSignaturError(error.message);
     }
   }
-
-
-
-
-
 
   public async updateOnlyBroker(id: string, body: UpdateUserDTO) {
     try {
@@ -287,6 +324,70 @@ export class UserService {
       const emailOrDni = await this.userRepository
         .createQueryBuilder('users')
         .where({ email })
+        .andWhere({ authorization: AUTHORIZATION.AUTHORIZED })
+        .getOne();
+
+      if (emailOrDni) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async verifyDni(dni: string | undefined) {
+    try {
+      const emailOrDni = await this.userRepository
+        .createQueryBuilder('users')
+        .leftJoinAndSelect('users.personalUser', 'personalUser')
+        .where('users.authorization = :auth', {
+          auth: AUTHORIZATION.AUTHORIZED,
+        })
+        .andWhere('personalUser.dni = :dni', { dni })
+        .getOne();
+
+      if (emailOrDni) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+  
+  public async verifyCuit(cuit: string | undefined) {
+    try {
+      const emailOrDni = await this.userRepository
+        .createQueryBuilder('users')
+        .leftJoinAndSelect('users.legalUser', 'legalUser')
+        .where('users.authorization = :auth', {
+          auth: AUTHORIZATION.AUTHORIZED,
+        })
+        .andWhere('legalUser.cuit = :cuit', { cuit })
+        .getOne();
+
+      if (emailOrDni) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async verifyEnrollment(enrollment: string | undefined) {
+    try {
+      const emailOrDni = await this.userRepository
+        .createQueryBuilder('users')
+        .leftJoinAndSelect('users.userBroker', 'userBroker')
+        .where('users.authorization = :auth', {
+          auth: AUTHORIZATION.AUTHORIZED,
+        })
+        .andWhere('userBroker.enrollment = :enrollment', { enrollment })
         .getOne();
 
       if (emailOrDni) {
@@ -462,6 +563,7 @@ export class UserService {
         .createQueryBuilder('users')
         .select(['users.email', 'users.id'])
         .where({ email: value })
+        .andWhere({ authorization: AUTHORIZATION.AUTHORIZED })
         .leftJoinAndSelect('users.userBroker', 'userBroker')
         .leftJoin('users.personalUser', 'personalUser')
         .addSelect('personalUser.name')
@@ -643,7 +745,21 @@ export class UserService {
     }
   }
 
-  //------------------------------
+  //- - - - - - - - - - - - - - - - - - - - -
+
+  public async findOneByEmail(email: string) {
+    const user = await this.userRepository.findOneBy({ email });
+
+    if (!user) {
+      throw new ErrorManager({
+        type: 'BAD_REQUEST',
+        message: 'No users found',
+      });
+    }
+
+    return user;
+  }
+  //- - - - - - - - - - - - - - - - - - - - -
 
   // Admin
 

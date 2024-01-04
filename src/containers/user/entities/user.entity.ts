@@ -24,7 +24,7 @@ export class UserEntity extends BaseEntity implements IUser {
   @Column()
   phoneNumber: string;
 
-  @Column({ unique: true })
+  @Column()
   email: string;
 
   @Column({ nullable: true })

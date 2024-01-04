@@ -21,7 +21,7 @@ export class VerifyEmailDniService {
   ) {
     try {
       if (enrollment) {
-        const verifyEnrollment = await this.userBrokerService.verifyEnrollment(
+        const verifyEnrollment = await this.userService.verifyEnrollment(
           enrollment,
         );
         if (verifyEnrollment) return true;
@@ -29,12 +29,12 @@ export class VerifyEmailDniService {
       let emaill: boolean;
       let dni: boolean;
       let cuit: boolean;
-console.log(dniOrCuit);
+
       if (email) emaill = await this.userService.verifyEmail(email);
 
-      if (dniOrCuit) dni = await this.personalUserService.verifyDni(dniOrCuit);
+      if (dniOrCuit) dni = await this.userService.verifyDni(dniOrCuit);
       
-      if (dniOrCuit) cuit = await this.legalUserService.verifyCuit(dniOrCuit);
+      if (dniOrCuit) cuit = await this.userService.verifyCuit(dniOrCuit);
 
       if (emaill || dni || cuit) {
         return true;

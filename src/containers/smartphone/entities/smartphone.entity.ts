@@ -5,7 +5,7 @@ import { Entity, Column, OneToOne } from "typeorm";
 
 @Entity({ name: 'smartphones' })
 export class SmartphoneEntity extends BaseEntity implements ISmartphone {
-  @Column()
+  @Column({ unique: true })
   imei: string;
 
   @Column()

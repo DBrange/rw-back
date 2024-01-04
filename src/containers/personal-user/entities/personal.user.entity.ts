@@ -19,6 +19,6 @@ export class PersonalUserEntity extends BaseEntity implements IPersonalUser {
   @Column({ type: 'enum', enum: GENDER })
   gender: GENDER;
 
-  @Column({ unique: true })
+  @Column()
   dni: string;
 }

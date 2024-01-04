@@ -56,6 +56,10 @@ import {
 } from '../dto/all-sinister.dto';
 import { SinisterDTO, UpdateSinisterDTO } from '../dto/sinister.dto';
 import { SinisterEntity } from '../entities/sinister.entity';
+import * as nodemailer from 'nodemailer';
+import { ConfigService } from '@nestjs/config';
+
+
 @Injectable()
 export class SinisterService {
   constructor(
@@ -174,6 +178,48 @@ export class SinisterService {
       }
 
       return sinister;
+    } catch (err) {
+      throw ErrorManager.createSignaturError(err.message);
+    }
+  }
+
+  public async sendPdfEmail(
+    pdfBuffer: any,
+    recipients: string[],
+  ): Promise<void> {
+    try {
+      // process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+      const configService = new ConfigService();
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: `${configService.get('EMAIL_USER')}`,
+          pass: `${configService.get('EMAIL_PASSWORD')}`,
+        },
+        tls: {
+          rejectUnauthorized: false,
+        },
+        requireTLS: true,
+      });
+
+      const mailOptions = {
+        from: `Aqui esta su denuncia <${configService.get('EMAIL_USER')}>`,
+        to: recipients.join(', '),
+        subject: 'PDF Denuncia',
+        text: 'Aqui esta la denuncia que solicito.',
+        attachments: [
+          {
+            filename: 'Denuncia.pdf',
+            content: pdfBuffer,
+          },
+        ],
+      };
+
+      await transporter.sendMail(mailOptions);
+
+      // delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
     } catch (err) {
       throw ErrorManager.createSignaturError(err.message);
     }
@@ -634,6 +680,12 @@ export class SinisterService {
             bodyThirdPartyVehicle,
           );
         }
+
+        //  const emails = crashDTO.friendlyStatement
+        //    ? [userDTO.email, ...thirdPartyVehicleEmails]
+        //    : [userDTO.email];
+
+        //  this.sendPdfEmail(generatePdf, [...emails]);
       }
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
@@ -1685,7 +1737,7 @@ export class SinisterService {
           }
 
           if (sinisterWeekIndex >= 0 && sinisterWeekIndex < 12) {
-            assetSinisterData[1].weeks[11 - sinisterWeekIndex] += 1; 
+            assetSinisterData[1].weeks[11 - sinisterWeekIndex] += 1;
           }
         });
       }

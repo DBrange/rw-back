@@ -39,7 +39,7 @@ export class AuthService {
   public async generateJWT(userId: string): Promise<AuthResponse> {
     try {
       const userToken = await this.userService.getUserByIdForProfile(userId);
-console.log('aaaaa')
+
       const date = new Date();
       const exp = Math.floor(date.getTime() / 1000) + 3600;
 
