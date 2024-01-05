@@ -4,11 +4,13 @@ import { ConfigService } from '@nestjs/config/dist';
 import * as morgan from 'morgan';
 import { CORS } from './constants/cors';
 import {ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
-
+  
+ app.use(cookieParser());
   app.use(morgan('dev'))
   app.enableCors(CORS);
   app.useGlobalPipes(

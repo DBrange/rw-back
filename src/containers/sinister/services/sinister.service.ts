@@ -1495,7 +1495,7 @@ export class SinisterService {
 
         return sinister;
       });
-      // console.log(assetsForSinisters);
+    
       const sinisters = (await Promise.all(sinisterPromises))?.flatMap(
         (sinister) => (!sinister ? [] : sinister),
       );
@@ -1576,7 +1576,7 @@ export class SinisterService {
   ) {
     try {
       const sinisterss = await this.geSinisterOfUsers();
-      // console.log(sinisterss);
+      
       const sinisterPromises = sinisterss.map(async (sin) => {
         const sinister = await this.sinisterForArrayPromisesBySinisterId(
           sin?.id,

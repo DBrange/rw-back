@@ -231,7 +231,6 @@ export class UserService {
         const regex = new RegExp(`^${searchField}`, 'i');
         const filteredBrokers = (brokers as unknown as UserEntity[]).filter(
           (broker) => {
-            console.log(broker);
             if (typeToFilter === 'user' && broker.personalUser?.dni) {
               return broker.personalUser?.dni
                 .toLowerCase()
@@ -760,6 +759,29 @@ export class UserService {
     return user;
   }
   //- - - - - - - - - - - - - - - - - - - - -
+  // Google authentication
+
+  public async findByGoogleEmail(email: string) {
+     try {
+       const user = await this.userRepository
+         .createQueryBuilder('users')
+         .where({ email })
+         .andWhere({ authorization: AUTHORIZATION.AUTHORIZED })
+         .getOne();
+
+    if(!user) return undefined
+    
+       return user;
+     } catch (error) {
+       throw ErrorManager.createSignaturError(error.message);
+     }
+  }
+
+
+
+
+
+  //- - - - - - - - - - - - - - - - - - - - -
 
   // Admin
 
@@ -802,7 +824,6 @@ export class UserService {
           if (typeToFilter === 'user' && user.personalUser?.dni) {
             return regex.test(user.personalUser?.dni);
           } else if (typeToFilter === 'legalUser' && user.legalUser?.cuit) {
-            console.log('hola?');
             return regex.test(user.legalUser.cuit);
           } else if (typeToFilter === '') {
             return (

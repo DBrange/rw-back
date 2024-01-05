@@ -33,6 +33,7 @@ import { UserModule } from './containers/user/user.module';
 import { VehicleGncModule } from './containers/vehicle-gnc/vehicle-gnc.module';
 import { VehicleModule } from './containers/vehicle/vehicle.module';
 import { VerifyEmailDniModule } from './containers/verify-email-dni/verify-email-dni.module';
+// import { CookieParserModule } from 'nestjs-cookie-parser';
 
 @Module({
   imports: [

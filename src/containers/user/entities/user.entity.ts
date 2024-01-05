@@ -67,7 +67,7 @@ export class UserEntity extends BaseEntity implements IUser {
 
   @ManyToMany(() => UserBrokerEntity, (broker) => broker.clients)
   @JoinTable()
-  broker: string[] 
+  broker: string[];
 
   @OneToOne(() => UserBrokerEntity)
   @JoinColumn()

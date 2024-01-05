@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { UserEntity } from 'src/containers/user/entities/user.entity';
@@ -9,6 +9,7 @@ import {
   PayloadToken,
   SingJWT,
 } from '../interfaces/auth.interface';
+import { Profile } from 'passport-google-oauth20';
 
 @Injectable()
 export class AuthService {
@@ -16,16 +17,23 @@ export class AuthService {
   public async validateUser(
     email: string,
     password: string,
-  ): Promise<UserEntity | null> {
+  ): Promise<AuthResponse | null> {
     try {
       const userByEmail = await this.userService.findBy({
         key: 'email',
         value: email,
       });
- 
+
       if (userByEmail) {
         const match = await bcrypt.compare(password, userByEmail.password);
-        if (match) return userByEmail;
+        if (match) {
+          const user = userByEmail;
+          const jwt = await this.generateJWT(user.id);
+
+          return jwt;
+        } else {
+          throw new UnauthorizedException('Data not valid');
+        }
       }
     } catch (error) {
       throw new ErrorManager.createSignaturError(error.message);
@@ -61,7 +69,8 @@ export class AuthService {
       throw new ErrorManager.createSignaturError(error.message);
     }
   }
-  public async generateRefreshJWT(userId: string){
+
+  public async generateRefreshJWT(userId: string) {
     try {
       const userToken = await this.userService.getUserByIdForProfile(userId);
 
@@ -84,5 +93,38 @@ export class AuthService {
     } catch (error) {
       throw new ErrorManager.createSignaturError(error.message);
     }
+  }
+
+  public async findUserGoogle(profile: Profile) {
+    try {
+      const findUser = await this.userService.findByGoogleEmail(
+        profile.emails[0].value,
+      );
+
+      if (findUser) {
+        const user = this.generateJWT(findUser.id);
+
+        return user;
+      } else return undefined;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async getGoogleLoginData(userId: string) {
+    try {
+      const user = await this.generateJWT(userId);
+
+      return user;
+    } catch (error) {
+      throw new ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public googleLogin(req) {
+    if (!req.user) {
+      return 'no user google';
+    }
+    return { message: 'User into from google', user: req.user };
   }
 }
