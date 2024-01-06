@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserService } from 'src/containers/user/services/user.service';
-import { MercadoPagoConfig, Payment } from 'mercadopago';
+import { MercadoPagoConfig, Payment, Preference } from 'mercadopago';
+import { PaymentCreateData } from 'mercadopago/dist/clients/payment/create/types';
 
 @Injectable()
 export class SubscriptionService {
@@ -8,25 +9,40 @@ export class SubscriptionService {
   public async createSubscripion() {
     const client = new MercadoPagoConfig({
       accessToken:
-        'TEST-199737975287477-122118-30b2d73208df35537da4cbe95621dd47-310415608',
+        'TEST-6289767696248900-122118-259029387c52b6a7c15c019c19e8c45c-1603753997',
       options: { timeout: 5000, idempotencyKey: 'abc' },
     });
 
-    const payment = new Payment(client);
+    // const body: PaymentCreateData = {
 
-    const body = {
-      transaction_amount: 12.34,
-      description: 'que se yoo',
-      payment_method_id: 'debit_card',
-      payer: {
-        email: 'asesincreedaltairr@hotmail.com',
-      },
-      
-    };
-    const result = await payment.create({ body });
 
-    console.log(result);
+    // };
 
-    return result;
+    // const preference = new Preference(client);
+    // const result = await preference.create({body})
+    // const payment = new Payment(client);
+    // const result = await payment.create({ body });
+    // const client = new MercadoPagoConfig({
+    //   accessToken:
+    //     'TEST-199737975287477-122118-30b2d73208df35537da4cbe95621dd47-310415608',
+    //   options: { timeout: 5000, idempotencyKey: 'abc' },
+    // });
+
+    // const payment = new Payment(client);
+
+    // const body = {
+    //   transaction_amount: 12.34,
+    //   description: 'que se yoo',
+    //   payment_method_id: 'debit_card',
+    //   payer: {
+    //     email: 'asesincreedaltairr@hotmail.com',
+    //   },
+
+    // };
+    // const result = await payment.create({ body });
+
+    // console.log(result);
+
+    // return result;
   }
 }
