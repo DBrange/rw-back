@@ -58,7 +58,7 @@ export class VehicleEntity extends BaseEntity implements IVehicle {
   @Column()
   noSpareTire: boolean;
 
-  @OneToOne(() => GncEntity)
+  @OneToOne(() => GncEntity, (gnc) => gnc.vehicle)
   @JoinColumn()
   gncId: string;
 

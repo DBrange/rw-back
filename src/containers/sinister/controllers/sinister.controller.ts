@@ -193,7 +193,7 @@ export class SinisterController {
     return result;
   }
 
-  @Post('fire-inspection/:brokerId/:clientId/:assetId')
+  @Post('crash-inspection/:brokerId/:clientId/:assetId')
   public async createSinisterCrashInInspection(
     @Param('brokerId') brokerId: string,
     @Param('clientId') clientId: string,
@@ -278,25 +278,26 @@ export class SinisterController {
     );
   }
 
-  @Post('element/:elementId')
-  public async createSinisterInElement(
-    @Param('elementId') elementId: string,
-    @Body() requestData: SinisterElement,
-  ) {
-    const result = await this.sinisterService.createSinisterInElement(
-      elementId,
-      requestData.theftDTO,
-      requestData.theftTireDTO,
-      requestData.fireDTO,
-      requestData.crashDTO,
-      requestData.injuredDTO,
-      requestData.thirdPartyVehicleDTO,
-      requestData.damageDTO,
-      requestData.swornDeclaration,
-    );
+  // @Post('element/:elementId')
+  // public async createSinisterInElement(
+  //   @Param('elementId') elementId: string,
+  //   @Body() requestData: SinisterElement,
+  // ) {
+  //   const result = await this.sinisterService.createSinisterInElement(
+  //     elementId,
+  //     requestData.theftDTO,
+  //     requestData.theftTireDTO,
+  //     requestData.fireDTO,
+  //     requestData.crashDTO,
+  //     requestData.injuredDTO,
+  //     requestData.thirdPartyVehicleDTO,
+  //     requestData.damageDTO,
+  //     requestData.swornDeclaration,
+  //   );
 
-    return result;
-  }
+  //   return result;
+  // }
+
   @Get('dashboard/:brokerId/:userBrokerId')
   public async getBrokerDashboard(
     @Param('brokerId') brokerId: string,

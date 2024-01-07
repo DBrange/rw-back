@@ -1171,12 +1171,32 @@ export class UserService {
       });
     }
 
-user.broker = (user.broker as unknown as UserBrokerEntity[]).filter(
-  (b) => b.id !== userBrokerId,
-) as unknown as string[]
+    user.broker = (user.broker as unknown as UserBrokerEntity[]).filter(
+      (b) => b.id !== userBrokerId,
+    ) as unknown as string[];
 
-await this.userRepository.save(user);
+    await this.updateUser(user.id, user);
 
-    return {msg: 'El broker ha sido removido con exito'}
+    return { msg: 'El broker ha sido removido con exito' };
   }
+
+  public async userForSinisterPdf(userId) {
+    const user = this.userRepository
+      .createQueryBuilder('users')
+      .where({ id: userId })
+      .leftJoinAndSelect('users.legalUser', 'legalUser')
+      .leftJoinAndSelect('users.personalUser', 'personalUser')
+      .getOne();
+    
+      if (!user) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+    
+    return user
+  }
+  
+
 }

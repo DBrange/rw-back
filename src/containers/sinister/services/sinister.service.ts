@@ -58,7 +58,12 @@ import { SinisterDTO, UpdateSinisterDTO } from '../dto/sinister.dto';
 import { SinisterEntity } from '../entities/sinister.entity';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
-
+import { UserDTO } from '../../user/dto/user.dto';
+import { LegalUserDTO } from '../../legal-user/dto/legal-user.dto';
+import { PersonalUserDTO } from '../../personal-user/dto/personal-user.dto';
+import { PDF } from '../interfaces/pdf.interface';
+import * as puppeteer from 'puppeteer';
+import { GncEntity } from 'src/containers/gnc/entities/gnc.entity';
 
 @Injectable()
 export class SinisterService {
@@ -85,6 +90,462 @@ export class SinisterService {
     private readonly userBrokerService: UserBrokerService,
     private readonly notificationService: NotificationService,
   ) {}
+
+  public async generarPDF({
+    newSinister,
+    userDTO,
+    personalUserDTO,
+    legalUserDTO,
+    vehicleDTO,
+    gncDTO,
+    crashDTO,
+    injuredDTO,
+    thirdPartyVehicleDTO,
+  }: Partial<PDF>): Promise<Buffer> {
+    try {
+      const browser = await puppeteer.launch();
+      const page = await browser.newPage();
+
+      let pdfContent = '';
+
+      if (userDTO) {
+        pdfContent += `
+      <section style='font-family: sans-serif; margin: 0 20px; height: 100vh;'>
+        <header style='border-bottom: 1px solid #000; margin-bottom: 20px; width: 100%; color: #8B5CF6;'>
+          <div style='width: 100%; display: flex; justify-content: flex-end;'>
+            <h2 style='margin-left: auto; padding-right: 20px;' >ReclamoWeb</h2>
+          </div>
+        </header>
+        <div>
+          <h2 style='padding: 20px 0; color: #8B5CF6;'>Persona</h2>
+          ${
+            personalUserDTO
+              ? `          
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Nombre: <span style='font-weight: 200;'>${personalUserDTO.name}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Apellido: <span style='font-weight: 200;'>${personalUserDTO.lastName}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>DNI: <span style='font-weight: 200;'>${personalUserDTO.dni}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Fecha de nacimiento: <span style='font-weight: 200;'>${personalUserDTO.birthDate}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Genero: <span style='font-weight: 200;'>${personalUserDTO.gender}</span></h4>`
+              : ''
+          }
+          ${
+            legalUserDTO
+              ? `
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Nombre de la compañia: <span style='font-weight: 200;'>${legalUserDTO.companyName}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>CUIT: <span style='font-weight: 200;'>${legalUserDTO.cuit}</span></h4>`
+              : ''
+          }
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Numero telefonico: <span style='font-weight: 200;'>${
+            userDTO.phoneNumber
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Email: <span style='font-weight: 200;'>${
+            userDTO.email
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Email alternativo: <span style='font-weight: 200;'>${
+            userDTO.altEmail
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Direccion: <span style='font-weight: 200;'>${
+            userDTO.address
+          }</span></h4>
+        </div>
+        <div style="page-break-after: always;"></div>
+        </section>
+        `;
+      }
+
+      if (vehicleDTO) {
+        pdfContent += `
+        <section style='font-family: sans-serif; margin: 0 20px; height: 100vh;'>
+        <header style='border-bottom: 1px solid #000; margin-bottom: 20px; width: 100%; color: #8B5CF6;'>
+          <div style='width: 100%; display: flex; justify-content: flex-end;'>
+            <h2 style='margin-left: auto; padding-right: 20px;' >ReclamoWeb</h2>
+          </div>
+        </header>
+        <div>
+          <h2 style='padding: 20px 0; color: #8B5CF6;'>Vehiculo</h2>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Vehiculo tipo: <span style='font-weight: 200;'>${
+            vehicleDTO.type
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Patente: <span style='font-weight: 200;'>${
+            vehicleDTO.plate
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Año: <span style='font-weight: 200;'>${
+            vehicleDTO.year
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Marca: <span style='font-weight: 200;'>${
+            vehicleDTO.brand
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Modelo: <span style='font-weight: 200;'>${
+            vehicleDTO.model
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Color: <span style='font-weight: 200;'>${
+            vehicleDTO.color
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Daño: <span style='font-weight: 200;'>${
+            vehicleDTO.damage ? 'Si' : 'No'
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Lugar dañado: <span style='font-weight: 200;'>${
+            vehicleDTO.damageLocation
+          }</span></h4>
+          <div style="display: flex; flex-direction: column">
+            <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Fotos del vehiculo:</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 5px">
+              ${(vehicleDTO.images as unknown as string[]).map(
+                (el: string) =>
+                  `
+                <img src="${el}" style="max-width: 30%; max-height: 300px; object-fit: contain;"/>
+                `,
+              )}
+            </div>
+          </div>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Es 0km: <span style='font-weight: 200;'>${
+            vehicleDTO.okm ? 'Si' : 'No'
+          }</span></h4>
+                  <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Es GNC: <span style='font-weight: 200;'>${
+                    vehicleDTO.gnc ? 'Si' : 'No'
+                  }</span></h4>
+                  ${
+                    gncDTO
+                      ? `
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Numero de oblea: <span style='font-weight: 200;'>${gncDTO.oblea}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Patente: <span style='font-weight: 200;'>${gncDTO.plate}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Fecha de expiracion: <span style='font-weight: 200;'>${gncDTO.expireDate}</span></h4>
+          `
+                      : ''
+                  }
+          ${
+            vehicleDTO && crashDTO
+              ? ''
+              : `
+        <h4 style='padding: 20px 0 10px 0; text-decoration: underline;'>Neumaticos:</h4>
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Marca: <span style='font-weight: 200;'>${vehicleDTO.tireBrand}</span></h4>
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Tamaño: <span style='font-weight: 200;'>${vehicleDTO.tireSize}</span></h4>
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Desgaste: <span style='font-weight: 200;'>${vehicleDTO.tireWear}</span></h4>
+        `
+          }
+        <div style="page-break-after: always;"></div>
+        </section>
+        </div>
+        `;
+      }
+
+      if (crashDTO) {
+        pdfContent += `
+        <section style='font-family: sans-serif; margin: 0 20px; min-height: 100vh;'>
+        <header style='border-bottom: 1px solid #000; margin-bottom: 20px; width: 100%; color: #8B5CF6;'>
+          <div style='width: 100%; display: flex; justify-content: flex-end;'>
+            <h2 style='margin-left: auto; padding-right: 20px;' >ReclamoWeb</h2>
+          </div>
+        </header>
+        <div>
+          <h2 style='padding: 20px 0; color: #8B5CF6;'>Denuncia: Choque</h2>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Horario del suceso: <span style='font-weight: 200;'>${
+            crashDTO.time
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Fecha del suceso: <span style='font-weight: 200;'>${
+            crashDTO.date
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Ubicacion del suceso: <span style='font-weight: 200;'>${
+            crashDTO.location
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Detalles del suceso: <span style='font-weight: 200;'>${
+            crashDTO.details
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Lesiones: <span style='font-weight: 200;'>${
+            crashDTO.injured ? 'Si' : 'No'
+          }</span></h4>
+          ${
+            crashDTO.injured
+              ? `
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Tipo de lesiones: <span style='font-weight: 200;'>${crashDTO.injuries}}</span></h4>    `
+              : ''
+          }
+        <h4>Ambulancia: ${crashDTO.ambulance ? 'Si' : 'No'}</h4>
+        ${
+          crashDTO.ambulance
+            ? `
+            <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Destino de la ambulancia: <span style='font-weight: 200;'>${crashDTO.ambulanceTo}</span></h4>  `
+            : ''
+        }
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Terceros lesionados: <span style='font-weight: 200;'>${
+          crashDTO.thirdInjured ? 'Si' : 'No'
+        }</span></h4>
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Declaracion amistosa: <span style='font-weight: bold; color: #8B5CF6;'>${
+          crashDTO.friendlyStatement ? 'Si' : 'No'
+        }</span></h4>
+        </div>
+        <div style="page-break-after: always;"></div>
+        </section>
+        `;
+      }
+
+      if (injuredDTO) {
+        const algo = injuredDTO.injuredInfo.map(
+          (el: InjuredInfoDTO, i: number) => {
+            const text = [];
+            !(i === 0)
+              ? text.push(`
+       <section style='font-family: sans-serif; margin: 0 20px; min-height: 100vh;'>
+        <header style='border-bottom: 1px solid #000; margin-bottom: 20px; width: 100%; color: #8B5CF6; height: 6vh;'>
+          <div style='width: 100%; display: flex; justify-content: flex-end;'>
+            <h2 style='margin-left: auto; padding-right: 20px;' >ReclamoWeb</h2>
+          </div>
+        </header>
+        <div style='height: 90vh;'>
+          <h2 style='color: #8B5CF6;'>Lesionado N° ${i + 1}</h2>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Nombre: <span style='font-weight: 200;'>${
+            el.name
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Apellido: <span style='font-weight: 200;'>${
+            el.lastName
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Fecha de nacimiento: <span style='font-weight: 200;'>${
+            el.birthDate
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>DNI: <span style='font-weight: 200;'>${
+            el.dni
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Email: <span style='font-weight: 200;'>${
+            el.email
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Genero: <span style='font-weight: 200;'>${
+            el.gender
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Numero telefonico: <span style='font-weight: 200;'>${
+            el.phoneNumber
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Tipo de lesiones: <span style='font-weight: 200;'>${
+            el.injuries
+          }</span></h4>
+          </div>
+          </section>
+          `)
+              : text.push(`
+              <div style='min-height: 88vh'>
+              <h2 style='padding: 20px 0; color: #8B5CF6;'>Lesionado N° ${
+                i + 1
+              }</h2>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Nombre: <span style='font-weight: 200;'>${
+            el.name
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Apellido: <span style='font-weight: 200;'>${
+            el.lastName
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Fecha de nacimiento: <span style='font-weight: 200;'>${
+            el.birthDate
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>DNI: <span style='font-weight: 200;'>${
+            el.dni
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Email: <span style='font-weight: 200;'>${
+            el.email
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Genero: <span style='font-weight: 200;'>${
+            el.gender
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Numero telefonico: <span style='font-weight: 200;'>${
+            el.phoneNumber
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Tipo de lesiones: <span style='font-weight: 200;'>${
+            el.injuries
+          }</span></h4> 
+          </div>`);
+            return text.join(',');
+          },
+        );
+        pdfContent += `
+        <section style='font-family: sans-serif; margin: 0 20px; min-height: 100vh;'>
+        <header style='border-bottom: 1px solid #000; margin-bottom: 20px; width: 100%; color: #8B5CF6; height: 6vh;'>
+          <div style='width: 100%; display: flex; justify-content: flex-end;'>
+            <h2 style='margin-left: auto; padding-right: 20px;' >ReclamoWeb</h2>
+          </div>
+        </header>
+        <div>
+          <h2 style='color: #8B5CF6; height: 2vh'>Terceros lesionados</h2>
+           ${algo.join('')}
+        </div>
+        </section>
+ 
+        `;
+      }
+
+      if (thirdPartyVehicleDTO) {
+        const algo2 = thirdPartyVehicleDTO.thirdPartyVehicleInfo.map(
+          (el: ThirdPartyVehicleDTO & ThirdPartyDriverDTO, i: number) => {
+            const text = [];
+            !(i === 0)
+              ? text.push(`
+        <section style='font-family: sans-serif; margin: 0 20px; min-height: 100vh;'>
+        <header style='border-bottom: 1px solid #000; margin-bottom: 20px; width: 100%; color: #8B5CF6; height: 6vh;'>
+          <div style='width: 100%; display: flex; justify-content: flex-end;'>
+            <h2 style='margin-left: auto; padding-right: 20px;' >ReclamoWeb</h2>
+          </div>
+        </header>
+        <div style='height: 85vh;'>
+          <h2 style='color: #8B5CF6;'>Vehiculo N° ${i + 1}</h2>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Nombre: <span style='font-weight: 200;'>${
+            el.name
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Año: <span style='font-weight: 200;'>${
+            el.year
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Patente: <span style='font-weight: 200;'>${
+            el.plate
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Marca: <span style='font-weight: 200;'>${
+            el.brand
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Modelo: <span style='font-weight: 200;'>${
+            el.model
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Compañia de seguros: <span style='font-weight: 200;'>${
+            el.insuranceCompany
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Poliza de seguros: <span style='font-weight: 200;'>${
+            el.insurancePolicy
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Nombre del propietario: <span style='font-weight: 200;'>${
+            el.ownerName
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Apellido del propietario: <span style='font-weight: 200;'>${
+            el.ownerLastName
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>DNI del propietario: <span style='font-weight: 200;'>${
+            el.ownerDni
+          }</span></h4>
+          <div style="display: flex; flex-direction: column">
+            <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Fotos de la denuncia:</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 5px">
+              ${(el.licensePhoto as unknown as string[]).map(
+                (el: string) =>
+                  `
+                <img src="${el}" style="max-width: 30%; max-height: 300px; object-fit: contain;"/>
+                `,
+              )}
+            </div>
+          </div>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Email del conductor: <span style='font-weight: 200;'>${
+            el.email
+          }</span></h4>  
+          ${
+            el.name || el.lastName || el.dni
+              ? `
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Nombre del conductor: <span style='font-weight: 200;'>${el.name}</span></h4> 
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Apellido del conductor: <span style='font-weight: 200;'>${el.lastName}</span></h4> 
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>DNI del conductor: <span style='font-weight: 200;'>${el.dni}</span></h4> 
+          `
+              : ''
+          } 
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Residencia del conductor: <span style='font-weight: 200;'>${
+          el.address
+        }</span></h4> 
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Telefono del conductor: <span style='font-weight: 200;'>${
+          el.phoneNumber
+        }</span></h4> 
+        </div>
+        </section>
+        `)
+              : text.push(`
+          <div style='height: 88vh;'>
+          <h2 style='padding-bottom: 20px 0; color: #8B5CF6;'>Vehiculo N° ${
+            i + 1
+          }</h2>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Nombre: <span style='font-weight: 200;'>${
+            el.name
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Año: <span style='font-weight: 200;'>${
+            el.year
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Patente: <span style='font-weight: 200;'>${
+            el.plate
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Marca: <span style='font-weight: 200;'>${
+            el.brand
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Modelo: <span style='font-weight: 200;'>${
+            el.model
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Compañia de seguros: <span style='font-weight: 200;'>${
+            el.insuranceCompany
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Poliza de seguros: <span style='font-weight: 200;'>${
+            el.insurancePolicy
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Nombre del propietario: <span style='font-weight: 200;'>${
+            el.ownerName
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Apellido del propietario: <span style='font-weight: 200;'>${
+            el.ownerLastName
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>DNI del propietario: <span style='font-weight: 200;'>${
+            el.ownerDni
+          }</span></h4>
+          <div style="display: flex; flex-direction: column">
+            <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Fotos de la denuncia:</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 5px">
+              ${(el.licensePhoto as unknown as string[]).map(
+                (el: string) =>
+                  `
+                <img src="${el}" style="max-width: 30%; max-height: 300px; object-fit: contain;"/>
+                `,
+              )}
+            </div>
+          </div>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Email del conductor: <span style='font-weight: 200;'>${
+            el.email
+          }</span></h4>  
+          ${
+            el.name || el.lastName || el.dni
+              ? `
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Nombre del conductor: <span style='font-weight: 200;'>${el.name}</span></h4> 
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Apellido del conductor: <span style='font-weight: 200;'>${el.lastName}</span></h4> 
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>DNI del conductor: <span style='font-weight: 200;'>${el.dni}</span></h4> 
+          `
+              : ''
+          } 
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Residencia del conductor: <span style='font-weight: 200;'>${
+          el.address
+        }</span></h4> 
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Telefono del conductor: <span style='font-weight: 200;'>${
+          el.phoneNumber
+        }</span></h4> 
+        </div>
+        `);
+
+            return text.join(',');
+          },
+        );
+        pdfContent += `
+        <section style='font-family: sans-serif; margin: 0 20px; min-height: 100vh;'>
+        <header style='border-bottom: 1px solid #000; margin-bottom: 20px; width: 100%; color: #8B5CF6; height: 6vh;'>
+          <div style='width: 100%; display: flex; justify-content: flex-end;'>
+            <h2 style='margin-left: auto; padding-right: 20px;' >ReclamoWeb</h2>
+          </div>
+        </header>
+        <div>
+          <h2 style='color: #8B5CF6; height: 2vh'>Vehiculo de terceros</h2>
+           ${algo2.join('')}
+
+        </div>
+        </section>
+        `;
+      }
+
+      await page.setContent(pdfContent);
+      const pdfBuffer = await page.pdf({ format: 'A4' });
+
+      await browser.close();
+      if (!pdfBuffer) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Error generatin PDF',
+        });
+      }
+      return pdfBuffer;
+    } catch (err) {
+      throw ErrorManager.createSignaturError(err.message);
+    }
+  }
 
   public async createSinister(body: SinisterDTO) {
     try {
@@ -215,6 +676,44 @@ export class SinisterService {
             content: pdfBuffer,
           },
         ],
+      };
+
+      await transporter.sendMail(mailOptions);
+
+      // delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+    } catch (err) {
+      throw ErrorManager.createSignaturError(err.message);
+    }
+  }
+
+  public async sendEmail(
+    user: { name: string; lastName: string; companyName: string },
+    recipients: string[],
+  ): Promise<void> {
+    try {
+      // process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+      const configService = new ConfigService();
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: `${configService.get('EMAIL_USER')}`,
+          pass: `${configService.get('EMAIL_PASSWORD')}`,
+        },
+        tls: {
+          rejectUnauthorized: false,
+        },
+        requireTLS: true,
+      });
+
+      const mailOptions = {
+        from: `Aqui esta su denuncia <${configService.get('EMAIL_USER')}>`,
+        to: recipients.join(', '),
+        subject: 'PDF Denuncia',
+        text: `Tiene una nueva de denuncia creada por ${
+          user.companyName ? user.companyName : user.name + ' ' + user.lastName
+        }.`,
       };
 
       await transporter.sendMail(mailOptions);
@@ -631,8 +1130,16 @@ export class SinisterService {
   // Crash
 
   private async createThirdPartyInSinister(
-    thirdPartyVehicleDTO: ThirdPartyVehicleData,
+    brokerEmail: string,
     newSinister: SinisterEntity,
+    userDTO: UserDTO,
+    personalUserDTO: PersonalUserDTO,
+    legalUserDTO: LegalUserDTO,
+    vehicleDTO: VehicleDTO,
+    gncDTO: GncDTO | GncEntity,
+    crashDTO: CrashDTO,
+    injuredDTO: InjuredData,
+    thirdPartyVehicleDTO: ThirdPartyVehicleData,
   ) {
     try {
       const thirdPartyVehicleEmails: string[] = [];
@@ -680,22 +1187,56 @@ export class SinisterService {
             bodyThirdPartyVehicle,
           );
         }
-
-        //  const emails = crashDTO.friendlyStatement
-        //    ? [userDTO.email, ...thirdPartyVehicleEmails]
-        //    : [userDTO.email];
-
-        //  this.sendPdfEmail(generatePdf, [...emails]);
       }
+      //Generate PDF and send Email
+      const generatePdf = await this.generarPDF({
+        newSinister,
+        userDTO,
+        personalUserDTO,
+        legalUserDTO,
+        vehicleDTO,
+        gncDTO,
+        crashDTO,
+        injuredDTO,
+        thirdPartyVehicleDTO,
+      });
+
+      const emails = crashDTO.friendlyStatement
+        ? [...thirdPartyVehicleEmails]
+        : [];
+
+      if (crashDTO.friendlyStatement) {
+        this.sendPdfEmail(generatePdf, [...emails]);
+      }
+
+      const emailFor = personalUserDTO
+        ? {
+            name: personalUserDTO.name,
+            lastName: personalUserDTO.lastName,
+            companyName: null,
+          }
+        : {
+            name: null,
+            lastName: null,
+            companyName: legalUserDTO.companyName,
+          };
+
+      this.sendEmail(emailFor, [brokerEmail]);
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
     }
   }
 
   private async createCrashInSinister(
+    brokerEmail: string,
     asset: AssetEntity,
     crashDTO: CrashDTO,
     injuredDTO: InjuredData,
+    userDTO: UserDTO,
+    personalUserDTO: PersonalUserDTO,
+    legalUserDTO: LegalUserDTO,
+    vehicleDTO: VehicleDTO,
+    gncDTO: GncDTO | GncEntity,
     thirdPartyVehicleDTO: ThirdPartyVehicleData,
   ) {
     try {
@@ -733,7 +1274,18 @@ export class SinisterService {
         );
       }
 
-      await this.createThirdPartyInSinister(thirdPartyVehicleDTO, newSinister);
+      await this.createThirdPartyInSinister(
+        brokerEmail,
+        newSinister,
+        userDTO,
+        personalUserDTO,
+        legalUserDTO,
+        vehicleDTO,
+        gncDTO,
+        crashDTO,
+        injuredDTO,
+        thirdPartyVehicleDTO,
+      );
 
       return newSinister;
     } catch (error) {
@@ -770,10 +1322,24 @@ export class SinisterService {
           false,
         );
 
+      const { legalUser, personalUser, ...rest } =
+        await this.userService.userForSinisterPdf(clientId);
+
+      const userDTO = { ...rest };
+
+      const brokerEmail = (await this.userService.userForSinisterPdf(brokerId))
+        .email;
+
       await this.createCrashInSinister(
+        brokerEmail,
         newAsset,
         crashDTO,
         injuredDTO,
+        userDTO,
+        personalUser,
+        legalUser,
+        vehicleDTO,
+        gncDTO,
         thirdPartyVehicleDTO,
       );
 
@@ -811,15 +1377,46 @@ export class SinisterService {
         (asset) => asset.id === assetId,
       );
 
-      await this.createCrashInSinister(
-        asset,
-        crashDTO,
-        injuredDTO,
-        thirdPartyVehicleDTO,
-      );
+      const { legalUser, personalUser, ...rest } =
+        await this.userService.userForSinisterPdf(clientId);
+
+      const userDTO = { ...rest };
 
       const vehicleEntity = (await this.assetService.getAssetById(asset.id))
         .vehicle as unknown as VehicleEntity;
+      // console.log(vehicleEntity);
+      const vehicleDTO = await this.vehicleService.vehicleForPdf(
+        vehicleEntity.id,
+      );
+
+      console.log(vehicleDTO.gncId);
+      let gncDTO: GncEntity | undefined;
+      if (vehicleDTO.gncId) {
+        
+        gncDTO = await this.gncService.getGncById(
+          (vehicleDTO.gncId as unknown as GncEntity)?.id,
+          );
+        }
+
+const brokerEmail = (await this.userService.userForSinisterPdf(brokerId))
+.email;
+
+await this.createCrashInSinister(
+  brokerEmail,
+  asset,
+  crashDTO,
+  injuredDTO,
+  userDTO,
+  personalUser,
+  legalUser,
+  vehicleDTO,
+  gncDTO,
+  thirdPartyVehicleDTO,
+  );
+  
+  console.log('3')
+      // const vehicleEntity = (await this.assetService.getAssetById(asset.id))
+      //   .vehicle as unknown as VehicleEntity;
 
       await this.vehicleSinisterNotification(
         vehicleEntity,
@@ -1107,6 +1704,7 @@ export class SinisterService {
 
     return sinister;
   }
+
   private async sinisterForArrayPromisesBySinisterId(sinisterId: string) {
     const sinister = await this.sinisterRepository
       .createQueryBuilder('sinisters')
@@ -1228,111 +1826,112 @@ export class SinisterService {
     }
   }
 
-  // public async getSinistersOfClients(userBrokerId: string) {
-  //   const clients = (await this.userBrokerService.getUserBrokerById(
-  //     userBrokerId,
-  //   )) as unknown as UserBrokerEntity;
+  // nooooooooooooooooooooooooo
+  //   // public async getSinistersOfClients(userBrokerId: string) {
+  //   //   const clients = (await this.userBrokerService.getUserBrokerById(
+  //   //     userBrokerId,
+  //   //   )) as unknown as UserBrokerEntity;
 
-  //   const allUserSinistersPromises = (
-  //     clients.clients as unknown as UserEntity[]
-  //   ).map(async (client) => await this.getSinistersOfBroker(client.id));
+  //   //   const allUserSinistersPromises = (
+  //   //     clients.clients as unknown as UserEntity[]
+  //   //   ).map(async (client) => await this.getSinistersOfBroker(client.id));
 
-  //   const allSinisters = (
-  //     await Promise.all([...allUserSinistersPromises])
-  //   ).flat();
+  //   //   const allSinisters = (
+  //   //     await Promise.all([...allUserSinistersPromises])
+  //   //   ).flat();
 
-  //   return allSinisters;
-  // }
+  //   //   return allSinisters;
+  //   // }
 
   // Element sinister
 
-  private async createSinisterFromElement(
-    asset: AssetEntity,
-    theftDTO: TheftDTO,
-    theftTireDTO: TheftTireDTO,
-    fireDTO: FireDTO,
-    injuredDTO: InjuredData,
-    crashDTO: CrashDTO,
-    damageDTO: DamageDTO,
-    thirdPartyVehicleDTO: ThirdPartyVehicleData,
-  ) {
-    try {
-      if (theftDTO) {
-        return await this.createTheftInSinister(asset, theftDTO, theftTireDTO);
-      } else if (fireDTO) {
-        return await this.createFireInSinister(asset, fireDTO, injuredDTO);
-      } else if (crashDTO) {
-        return await this.createCrashInSinister(
-          asset,
-          crashDTO,
-          injuredDTO,
-          thirdPartyVehicleDTO,
-        );
-      } else if (damageDTO) {
-        return await this.createDamageInSinister(asset, damageDTO);
-      }
-    } catch (error) {
-      throw ErrorManager.createSignaturError(error.message);
-    }
-  }
+  // private async createSinisterFromElement(
+  //   asset: AssetEntity,
+  //   theftDTO: TheftDTO,
+  //   theftTireDTO: TheftTireDTO,
+  //   fireDTO: FireDTO,
+  //   injuredDTO: InjuredData,
+  //   crashDTO: CrashDTO,
+  //   damageDTO: DamageDTO,
+  //   thirdPartyVehicleDTO: ThirdPartyVehicleData,
+  // ) {
+  //   try {
+  //     if (theftDTO) {
+  //       return await this.createTheftInSinister(asset, theftDTO, theftTireDTO);
+  //     } else if (fireDTO) {
+  //       return await this.createFireInSinister(asset, fireDTO, injuredDTO);
+  //     } else if (crashDTO) {
+  //       return await this.createCrashInSinister(
+  //         asset,
+  //         crashDTO,
+  //         injuredDTO,
+  //         thirdPartyVehicleDTO,
+  //       );
+  //     } else if (damageDTO) {
+  //       return await this.createDamageInSinister(asset, damageDTO);
+  //     }
+  //   } catch (error) {
+  //     throw ErrorManager.createSignaturError(error.message);
+  //   }
+  // }
 
-  public async createSinisterInElement(
-    elementId: string,
-    theftDTO: TheftDTO,
-    theftTireDTO: TheftTireDTO,
-    fireDTO: FireDTO,
-    crashDTO: CrashDTO,
-    injuredDTO: InjuredData,
-    thirdPartyVehicleDTO: ThirdPartyVehicleData,
-    damageDTO: DamageDTO,
-    swornDeclaration: boolean,
-  ) {
-    try {
-      if (!swornDeclaration) {
-        throw new ErrorManager({
-          type: 'BAD_REQUEST',
-          message: 'Without sworn declaration',
-        });
-      }
-      const findVehicle = (await this.vehicleService.getVehicles()).find(
-        (vehi) => vehi.id === elementId,
-      );
+  // public async createSinisterInElement(
+  //   elementId: string,
+  //   theftDTO: TheftDTO,
+  //   theftTireDTO: TheftTireDTO,
+  //   fireDTO: FireDTO,
+  //   crashDTO: CrashDTO,
+  //   injuredDTO: InjuredData,
+  //   thirdPartyVehicleDTO: ThirdPartyVehicleData,
+  //   damageDTO: DamageDTO,
+  //   swornDeclaration: boolean,
+  // ) {
+  //   try {
+  //     if (!swornDeclaration) {
+  //       throw new ErrorManager({
+  //         type: 'BAD_REQUEST',
+  //         message: 'Without sworn declaration',
+  //       });
+  //     }
+  //     const findVehicle = (await this.vehicleService.getVehicles()).find(
+  //       (vehi) => vehi.id === elementId,
+  //     );
 
-      if (findVehicle) {
-        const asset: AssetEntity = findVehicle.asset as unknown as AssetEntity;
+  //     if (findVehicle) {
+  //       const asset: AssetEntity = findVehicle.asset as unknown as AssetEntity;
 
-        await this.createSinisterFromElement(
-          asset,
-          theftDTO,
-          theftTireDTO,
-          fireDTO,
-          injuredDTO,
-          crashDTO,
-          damageDTO,
-          thirdPartyVehicleDTO,
-        );
-      } else {
-        const asset: AssetEntity = (
-          await this.electronicService.getElectronicById(elementId)
-        ).asset as unknown as AssetEntity;
+  //       await this.createSinisterFromElement(
+  //         asset,
+  //         theftDTO,
+  //         theftTireDTO,
+  //         fireDTO,
+  //         injuredDTO,
+  //         crashDTO,
+  //         damageDTO,
+  //         thirdPartyVehicleDTO,
+  //       );
+  //     } else {
+  //       const asset: AssetEntity = (
+  //         await this.electronicService.getElectronicById(elementId)
+  //       ).asset as unknown as AssetEntity;
 
-        await this.createSinisterFromElement(
-          asset,
-          theftDTO,
-          theftTireDTO,
-          fireDTO,
-          injuredDTO,
-          crashDTO,
-          damageDTO,
-          thirdPartyVehicleDTO,
-        );
-      }
+  //       await this.createSinisterFromElement(
+  //         asset,
+  //         theftDTO,
+  //         theftTireDTO,
+  //         fireDTO,
+  //         injuredDTO,
+  //         crashDTO,
+  //         damageDTO,
+  //         thirdPartyVehicleDTO,
+  //       );
+  //     }
 
-      return { message: 'La denuncia ha sido creada con exito' };
-    } catch (err) {
-      throw ErrorManager.createSignaturError(err.message);
-    }
-  }
+  //     return { message: 'La denuncia ha sido creada con exito' };
+  //   } catch (err) {
+  //     throw ErrorManager.createSignaturError(err.message);
+  //   }
+  // }
 
   // - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -1495,7 +2094,7 @@ export class SinisterService {
 
         return sinister;
       });
-    
+
       const sinisters = (await Promise.all(sinisterPromises))?.flatMap(
         (sinister) => (!sinister ? [] : sinister),
       );
@@ -1576,7 +2175,7 @@ export class SinisterService {
   ) {
     try {
       const sinisterss = await this.geSinisterOfUsers();
-      
+
       const sinisterPromises = sinisterss.map(async (sin) => {
         const sinister = await this.sinisterForArrayPromisesBySinisterId(
           sin?.id,

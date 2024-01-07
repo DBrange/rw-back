@@ -18,20 +18,20 @@ export class GncController {
   }
 
   @Get(':gncId')
-  public async getGncById(@Param('gncId') id: string) {
-    return await this.gncService.getGncById(id);
+  public async getGncById(@Param('gncId') gncId: string) {
+    return await this.gncService.getGncById(gncId);
   }
 
   @Put(':gncId')
   public async updateGnc(
-    @Param('gncId') id: string,
+    @Param('gncId') gncId: string,
     @Body() body: UpdateGncDTO,
   ) {
-    return await this.gncService.updateGnc(id, body);
+    return await this.gncService.updateGnc(gncId, body);
   }
 
   @Delete(':gncId')
-  public async deleteGnc(@Param('gncId') id: string) {
-    return await this.gncService.deleteGnc(id);
+  public async deleteGnc(@Param('gncId') gncId: string) {
+    return await this.gncService.deleteGnc(gncId);
   }
 }

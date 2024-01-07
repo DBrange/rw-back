@@ -14,6 +14,6 @@ export class GncEntity extends BaseEntity implements IGnc {
   @Column()
   plate: string;
 
-  @OneToOne(() => VehicleEntity)
+  @OneToOne(() => VehicleEntity, (vehicle) => vehicle.gncId)
   vehicle: string;
 };

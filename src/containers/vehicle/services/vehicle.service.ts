@@ -40,7 +40,7 @@ export class VehicleService {
         .leftJoinAndSelect('vehicles.gncId', 'gnc')
         .leftJoinAndSelect('vehicles.asset', 'asset')
         .getOne();
- 
+
       if (!vehicle) {
         throw new ErrorManager({
           type: 'BAD_REQUEST',
@@ -87,5 +87,22 @@ export class VehicleService {
     } catch (err) {
       throw ErrorManager.createSignaturError(err.message);
     }
+  }
+
+  public async vehicleForPdf(vehicleId: string) {
+    const vehicle = await this.vehicleRepository
+      .createQueryBuilder('vehicles')
+      .where({ id: vehicleId })
+      .leftJoinAndSelect('vehicles.gncId', 'gnc')
+      .getOne();
+
+    if (!vehicle) {
+      throw new ErrorManager({
+        type: 'BAD_REQUEST',
+        message: 'No vehicles found',
+      });
+    }
+
+    return vehicle;
   }
 }
