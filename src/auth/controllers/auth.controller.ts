@@ -41,7 +41,7 @@ res.send(`
       window.opener.postMessage({ type: 'loginComplete', data: ${loginGoogleData} }, '*');
 
       // Cierra la ventana emergente después de unos segundos (ajusta el tiempo según sea necesario)
-      setTimeout(() => window.close(), 1000);
+      setTimeout(() => window.close(), 100);
     </script>
   `);
     // res.redirect('http://localhost:5173/public/login');
