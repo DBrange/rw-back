@@ -65,7 +65,12 @@ export class UserEntity extends BaseEntity implements IUser {
   })
   authorization: AUTHORIZATION;
 
-  @ManyToMany(() => UserBrokerEntity, (broker) => broker.clients)
+  // @ManyToMany(() => UserBrokerEntity, (broker) => broker.clients)
+  // @JoinTable()
+  // broker: string[];
+  @ManyToMany(() => UserBrokerEntity, (broker) => broker.clients, {
+    onDelete: 'CASCADE', // <-- Aquí
+  })
   @JoinTable()
   broker: string[];
 

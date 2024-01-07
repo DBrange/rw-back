@@ -129,14 +129,15 @@ export class UserService {
             .where({ userBroker: brokerEntity.id })
             .leftJoinAndSelect('users.legalUser', 'legalUser')
             .leftJoinAndSelect('users.personalUser', 'personalUser')
+            .leftJoinAndSelect('users.userBroker', 'userBroker')
             .getOne();
 
           return findUserBroker;
         });
 
-        const borkers = await Promise.all(userBrokersPromises);
+        const brokers = await Promise.all(userBrokersPromises);
 
-        return { ...user, brokerUser: borkers };
+        return { ...user, brokerUser: brokers };
       }
 
       return user;
@@ -356,7 +357,7 @@ export class UserService {
       throw ErrorManager.createSignaturError(error.message);
     }
   }
-  
+
   public async verifyCuit(cuit: string | undefined) {
     try {
       const emailOrDni = await this.userRepository
@@ -762,24 +763,20 @@ export class UserService {
   // Google authentication
 
   public async findByGoogleEmail(email: string) {
-     try {
-       const user = await this.userRepository
-         .createQueryBuilder('users')
-         .where({ email })
-         .andWhere({ authorization: AUTHORIZATION.AUTHORIZED })
-         .getOne();
+    try {
+      const user = await this.userRepository
+        .createQueryBuilder('users')
+        .where({ email })
+        .andWhere({ authorization: AUTHORIZATION.AUTHORIZED })
+        .getOne();
 
-    if(!user) return undefined
-    
-       return user;
-     } catch (error) {
-       throw ErrorManager.createSignaturError(error.message);
-     }
+      if (!user) return undefined;
+
+      return user;
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
   }
-
-
-
-
 
   //- - - - - - - - - - - - - - - - - - - - -
 
@@ -1157,5 +1154,29 @@ export class UserService {
     } catch (error) {
       throw new ErrorManager.createSignaturError(error.message);
     }
+  }
+
+  public async deleteBroker(clientId: string, userBrokerId: string) {
+    const user = await this.userRepository
+      .createQueryBuilder('users')
+      .where({ id: clientId })
+      .leftJoinAndSelect('users.broker', 'broker')
+      .getOne();
+
+    console.log(user.broker);
+    if (!user) {
+      throw new ErrorManager({
+        type: 'BAD_REQUEST',
+        message: 'No users found',
+      });
+    }
+
+user.broker = (user.broker as unknown as UserBrokerEntity[]).filter(
+  (b) => b.id !== userBrokerId,
+) as unknown as string[]
+
+await this.userRepository.save(user);
+
+    return {msg: 'El broker ha sido removido con exito'}
   }
 }

@@ -14,9 +14,11 @@ export class UserBrokerEntity extends BaseEntity implements IUserBroker {
   @Column()
   card: string;
 
-  @ManyToMany(() => UserEntity, (user) => user.broker)
-  // @JoinTable()
-  clients: string[] 
+  @ManyToMany(() => UserEntity, (user) => user.broker, {
+    onDelete: 'CASCADE', // <-- y Aquí
+  })
+  @JoinTable()
+  clients: string[];
 }
 
 

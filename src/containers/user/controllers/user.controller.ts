@@ -156,6 +156,14 @@ export class UserController {
     return await this.userService.newPasswordForForgottem(email);
   }
 
+  @Post('delete-broker/:clietnId/:userBrokerId')
+  public async deleteBroker(
+    @Param('clietnId') clietnId: string,
+    @Param('userBrokerId') userBrokerId: string,
+  ) {
+    return await this.userService.deleteBroker(clietnId, userBrokerId);
+  }
+
   //-------------------------------
   // Admin
 }

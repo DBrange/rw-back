@@ -22,7 +22,15 @@ export class UserInBrokerController {
       body.clientLastname,
     );
   }
-  
+
+  // @Post('delete-broker/:clietnId/:userBrokerId')
+  // public async deleteBroker(
+  //   @Param('clietnId') clietnId: string,
+  //   @Param('userBrokerId') userBrokerId: string,
+  // ) {
+  //   return await this.userInBrokerService.deleteBroker(clietnId, userBrokerId);
+  // }
+
   @Post(':brokerId/:clientId')
   public async addClient(
     @Param('brokerId') brokerId: string,

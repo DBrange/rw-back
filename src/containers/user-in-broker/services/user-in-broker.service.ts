@@ -25,7 +25,7 @@ export class UserInBrokerService {
       //   if (broker.id !== userBrokerId) {
       //     return broker.id;
       //   }
-      //   return 
+      //   return
       // });
       // console.log({
       //   ...client,
@@ -37,7 +37,7 @@ export class UserInBrokerService {
         broker: [userBrokerId],
       });
 
-      const brokers = await this.userService.getUserForBrokers(clientId)
+      const brokers = await this.userService.getUserForBrokers(clientId);
 
       // const userBroker = await this.userBrokerService.getUserBrokerById(
       //   userBrokerId,
@@ -96,4 +96,14 @@ export class UserInBrokerService {
 
     return { message: 'the notification successfully' };
   }
+
+  // public async deleteBroker(clientId: string, userBrokerId: string) {
+  //   const user = await this.userService.userForDeleteBroker(clientId)
+
+  //   if (user) {
+  //     const a = (user.broker as unknown as UserBrokerEntity[]).filter(el => el.id !== userBrokerId)
+
+  //     await this.
+  //   }
+  // }
 }
