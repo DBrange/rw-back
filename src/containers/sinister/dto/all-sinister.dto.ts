@@ -90,7 +90,7 @@ export class SinisterLegalUserVehicleCrashDTO {
 export class SinisterUserElectronicTheftDTO {
   userDTO: UserDTO;
   electronicDTO: ElectronicDTO;
-  smartPhoneDTO: SmartphoneDTO;
+  smartphoneDTO: SmartphoneDTO;
   theftDTO: TheftDTO;
   theftTireDTO: TheftTireDTO;
   assetDTO: AssetDTO;
@@ -100,7 +100,7 @@ export class SinisterUserElectronicTheftDTO {
 export class SinisterLegalUserElectronicTheftDTO {
   legalUserDTO: LegalUserDTO;
   electronicDTO: ElectronicDTO;
-  smartPhoneDTO: SmartphoneDTO;
+  smartphoneDTO: SmartphoneDTO;
   theftDTO: TheftDTO;
   theftTireDTO: TheftTireDTO;
   assetDTO: AssetDTO;

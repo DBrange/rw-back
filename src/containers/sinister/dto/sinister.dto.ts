@@ -44,6 +44,10 @@ export class UpdateSinisterDTO {
   location: string;
 
   @IsOptional()
+  @IsString()
+  pdf: string;
+
+  @IsOptional()
   @IsUUID()
   asset: AssetEntity;
 

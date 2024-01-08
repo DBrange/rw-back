@@ -16,6 +16,9 @@ export class SinisterEntity extends BaseEntity implements ISinister {
 
   @Column()
   location: string;
+  
+  @Column({nullable: true})
+  pdf: string;
 
   @ManyToOne(() => AssetEntity, (asset) => asset.sinisters)
   asset: AssetEntity;

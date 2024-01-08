@@ -32,8 +32,8 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(passportGuard('google'))
   googleLoginCallback(@Req() req, @Res() res) {
-    console.log(req.user)
     const loginGoogleData = JSON.stringify(req.user)
+    console.log(loginGoogleData);
     
     res.cookie('loginGoogle', loginGoogleData);
 

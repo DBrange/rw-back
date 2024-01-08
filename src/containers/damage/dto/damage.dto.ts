@@ -20,7 +20,7 @@ export class DamageDTO {
 
   @IsNotEmpty()
   @IsString()
-  photo: string;
+  reportPhoto: string;
 };
 
 export class UpdateDamageDTO {

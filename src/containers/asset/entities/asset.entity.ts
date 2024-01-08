@@ -28,6 +28,9 @@ export class AssetEntity extends BaseEntity {
   @Column({ default: true })
   inspection: boolean;
 
+  @Column({ nullable: true })
+  pdf: string;
+
   @OneToMany(() => SinisterEntity, (sinister) => sinister.asset)
   sinisters: SinisterEntity[];
 }

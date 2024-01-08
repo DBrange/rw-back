@@ -23,6 +23,13 @@ import { ErrorManager } from 'src/utils/error.manager';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { AssetDTO, UpdateAssetDTO } from '../dto/asset.dto';
 import { AssetEntity } from '../entities/asset.entity';
+import { PDFSaveInAsset } from '../interfaces/pdf-asset.interface';
+import * as fileUpload from 'express-fileupload';
+import * as fs from 'fs';
+import * as nodemailer from 'nodemailer';
+import * as puppeteer from 'puppeteer';
+import { cloudinaryUpload } from 'src/lib/cloudinary';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AssetService {
@@ -38,6 +45,250 @@ export class AssetService {
     private readonly userBrokerService: UserBrokerService,
     private readonly notificationService: NotificationService,
   ) {}
+
+  public async generatePDFForSave({
+    userDTO,
+    personalUserDTO,
+    legalUserDTO,
+    vehicleDTO,
+    gncDTO,
+    electronicDTO,
+    smartphoneDTO,
+  }: Partial<PDFSaveInAsset>): Promise<Buffer> {
+    try {
+      const browser = await puppeteer.launch();
+      const page = await browser.newPage();
+
+      let pdfContent = '';
+
+      if (userDTO) {
+        pdfContent += `
+      <section style='font-family: sans-serif; margin: 0 20px; height: 100vh;'>
+        <header style='border-bottom: 1px solid #000; margin-bottom: 20px; width: 100%; color: #8B5CF6;'>
+          <div style='width: 100%; display: flex; justify-content: flex-end;'>
+            <h2 style='margin-left: auto; padding-right: 20px;' >ReclamoWeb</h2>
+          </div>
+        </header>
+        <div>
+          <h2 style='padding: 20px 0; color: #8B5CF6;'>Persona</h2>
+          ${
+            personalUserDTO
+              ? `          
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Nombre: <span style='font-weight: 200;'>${personalUserDTO.name}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Apellido: <span style='font-weight: 200;'>${personalUserDTO.lastName}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>DNI: <span style='font-weight: 200;'>${personalUserDTO.dni}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Fecha de nacimiento: <span style='font-weight: 200;'>${personalUserDTO.birthDate}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Genero: <span style='font-weight: 200;'>${personalUserDTO.gender}</span></h4>`
+              : ''
+          }
+          ${
+            legalUserDTO
+              ? `
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Nombre de la compañia: <span style='font-weight: 200;'>${legalUserDTO.companyName}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>CUIT: <span style='font-weight: 200;'>${legalUserDTO.cuit}</span></h4>`
+              : ''
+          }
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Numero telefonico: <span style='font-weight: 200;'>${
+            userDTO.phoneNumber
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Email: <span style='font-weight: 200;'>${
+            userDTO.email
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Email alternativo: <span style='font-weight: 200;'>${
+            userDTO.altEmail
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Direccion: <span style='font-weight: 200;'>${
+            userDTO.address
+          }</span></h4>
+        </div>
+        <div style="page-break-after: always;"></div>
+        </section>
+        `;
+      }
+
+      if (vehicleDTO) {
+        pdfContent += `
+        <section style='font-family: sans-serif; margin: 0 20px; height: 100vh;'>
+        <header style='border-bottom: 1px solid #000; margin-bottom: 20px; width: 100%; color: #8B5CF6;'>
+          <div style='width: 100%; display: flex; justify-content: flex-end;'>
+            <h2 style='margin-left: auto; padding-right: 20px;' >ReclamoWeb</h2>
+          </div>
+        </header>
+        <div>
+          <h2 style='padding: 20px 0; color: #8B5CF6;'>Vehiculo</h2>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Vehiculo tipo: <span style='font-weight: 200;'>${
+            vehicleDTO.type
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Patente: <span style='font-weight: 200;'>${
+            vehicleDTO.plate
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Año: <span style='font-weight: 200;'>${
+            vehicleDTO.year
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Marca: <span style='font-weight: 200;'>${
+            vehicleDTO.brand
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Modelo: <span style='font-weight: 200;'>${
+            vehicleDTO.model
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Color: <span style='font-weight: 200;'>${
+            vehicleDTO.color
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Daño: <span style='font-weight: 200;'>${
+            vehicleDTO.damage ? 'Si' : 'No'
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Lugar dañado: <span style='font-weight: 200;'>${
+            vehicleDTO.damageLocation
+          }</span></h4>
+          <div style="display: flex; flex-direction: column">
+            <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Fotos del vehiculo:</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 5px">
+              ${(vehicleDTO.images as unknown as string[]).map(
+                (el: string) =>
+                  `
+                <img src="${el}" style="max-width: 30%; max-height: 300px; object-fit: contain;"/>
+                `,
+              )}
+            </div>
+          </div>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Es 0km: <span style='font-weight: 200;'>${
+            vehicleDTO.okm ? 'Si' : 'No'
+          }</span></h4>
+                  <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Es GNC: <span style='font-weight: 200;'>${
+                    vehicleDTO.gnc ? 'Si' : 'No'
+                  }</span></h4>
+                  ${
+                    gncDTO
+                      ? `
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Numero de oblea: <span style='font-weight: 200;'>${gncDTO.oblea}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Patente: <span style='font-weight: 200;'>${gncDTO.plate}</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Fecha de expiracion: <span style='font-weight: 200;'>${gncDTO.expireDate}</span></h4>
+          `
+                      : ''
+                  }
+          ${
+            !vehicleDTO
+              ? ''
+              : `
+        <h4 style='padding: 20px 0 10px 0; text-decoration: underline;'>Neumaticos:</h4>
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Marca: <span style='font-weight: 200;'>${vehicleDTO.tireBrand}</span></h4>
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Tamaño: <span style='font-weight: 200;'>${vehicleDTO.tireSize}</span></h4>
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Desgaste: <span style='font-weight: 200;'>${vehicleDTO.tireWear}</span></h4>
+        `
+          }
+        <div style="page-break-after: always;"></div>
+        </section>
+        </div>
+        `;
+      }
+
+      if (electronicDTO) {
+        pdfContent += `
+        <section style='font-family: sans-serif; margin: 0 20px; height: 100vh;'>
+        <header style='border-bottom: 1px solid #000; margin-bottom: 20px; width: 100%; color: #8B5CF6;'>
+          <div style='width: 100%; display: flex; justify-content: flex-end;'>
+            <h2 style='margin-left: auto; padding-right: 20px;' >ReclamoWeb</h2>
+          </div>
+        </header>
+        <div>
+          <h2 style='padding: 20px 0; color: #8B5CF6;'>Electrodomestico</h2>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Electrodomestico tipo: <span style='font-weight: 200;'>${
+            electronicDTO.type
+          }</span></h4>
+          ${
+            smartphoneDTO
+              ? `
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Numero del movil: <span style='font-weight: 200;'>${smartphoneDTO.phoneNumber}</span></h4>
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Servicio del movil: <span style='font-weight: 200;'>${smartphoneDTO.phoneService}</span></h4>
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>IMEI: <span style='font-weight: 200;'>${smartphoneDTO.imei}</span></h4>
+        `
+              : ''
+          }
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Marca: <span style='font-weight: 200;'>${
+          electronicDTO.brand
+        }</span></h4>
+        <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Modelo: <span style='font-weight: 200;'>${
+          electronicDTO.model
+        }</span></h4>
+        </div>
+        <div style="page-break-after: always;"></div>
+        </section>
+        `;
+      }
+
+      await page.setContent(pdfContent);
+      const pdfBuffer = await page.pdf({ format: 'A4' });
+
+      await browser.close();
+      if (!pdfBuffer) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Error generatin PDF',
+        });
+      }
+      return pdfBuffer;
+    } catch (err) {
+      throw ErrorManager.createSignaturError(err.message);
+    }
+  }
+
+  public async savePdf(entity: AssetEntity, generatePdf: Buffer) {
+    try {
+      const middleware = fileUpload({});
+
+      middleware(null, null, async () => {
+        const archivoSubido = `archivo_generado_${entity.id}.pdf`;
+
+        fs.writeFileSync(archivoSubido, generatePdf);
+
+        const file = await cloudinaryUpload(archivoSubido);
+
+        const pdf = file.secure_url;
+
+        await this.updateAsset(entity.id, { ...entity, pdf });
+      });
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+
+  public async sendEmail(
+    user: { name: string; lastName: string; companyName: string },
+    recipients: string[],
+  ): Promise<void> {
+    try {
+      // process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+      const configService = new ConfigService();
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: `${configService.get('EMAIL_USER')}`,
+          pass: `${configService.get('EMAIL_PASSWORD')}`,
+        },
+        tls: {
+          rejectUnauthorized: false,
+        },
+        requireTLS: true,
+      });
+
+      const mailOptions = {
+        from: `Aqui esta su denuncia <${configService.get('EMAIL_USER')}>`,
+        to: recipients.join(', '),
+        subject: 'PDF Denuncia',
+        text: `Tiene una nueva de denuncia creada por ${
+          user.companyName ? user.companyName : user.name + ' ' + user.lastName
+        }.`,
+      };
+
+      await transporter.sendMail(mailOptions);
+
+      // delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+    } catch (err) {
+      throw ErrorManager.createSignaturError(err.message);
+    }
+  }
 
   public async createAsset(body: AssetDTO) {
     try {
@@ -188,7 +439,8 @@ export class AssetService {
     assetDTO: AssetDTO,
     brokerId: string,
     clientId: string,
-    inspection?: boolean,
+    // inspection?: boolean,
+    pdf?: Buffer,
   ) {
     try {
       let newGnc: GncEntity;
@@ -211,18 +463,24 @@ export class AssetService {
         vehicle: newVehicle?.id,
         user: brokerId,
         client: clientId,
-        inspection: inspection === false ? false : true,
+        // inspection: inspection === false ? false : true,
       };
 
-      if (inspection !== false) {
-        await this.vehicleInspectionNotification(
-          newVehicle,
-          clientId,
-          brokerId,
-        );
+      // if (inspection !== false) {
+      //   await this.vehicleInspectionNotification(
+      //     newVehicle,
+      //     clientId,
+      //     brokerId,
+      //   );
+      // }
+
+      const newAsset = await this.createAsset(asset);
+
+      if (pdf) {
+        await this.savePdf(newAsset, pdf);
       }
 
-      return await this.createAsset(asset);
+      return newAsset;
     } catch (err) {
       throw ErrorManager.createSignaturError(err.message);
     }
@@ -234,7 +492,8 @@ export class AssetService {
     assetDTO: AssetDTO,
     brokerId: string,
     clientId: string,
-    inspection?: boolean,
+    // inspection?: boolean,
+    pdf?: Buffer,
   ) {
     try {
       let newSmartphone: SmartphoneEntity | null;
@@ -258,18 +517,24 @@ export class AssetService {
         electronic: newElectronic.id,
         user: brokerId,
         client: clientId,
-        inspection: inspection === false ? false : true,
+        // inspection: inspection === false ? false : true,
       };
 
-      if (inspection !== false) {
-        await this.electronicInspectionNotification(
-          newElectronic,
-          clientId,
-          brokerId,
-        );
+      // if (inspection !== false) {
+      //   await this.electronicInspectionNotification(
+      //     newElectronic,
+      //     clientId,
+      //     brokerId,
+      //   );
+      // }
+
+      const newAsset = await this.createAsset(asset);
+
+      if (pdf) {
+        await this.savePdf(newAsset, pdf);
       }
 
-      return await this.createAsset(asset);
+      return newAsset;
     } catch (err) {
       throw ErrorManager.createSignaturError(err.message);
     }
@@ -293,6 +558,21 @@ export class AssetService {
         });
       }
 
+      const { legalUser, personalUser, ...rest } =
+        await this.userService.userForSinisterPdf(clientId);
+
+      const userDTO = { ...rest };
+
+      const pdf = await this.generatePDFForSave({
+        userDTO,
+        legalUserDTO: legalUser,
+        personalUserDTO: personalUser,
+        vehicleDTO,
+        gncDTO,
+        electronicDTO,
+        smartphoneDTO,
+      });
+
       if (vehicleDTO) {
         await this.createVehicleInAsset(
           vehicleDTO,
@@ -300,6 +580,7 @@ export class AssetService {
           assetDTO,
           brokerId,
           clientId,
+          pdf,
         );
       } else {
         await this.createElectronicInAsset(
@@ -308,8 +589,26 @@ export class AssetService {
           assetDTO,
           brokerId,
           clientId,
+          pdf,
         );
       }
+
+      const emailFor = personalUser
+        ? {
+            name: personalUser.name,
+            lastName: personalUser.lastName,
+            companyName: null,
+          }
+        : {
+            name: null,
+            lastName: null,
+            companyName: legalUser.companyName,
+          };
+
+      const brokerEmail = (await this.userService.userForSinisterPdf(brokerId))
+        .email;
+
+      this.sendEmail(emailFor, [brokerEmail]);
 
       return { message: 'La inspeccion a sido realizada con exito' };
     } catch (error) {

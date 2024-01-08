@@ -23,6 +23,10 @@ export class AssetDTO {
   @IsOptional()
   @IsBoolean()
   inspection: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  pdf: string;
 }
 
 export class UpdateAssetDTO {
@@ -45,4 +49,8 @@ export class UpdateAssetDTO {
   @IsOptional()
   @IsBoolean()
   inspection: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  pdf: string;
 }
