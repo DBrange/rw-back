@@ -1175,7 +1175,7 @@ export class UserService {
       (b) => b.id !== userBrokerId,
     ) as unknown as string[];
 
-    await this.updateUser(user.id, user);
+    await this.userRepository.save(user);
 
     return { msg: 'El broker ha sido removido con exito' };
   }
