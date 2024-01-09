@@ -15,6 +15,7 @@ import {
 } from '../interfaces/user.interface';
 import { ACCESS_LEVEL, AUTHORIZATION, ROLES } from 'src/constants/roles';
 import { differenceInWeeks, startOfWeek, differenceInMonths } from 'date-fns';
+import { NotificationEntity } from 'src/containers/notification/entities/notification.entity';
 @Injectable()
 export class UserService {
   constructor(
@@ -48,6 +49,8 @@ export class UserService {
       const user = await this.userRepository
         .createQueryBuilder('users')
         .where({ id })
+        .leftJoinAndSelect('users.legalUser', 'legalUser')
+        .leftJoinAndSelect('users.personalUser', 'personalUser')
         .leftJoinAndSelect('users.broker', 'brokers')
         .getOne();
 
@@ -111,7 +114,7 @@ export class UserService {
         .leftJoinAndSelect('users.legalUser', 'legalUsers')
         .leftJoinAndSelect('users.broker', 'brokers')
         .leftJoinAndSelect('users.userBroker', 'userBroker')
-        .leftJoinAndSelect('users.receivedNotifications', 'notifications')
+        // .leftJoinAndSelect('users.receivedNotifications', 'notifications')
         .getOne();
 
       if (!user) {
@@ -536,7 +539,11 @@ export class UserService {
     }
   }
 
-  public async getClientNotificationsById(id: string) {
+  public async getClientNotificationsById(
+    id: string,
+    page: number,
+    limit: number,
+  ) {
     try {
       const user = await this.userRepository
         .createQueryBuilder('users')
@@ -551,7 +558,18 @@ export class UserService {
         });
       }
 
-      return user.receivedNotifications;
+      const notifications =
+        user.receivedNotifications as unknown as NotificationEntity[];
+
+      const pageSize = limit;
+      const start = (page - 1) * pageSize;
+      const end = start + pageSize;
+
+      const paginatedNotifications = notifications.slice(start, end);
+
+      return paginatedNotifications;
+
+      // return user.receivedNotifications;
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
     }
@@ -1187,16 +1205,32 @@ export class UserService {
       .leftJoinAndSelect('users.legalUser', 'legalUser')
       .leftJoinAndSelect('users.personalUser', 'personalUser')
       .getOne();
-    
-      if (!user) {
-        throw new ErrorManager({
-          type: 'BAD_REQUEST',
-          message: 'No users found',
-        });
-      }
-    
-    return user
-  }
-  
 
+    if (!user) {
+      throw new ErrorManager({
+        type: 'BAD_REQUEST',
+        message: 'No users found',
+      });
+    }
+
+    return user;
+  }
+
+  public async getUserByUserBrokerId(userBrokerId: string) {
+        const user = this.userRepository
+          .createQueryBuilder('users')
+          .where({ userBroker: userBrokerId })
+          .leftJoinAndSelect('users.legalUser', 'legalUser')
+          .leftJoinAndSelect('users.personalUser', 'personalUser')
+          .getOne();
+    
+        if (!user) {
+          throw new ErrorManager({
+            type: 'BAD_REQUEST',
+            message: 'No users found',
+          });
+        }
+
+        return user;
+  }
 }

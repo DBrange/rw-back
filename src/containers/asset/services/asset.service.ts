@@ -274,10 +274,10 @@ export class AssetService {
       });
 
       const mailOptions = {
-        from: `Aqui esta su denuncia <${configService.get('EMAIL_USER')}>`,
+        from: `<${configService.get('EMAIL_USER')}>`,
         to: recipients.join(', '),
-        subject: 'PDF Denuncia',
-        text: `Tiene una nueva de denuncia creada por ${
+        subject: 'Nueva inspeccion',
+        text: `Tiene una nueva de inspeccion creada por ${
           user.companyName ? user.companyName : user.name + ' ' + user.lastName
         }.`,
       };
@@ -439,8 +439,8 @@ export class AssetService {
     assetDTO: AssetDTO,
     brokerId: string,
     clientId: string,
-    // inspection?: boolean,
     pdf?: Buffer,
+    inspection?: boolean,
   ) {
     try {
       let newGnc: GncEntity;
@@ -466,13 +466,13 @@ export class AssetService {
         // inspection: inspection === false ? false : true,
       };
 
-      // if (inspection !== false) {
-      //   await this.vehicleInspectionNotification(
-      //     newVehicle,
-      //     clientId,
-      //     brokerId,
-      //   );
-      // }
+      if (inspection !== false) {
+        await this.vehicleInspectionNotification(
+          newVehicle,
+          clientId,
+          brokerId,
+        );
+      }
 
       const newAsset = await this.createAsset(asset);
 
@@ -492,8 +492,8 @@ export class AssetService {
     assetDTO: AssetDTO,
     brokerId: string,
     clientId: string,
-    // inspection?: boolean,
     pdf?: Buffer,
+    inspection?: boolean,
   ) {
     try {
       let newSmartphone: SmartphoneEntity | null;
@@ -520,13 +520,13 @@ export class AssetService {
         // inspection: inspection === false ? false : true,
       };
 
-      // if (inspection !== false) {
-      //   await this.electronicInspectionNotification(
-      //     newElectronic,
-      //     clientId,
-      //     brokerId,
-      //   );
-      // }
+      if (inspection !== false) {
+        await this.electronicInspectionNotification(
+          newElectronic,
+          clientId,
+          brokerId,
+        );
+      }
 
       const newAsset = await this.createAsset(asset);
 

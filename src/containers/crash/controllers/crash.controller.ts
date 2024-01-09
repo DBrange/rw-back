@@ -1,9 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { CrashDTO, UpdateCrashDTO } from '../dto/crash.dto';
 import { CrashService } from '../services/crash.service';
+import { AccessLevelGuard } from 'src/auth/guards/access-level.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 
 @Controller('crash')
-// @UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
+@UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
 export class CrashController {
   constructor(private readonly crashService: CrashService) {}
 

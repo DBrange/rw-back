@@ -7,12 +7,16 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { SmartphoneDTO, UpdateSmartphoneDTO } from '../dto/smartphone.dto';
 import { SmartphoneService } from '../services/smartphone.service';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { AccessLevelGuard } from 'src/auth/guards/access-level.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @Controller('smartphone')
-// @UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
+@UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
 export class SmartphoneController {
   constructor(private readonly smartphoneService: SmartphoneService) {}
 

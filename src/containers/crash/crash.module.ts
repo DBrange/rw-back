@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { CrashService } from './services/crash.service';
-import { CrashController } from './controllers/crash.controller';
 import { TypeOrmModule } from '@nestjs/typeorm/dist';
+import { CrashController } from './controllers/crash.controller';
 import { CrashEntity } from './entities/crash.entity';
+import { CrashService } from './services/crash.service';
 
 @Module({
   providers: [CrashService],

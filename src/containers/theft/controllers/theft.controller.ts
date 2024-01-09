@@ -1,9 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { TheftDTO, UpdateTheftDTO } from '../dto/theft.dto';
 import { TheftService } from '../services/theft.service';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { AccessLevelGuard } from 'src/auth/guards/access-level.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @Controller('theft')
-// @UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
+@UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
 export class TheftController {
   constructor(private readonly theftService: TheftService) {}
 

@@ -7,6 +7,8 @@ import { UserService } from 'src/containers/user/services/user.service';
 import { ErrorManager } from 'src/utils/error.manager';
 import { NotificationService } from '../../notification/services/notification.service';
 import { BrokerEntity } from 'src/containers/broker/entities/broker.entity';
+import { ConfigService } from '@nestjs/config';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class UserInBrokerService {
@@ -16,21 +18,76 @@ export class UserInBrokerService {
     private readonly notificationService: NotificationService,
   ) {}
 
+  public async sendEmail(
+    clientName: string,
+    recipients: string[],
+  ): Promise<void> {
+    try {
+      // process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+      const configService = new ConfigService();
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: `${configService.get('EMAIL_USER')}`,
+          pass: `${configService.get('EMAIL_PASSWORD')}`,
+        },
+        tls: {
+          rejectUnauthorized: false,
+        },
+        requireTLS: true,
+      });
+
+      const mailOptions = {
+        from: `<${configService.get('EMAIL_USER')}>`,
+        to: recipients.join(', '),
+        subject: 'Nuevo cliente',
+        text: `El cliente ${clientName} ha aceptado su solicitud`,
+      };
+
+      await transporter.sendMail(mailOptions);
+
+      // delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+    } catch (err) {
+      throw ErrorManager.createSignaturError(err.message);
+    }
+  }
+
+  private async notificationClientAdded(
+    clientId: string,
+    brokerId: string,
+    brokerName: string,
+    clientName: string,
+  ) {
+    const bodyNotificationClient: NotificationDTO = {
+      title: 'Inspeccion',
+      message: `Se ha añadido un nuevo broker - ${brokerName}`,
+      withOptions: false,
+      additional: null,
+      response: null,
+      sender: null,
+      receiver: clientId,
+    };
+
+    const bodyNotificationBroker: NotificationDTO = {
+      title: 'Inspeccion',
+      message: `Se ha añadido un nuevo cliente - ${clientName}`,
+      withOptions: false,
+      additional: null,
+      response: null,
+      sender: null,
+      receiver: brokerId,
+    };
+
+    await this.notificationService.createNotification(bodyNotificationClient);
+    await this.notificationService.createNotification(bodyNotificationBroker);
+  }
+
   public async addClient(userBrokerId: string, clientId: string) {
     try {
       const client = await this.userService.getUserByIdForOnlyBroker(clientId);
-      // const filterRepeatedId: string[] = (
-      //   client.broker as unknown as BrokerEntity[]
-      // ).map((broker) => {
-      //   if (broker.id !== userBrokerId) {
-      //     return broker.id;
-      //   }
-      //   return
-      // });
-      // console.log({
-      //   ...client,
-      //   broker: [...filterRepeatedId, userBrokerId],
-      // });
+      const broker = await this.userService.getUserByUserBrokerId(userBrokerId);
 
       await this.userService.updateOnlyBroker(clientId, {
         ...client,
@@ -39,18 +96,22 @@ export class UserInBrokerService {
 
       const brokers = await this.userService.getUserForBrokers(clientId);
 
-      // const userBroker = await this.userBrokerService.getUserBrokerById(
-      //   userBrokerId,
-      // );
+      const brokerName = broker.legalUser
+        ? broker.legalUser.companyName
+        : `${broker.personalUser.name} ${broker.personalUser.lastName}`;
 
-      // const filterRepeatedIdUserBroker = userBroker.clients.filter(
-      //   (broker) => broker !== userBrokerId,
-      //   );
+      const clientName = client.legalUser
+        ? client.legalUser.companyName
+        : `${client.personalUser.name} ${client.personalUser.lastName}`;
 
-      // await this.userBrokerService.updateUserBroker(userBrokerId, {
-      //   ...userBroker,
-      //   clients: [...filterRepeatedIdUserBroker, clientId],
-      // });
+      await this.notificationClientAdded(
+        clientId,
+        broker.id,
+        brokerName,
+        clientName,
+      );
+
+      await this.sendEmail(clientName, [broker.email]);
 
       return brokers;
     } catch (err) {

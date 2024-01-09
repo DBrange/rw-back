@@ -1,9 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ThirdPartyVehicleDTO, UpdateThirdPartyVehicleDTO } from '../dto/third-party-vehicle.dto';
 import { ThirdPartyVehicleService } from '../services/third-party-vehicle.service';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { AccessLevelGuard } from 'src/auth/guards/access-level.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @Controller('third-party-vehicle')
-// @UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
+@UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
 export class ThirdPartyVehicleController {
   constructor(
     private readonly thirdPartyVehicleService: ThirdPartyVehicleService,

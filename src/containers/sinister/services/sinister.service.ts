@@ -1598,6 +1598,8 @@ export class SinisterService {
             assetDTO,
             brokerId,
             clientId,
+            undefined,
+            false
           );
 
         const { legalUser, personalUser, ...rest } =
@@ -1651,6 +1653,8 @@ export class SinisterService {
             assetDTO,
             brokerId,
             clientId,
+            undefined,
+            false
           );
 
         const { legalUser, personalUser, ...rest } =
@@ -1842,6 +1846,8 @@ export class SinisterService {
           assetDTO,
           brokerId,
           clientId,
+          undefined,
+          false,
         );
 
       // NewSinister
@@ -2168,6 +2174,8 @@ export class SinisterService {
           assetDTO,
           brokerId,
           clientId,
+          undefined,
+          false,
         );
 
       const { legalUser, personalUser, ...rest } =
@@ -2395,6 +2403,8 @@ export class SinisterService {
             assetDTO,
             brokerId,
             clientId,
+            undefined,
+            false,
           );
 
         const { legalUser, personalUser, ...rest } =
@@ -2453,6 +2463,8 @@ export class SinisterService {
             assetDTO,
             brokerId,
             clientId,
+            undefined,
+            false
           );
 
         const { legalUser, personalUser, ...rest } =

@@ -7,13 +7,19 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { AssetInspection } from '../dto/all-asset.dto';
 import { AssetDTO, UpdateAssetDTO } from '../dto/asset.dto';
 import { AssetService } from '../services/asset.service';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { AccessLevelGuard } from 'src/auth/guards/access-level.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { PublicAccess } from '../../../auth/decorators/public.decorator';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @Controller('asset')
-// @UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
+@UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
 export class AssetController {
   constructor(private readonly assetService: AssetService) {}
 
@@ -27,6 +33,8 @@ export class AssetController {
     return await this.assetService.getAssets();
   }
 
+  // @Roles('BROKER')
+  @PublicAccess()
   @Get('inspections')
   public async getAssetsForAdmin(
     @Query('searchField') searchField?: string,
@@ -42,6 +50,8 @@ export class AssetController {
     );
   }
 
+  // @Roles('BROKER', 'ADMIN')
+  @PublicAccess()
   @Get(':assetId')
   public async getAssetById(@Param('assetId') id: string) {
     return await this.assetService.getAssetById(id);
@@ -60,6 +70,7 @@ export class AssetController {
     return await this.assetService.deleteAsset(id);
   }
 
+  @PublicAccess()
   @Post('inspection/:brokerId/:clientId')
   public async createInspection(
     @Param('brokerId') brokerId: string,
@@ -79,6 +90,8 @@ export class AssetController {
     return result;
   }
 
+  // @Roles('BROKER','ADMIN')
+  @PublicAccess()
   @Get('inspections-client/:brokerId')
   public async getInspectionsOfClients(
     @Param('brokerId') brokerId: string,
@@ -96,6 +109,8 @@ export class AssetController {
     );
   }
 
+  // @Roles('BROKER')
+  @PublicAccess()
   @Get('broker-clients/:userBrokerId')
   public async getAllClientsInBroker(
     @Param('userBrokerId') userBrokerId: string,
@@ -118,6 +133,8 @@ export class AssetController {
     return await this.assetService.getAllElementsFromClient(clientId);
   }
 
+  // @Roles('CLIENT', 'BROKER', 'ADMIN')
+  @PublicAccess()
   @Get('all-read/:userId')
   public async allRead(@Param('userId') userId: string) {
     return await this.assetService.allRead(userId);

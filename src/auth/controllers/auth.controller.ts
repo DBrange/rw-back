@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthDTO } from '../dto/auth.dto';
 import { AuthService } from '../services/auth.service';
 import { AccessLevelGuard } from '../guards/access-level.guard';
@@ -6,38 +16,42 @@ import { AuthGuard as passportGuard } from '@nestjs/passport';
 // import { AuthGuard } from '../guards/auth.guard';
 import { RolesGuard } from '../guards/roles.guard';
 import { PublicAccess } from '../decorators/public.decorator';
+import { Roles } from '../decorators/roles.decorator';
+import { AuthGuard } from '../guards/auth.guard';
 
 @Controller('auth')
-// @UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
+@UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  // @PublicAccess()
+  @PublicAccess()
   @Post('login')
   async login(@Body() { email, password }: AuthDTO) {
     return await this.authService.validateUser(email, password);
   }
 
+  @Roles('CLIENT', 'BROKER', 'ADMIN')
   @Post('refresh-token/:userId')
   async generateRefreshJWT(@Param('userId') userId: string) {
     return await this.authService.generateRefreshJWT(userId);
   }
-  
+
+  @PublicAccess()
   @Get('google')
   @UseGuards(passportGuard('google'))
   googleAuth(@Req() req) {
     //
   }
-
+  @PublicAccess()
   @Get('google/callback')
   @UseGuards(passportGuard('google'))
   googleLoginCallback(@Req() req, @Res() res) {
-    const loginGoogleData = JSON.stringify(req.user)
-    console.log(loginGoogleData);
-    
-    res.cookie('loginGoogle', loginGoogleData);
+    const loginGoogleData = JSON.stringify(req.user);
+    console.log(req.user);
 
-res.send(`
+    res.cookie('test', 'hello');
+    res.cookie('loginGoogle', loginGoogleData);
+    res.send(`
     <script>
       // Envía un mensaje a la ventana principal para indicar que la autenticación ha finalizado
       window.opener.postMessage({ type: 'loginComplete', data: ${loginGoogleData} }, '*');

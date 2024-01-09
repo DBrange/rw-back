@@ -6,7 +6,8 @@ import {
   Param,
   Post,
   Put,
-  Query
+  Query,
+  UseGuards,
 } from '@nestjs/common';
 import { PublicAccess } from 'src/auth/decorators/public.decorator';
 import {
@@ -22,9 +23,14 @@ import {
 } from '../dto/all-sinister.dto';
 import { SinisterDTO, UpdateSinisterDTO } from '../dto/sinister.dto';
 import { SinisterService } from '../services/sinister.service';
+import { AccessLevelGuard } from 'src/auth/guards/access-level.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { AdminAccess } from 'src/auth/decorators/admin.decorator';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @Controller('sinister')
-// @UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
+@UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
 export class SinisterController {
   constructor(private readonly sinisterService: SinisterService) {}
 
@@ -56,11 +62,15 @@ export class SinisterController {
     );
   }
 
+  // @AdminAccess()
+  @PublicAccess()
   @Get('admin/dashboard/documents')
   public async dashboardDocuments() {
     return await this.sinisterService.dashboardDocuments();
   }
 
+  // @Roles('CLIENT', 'BROKER')
+  @PublicAccess()
   @Get(':sinisterId')
   public async getSinisterById(@Param('sinisterId') id: string) {
     return await this.sinisterService.getSinisterById(id);
@@ -79,6 +89,8 @@ export class SinisterController {
     return await this.sinisterService.deleteSinister(id);
   }
 
+  // @Roles('CLIENT', 'BROKER')
+  @PublicAccess()
   @Post('theft/:brokerId/:clientId')
   public async createSinisterTheft(
     @Param('brokerId') brokerId: string,
@@ -99,6 +111,8 @@ export class SinisterController {
     );
   }
 
+  // @Roles('CLIENT', 'BROKER')
+  @PublicAccess()
   @Post('fire/:brokerId/:clientId')
   public async createSinisterFire(
     @Param('brokerId') brokerId: string,
@@ -117,6 +131,8 @@ export class SinisterController {
     );
   }
 
+  // @Roles('CLIENT', 'BROKER')
+  @PublicAccess()
   @Post('crash/:brokerId/:clientId')
   public async createSinisterCrash(
     @Param('brokerId') brokerId: string,
@@ -136,6 +152,8 @@ export class SinisterController {
     );
   }
 
+  // @Roles('CLIENT', 'BROKER')
+  @PublicAccess()
   @Post('damage/:brokerId/:clientId')
   public async createSinisterDamage(
     @Param('brokerId') brokerId: string,
@@ -155,6 +173,8 @@ export class SinisterController {
     );
   }
 
+  // @Roles('CLIENT', 'BROKER')
+  @PublicAccess()
   @Post('theft-inspection/:brokerId/:clientId/:assetId')
   public async createSinisterTheftInInspection(
     @Param('brokerId') brokerId: string,
@@ -174,6 +194,8 @@ export class SinisterController {
     return result;
   }
 
+  // @Roles('CLIENT', 'BROKER')
+  @PublicAccess()
   @Post('fire-inspection/:brokerId/:clientId/:assetId')
   public async createSinisterFireInInspection(
     @Param('brokerId') brokerId: string,
@@ -193,6 +215,8 @@ export class SinisterController {
     return result;
   }
 
+  // @Roles('CLIENT', 'BROKER')
+  @PublicAccess()
   @Post('crash-inspection/:brokerId/:clientId/:assetId')
   public async createSinisterCrashInInspection(
     @Param('brokerId') brokerId: string,
@@ -213,6 +237,8 @@ export class SinisterController {
     return result;
   }
 
+  // @Roles('CLIENT', 'BROKER')
+  @PublicAccess()
   @Post('damage-inspection/:brokerId/:clientId/:assetId')
   public async createSinisterDamageInInspection(
     @Param('brokerId') brokerId: string,
@@ -231,6 +257,8 @@ export class SinisterController {
     return result;
   }
 
+  // @Roles('BROKER', 'CLIENT')
+  @PublicAccess()
   @Get('client/:clientId')
   public async getSinistersOfClient(
     @Param('clientId') clientId: string,
@@ -250,6 +278,8 @@ export class SinisterController {
     );
   }
 
+  // @Roles('CLIENT', 'BROKER', 'ADMIN')
+  @PublicAccess()
   @Get('client-detail/:brokerId/:clientId')
   public async getClientInBroker(
     @Param('brokerId') brokerId: string,
@@ -298,6 +328,8 @@ export class SinisterController {
   //   return result;
   // }
 
+  // @AdminAccess()
+  @PublicAccess()
   @Get('dashboard/:brokerId/:userBrokerId')
   public async getBrokerDashboard(
     @Param('brokerId') brokerId: string,
@@ -310,7 +342,9 @@ export class SinisterController {
 
     return result;
   }
-
+  
+  // @AdminAccess()
+  @PublicAccess()
   @Get('broker-detail/:userId')
   public async getBrokerDetailForAdmin(@Param('userId') userId: string) {
     const result = await this.sinisterService.getBrokerDetailForAdmin(userId);

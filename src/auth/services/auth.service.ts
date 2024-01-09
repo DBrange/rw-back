@@ -74,13 +74,13 @@ export class AuthService {
     try {
       const userToken = await this.userService.getUserByIdForProfile(userId);
 
-      const date = new Date();
-      const exp = Math.floor(date.getTime() / 1000) + 3600;
+const date = new Date();
+const exp = Math.floor(date.getTime() / 1000) + 3600;
 
-      const payload: PayloadToken = {
-        role: userToken.role,
-        sub: userToken.id,
-      };
+const payload: PayloadToken = {
+  role: userToken.role,
+  sub: userToken.id,
+};
 
       return {
         accessToken: this.signJWT({

@@ -1,9 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { LegalUserDTO, UpdateLegalUserDTO } from '../dto/legal-user.dto';
 import { LegalUserService } from '../services/legal-user.service';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { AccessLevelGuard } from 'src/auth/guards/access-level.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @Controller('legal-user')
-// @UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
+@UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
 export class LegalUserController {
   constructor(private readonly legalUserService: LegalUserService) {}
 
