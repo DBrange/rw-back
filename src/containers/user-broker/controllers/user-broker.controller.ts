@@ -4,6 +4,7 @@ import { UserBrokerService } from '../services/user-broker.service';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { AccessLevelGuard } from 'src/auth/guards/access-level.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { PublicAccess } from 'src/auth/decorators/public.decorator';
 
 @Controller('user-broker')
 @UseGuards(AuthGuard, RolesGuard, AccessLevelGuard)
@@ -15,6 +16,7 @@ export class UserBrokerController {
     return await this.userBrokerService.createUserBroker(body);
   }
 
+  @PublicAccess()
   @Get('')
   public async getUsersBroker() {
     return await this.userBrokerService.getUsersBroker();

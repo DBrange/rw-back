@@ -89,30 +89,36 @@ export class UserInBrokerService {
       const client = await this.userService.getUserByIdForOnlyBroker(clientId);
       const broker = await this.userService.getUserByUserBrokerId(userBrokerId);
 
+      console.log('0')
       await this.userService.updateOnlyBroker(clientId, {
         ...client,
         broker: [userBrokerId],
       });
+console.log('1')
+const brokers = await this.userService.getUserForBrokers(clientId);
 
-      const brokers = await this.userService.getUserForBrokers(clientId);
+console.log('2')
+const brokerName = broker.legalUser
+? broker.legalUser.companyName
+: `${broker.personalUser.name} ${broker.personalUser.lastName}`;
 
-      const brokerName = broker.legalUser
-        ? broker.legalUser.companyName
-        : `${broker.personalUser.name} ${broker.personalUser.lastName}`;
+console.log('3')
+const clientName = client.legalUser
+? client.legalUser.companyName
+: `${client.personalUser.name} ${client.personalUser.lastName}`;
 
-      const clientName = client.legalUser
-        ? client.legalUser.companyName
-        : `${client.personalUser.name} ${client.personalUser.lastName}`;
-
-      await this.notificationClientAdded(
-        clientId,
-        broker.id,
-        brokerName,
-        clientName,
-      );
-
-      await this.sendEmail(clientName, [broker.email]);
-
+console.log('4')
+await this.notificationClientAdded(
+  clientId,
+  broker.id,
+  brokerName,
+  clientName,
+  );
+  console.log('5')
+  
+  await this.sendEmail(clientName, [broker.email]);
+  
+  console.log('6')
       return brokers;
     } catch (err) {
       throw ErrorManager.createSignaturError(err.message);

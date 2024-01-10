@@ -34,7 +34,8 @@ export class UserInBrokerController {
   //   return await this.userInBrokerService.deleteBroker(clietnId, userBrokerId);
   // }
 
-  @Roles('CLIENT')
+  // @Roles('CLIENT')
+  @PublicAccess()
   @Post(':brokerId/:clientId')
   public async addClient(
     @Param('brokerId') brokerId: string,

@@ -27,7 +27,7 @@ export class UserController {
   public async createUser(@Body() body: UserDTO) {
     return await this.userService.createUser(body);
   }
-
+  @PublicAccess()
   @Get('')
   public async getUsers() {
     return await this.userService.getUsers();
@@ -113,6 +113,7 @@ export class UserController {
     return await this.userService.dashboardIncome();
   }
 
+  @PublicAccess()
   @Get(':userId')
   public async getUserById(@Param('userId') id: string) {
     return await this.userService.getUserById(id);

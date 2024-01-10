@@ -181,8 +181,8 @@ export class RegisterService {
     await this.userService.updateUser(user.id, {
       ...user,
       authorization: AUTHORIZATION.AUTHORIZED,
-    });
-
+   });
+    console.log('das')
     return true;
   }
 }
