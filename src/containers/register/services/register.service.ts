@@ -25,35 +25,58 @@ export class RegisterService {
   ) {}
 
   public async registerUser(body: RegisterDTO): Promise<UserEntity> {
-    let personalUser: PersonalUserEntity;
-    let legalUser: LegalUserEntity;
-    let userBroker: UserBrokerEntity;
+    try {
+      let personalUser: PersonalUserEntity;
+      let legalUser: LegalUserEntity;
+      let userBroker: UserBrokerEntity;
 
-    if (body.personalUserDTO) {
-      personalUser = await this.personalUserService.createPersonalUser(
-        body.personalUserDTO,
-      );
-    } else if (body.legalUserDTO) {
-      legalUser = await this.legalUserService.createLegalUser(
-        body.legalUserDTO,
-      );
-    }
+      const email = body.userDTO.email;
+      const dniOrCuit = body.personalUserDTO
+        ? body.personalUserDTO.dni
+        : body.legalUserDTO.cuit;
+      const enrollment = body.userBrokerDTO?.enrollment
+        ? body.userBrokerDTO.enrollment
+        : undefined;
+      console.log('1');
+      const isAcive = await this.verifyEmailDni(email, dniOrCuit, enrollment);
+      console.log('2');
+      console.log('2');
 
-    if (body.userBrokerDTO) {
-      userBroker = await this.userBrokerService.createUserBroker(
-        body.userBrokerDTO,
-      );
-    }
+      if (!isAcive) {
+        console.log('3');
+        if (body.personalUserDTO) {
+          personalUser = await this.personalUserService.createPersonalUser(
+            body.personalUserDTO,
+          );
+        } else if (body.legalUserDTO) {
+          legalUser = await this.legalUserService.createLegalUser(
+            body.legalUserDTO,
+          );
+        }
 
-    const userObj = {
-      ...body.userDTO,
-      personalUser,
-      legalUser,
-      userBroker,
-      role: userBroker ? ROLES.BROKER : ROLES.CLIENT,
-    };
+        if (body.userBrokerDTO) {
+          userBroker = await this.userBrokerService.createUserBroker(
+            body.userBrokerDTO,
+          );
+        }
+      } else {
+        console.log('4');
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'In use',
+        });
+      }
+console.log('5');
+      const userObj = {
+        ...body.userDTO,
+        personalUser,
+        legalUser,
+        userBroker,
+        role: userBroker ? ROLES.BROKER : ROLES.CLIENT,
+      };
 
-    return await this.userService.createUser(userObj);
+      return await this.userService.createUserAndDelete(userObj, email);
+    } catch (error) { throw ErrorManager.createSignaturError(error.message);}
   }
 
   // Authentication
@@ -165,7 +188,7 @@ export class RegisterService {
 
     const { email, id } = data.data;
 
-    const user = await this.userService.findOneByEmail( email );
+    const user = await this.userService.findOneByEmail(email);
 
     if (!user === null) {
       throw new ErrorManager({
@@ -181,8 +204,40 @@ export class RegisterService {
     await this.userService.updateUser(user.id, {
       ...user,
       authorization: AUTHORIZATION.AUTHORIZED,
-   });
-    console.log('das')
+    });
+
     return true;
+  }
+
+  public async verifyEmailDni(
+    email: string | undefined,
+    dniOrCuit: string | undefined,
+    enrollment: string | undefined,
+  ) {
+    try {
+      if (enrollment) {
+        const verifyEnrollment = await this.userService.verifyEnrollment(
+          enrollment,
+        );
+        if (verifyEnrollment) return true;
+      }
+      let emaill: boolean;
+      let dni: boolean;
+      let cuit: boolean;
+
+      if (email) emaill = await this.userService.verifyEmail(email);
+
+      if (dniOrCuit) dni = await this.userService.verifyDni(dniOrCuit);
+
+      if (dniOrCuit) cuit = await this.userService.verifyCuit(dniOrCuit);
+
+      if (emaill || dni || cuit) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
   }
 }

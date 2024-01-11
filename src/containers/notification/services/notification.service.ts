@@ -61,7 +61,6 @@ export class NotificationService {
     body: UpdateNotificationDTO,
   ): Promise<UpdateResult> {
     try {
-      console.log(body)
       const updatedNotification = await this.notificationRepository.update(
         id,
         body,

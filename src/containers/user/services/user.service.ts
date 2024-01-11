@@ -1217,20 +1217,52 @@ export class UserService {
   }
 
   public async getUserByUserBrokerId(userBrokerId: string) {
-        const user = this.userRepository
-          .createQueryBuilder('users')
-          .where({ userBroker: userBrokerId })
-          .leftJoinAndSelect('users.legalUser', 'legalUser')
-          .leftJoinAndSelect('users.personalUser', 'personalUser')
-          .getOne();
-    
-        if (!user) {
-          throw new ErrorManager({
-            type: 'BAD_REQUEST',
-            message: 'No users found',
-          });
-        }
+    const user = this.userRepository
+      .createQueryBuilder('users')
+      .where({ userBroker: userBrokerId })
+      .leftJoinAndSelect('users.legalUser', 'legalUser')
+      .leftJoinAndSelect('users.personalUser', 'personalUser')
+      .getOne();
 
-        return user;
+    if (!user) {
+      throw new ErrorManager({
+        type: 'BAD_REQUEST',
+        message: 'No users found',
+      });
+    }
+
+    return user;
+  }
+
+  public async createUserAndDelete(body: UserDTO, email: string) {
+    try {
+console.log('6');
+      const users: UserEntity[] = await this.userRepository
+        .createQueryBuilder('users')
+        .where({email})
+        .getMany();
+      console.log('7');
+      if (users.length) {
+        users.map( async (el) => await this.deleteUser(el.id));
+        
+      }
+      console.log('8');
+      body.password = await bcrypt.hash(body.password, +process.env.HASH_SALT);
+      
+      const user = await this.userRepository.save(body);
+
+      if (!user) {
+         throw new ErrorManager({
+           type: 'BAD_REQUEST',
+           message: 'In use',
+         });
+      }
+      console.log('9');
+
+      return user
+      // return { message: 'The user has been created successfully.' };
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
   }
 }

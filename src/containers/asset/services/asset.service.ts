@@ -400,6 +400,8 @@ export class AssetService {
       receiver: brokerId,
     };
 
+    console.log(bodyNotificationClient);
+    console.log(bodyNotificationBroker);
     await this.notificationService.createNotification(bodyNotificationClient);
     await this.notificationService.createNotification(bodyNotificationBroker);
   }
@@ -428,9 +430,12 @@ export class AssetService {
       sender: null,
       receiver: brokerId,
     };
+    
+    const a =await this.notificationService.createNotification(bodyNotificationClient);
+    const b = await this.notificationService.createNotification(bodyNotificationBroker);
 
-    await this.notificationService.createNotification(bodyNotificationClient);
-    await this.notificationService.createNotification(bodyNotificationBroker);
+    console.log(a)
+    console.log(b)
   }
 
   public async createVehicleInAsset(
@@ -838,12 +843,12 @@ export class AssetService {
       return notification;
     });
 
-    await Promise.all(promiseNotificationsRead);
+    const notificationsArr = await Promise.all(promiseNotificationsRead);
 
-    const userr = (await this.userService.getUserById(userId))
-      .receivedNotifications;
+    // const userr = (await this.userService.getUserById(userId))
+    //   .receivedNotifications;
 
-    return userr;
+    return notificationsArr;
   }
 
   //-----------------------------

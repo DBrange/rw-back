@@ -27,6 +27,6 @@ import { UserService } from '../user/services/user.service';
       PersonalUserEntity,
       LegalUserEntity,
     ]),
-  ],
+  ]
 })
 export class VerifyEmailDniModule {}
