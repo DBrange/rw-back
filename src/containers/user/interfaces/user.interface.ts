@@ -1,10 +1,10 @@
-import { ACCESS_LEVEL } from "src/constants/roles";
+import { ACCESS_LEVEL } from 'src/constants/roles';
 
 export interface AccessLevelData {
   [ACCESS_LEVEL.FREE]: LevelData;
   [ACCESS_LEVEL.BASIC]: LevelData;
   [ACCESS_LEVEL.PREMIUM]: LevelData;
-  [ACCESS_LEVEL.PRO]: LevelData;
+  [ACCESS_LEVEL.GOLD]: LevelData;
 }
 
 interface LevelData {

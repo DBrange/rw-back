@@ -201,6 +201,12 @@ export class SinisterService {
               )}
             </div>
           </div>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Airbag explotado: <span style='font-weight: 200;'>${
+            vehicleDTO.explodedAirbag ? 'Si' : 'No'
+          }</span></h4>
+          <h4 style='margin-bottom: 5px; font-weight: 600; display:'>No posee rueda de auxilio: <span style='font-weight: 200;'>${
+            vehicleDTO.noSpareTire ? 'Si' : 'No'
+          }</span></h4>
           <h4 style='margin-bottom: 5px; font-weight: 600; display:'>Es 0km: <span style='font-weight: 200;'>${
             vehicleDTO.okm ? 'Si' : 'No'
           }</span></h4>
@@ -1599,7 +1605,7 @@ export class SinisterService {
             brokerId,
             clientId,
             undefined,
-            false
+            false,
           );
 
         const { legalUser, personalUser, ...rest } =
@@ -1654,7 +1660,7 @@ export class SinisterService {
             brokerId,
             clientId,
             undefined,
-            false
+            false,
           );
 
         const { legalUser, personalUser, ...rest } =
@@ -2464,7 +2470,7 @@ export class SinisterService {
             brokerId,
             clientId,
             undefined,
-            false
+            false,
           );
 
         const { legalUser, personalUser, ...rest } =
@@ -2842,6 +2848,48 @@ export class SinisterService {
       const paginatedSinisters = filteredSinisters.slice(start, end);
 
       return paginatedSinisters;
+    } catch (error) {
+      throw ErrorManager.createSignaturError(error.message);
+    }
+  }
+  public async getSinistersOfBrokerQuantity(brokerId: string) {
+    try {
+      const brokerAssets = (await this.userService.getUserById(brokerId))
+        .assets as unknown as AssetEntity[];
+
+      const assetsForSinisters: AssetEntity[] = brokerAssets
+        .map((asset) => {
+          if (asset.sinisters.length) {
+            let assets = [];
+
+            for (let i = 0; i < asset.sinisters.length; i++) {
+              assets = [...assets, asset.sinisters[i]];
+            }
+
+            return assets;
+          } else if (!asset.inspection) {
+            return asset;
+          }
+        })
+        .flat();
+
+      const sinisterPromises = assetsForSinisters.map(async (brokerAssets) => {
+        const sinister = await this.sinisterForArrayPromisesBySinisterId(
+          brokerAssets?.id,
+        );
+
+        return sinister;
+      });
+
+      const sinisters = (await Promise.all(sinisterPromises)).flatMap(
+        (sinister) => (!sinister ? [] : sinister),
+      );
+
+      const sinistersWithoutNullQuantity = sinisters
+        .flat()
+        .filter(Boolean).length;
+
+      return { quantity: sinistersWithoutNullQuantity };
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
     }

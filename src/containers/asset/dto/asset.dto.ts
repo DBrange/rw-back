@@ -10,6 +10,10 @@ export class AssetDTO {
 
   @IsOptional()
   @IsUUID()
+  electronic: string;
+
+  @IsOptional()
+  @IsUUID()
   user: string;
 
   @IsOptional()

@@ -288,6 +288,7 @@ export class SinisterController {
     return await this.sinisterService.getClientInBroker(brokerId, clientId);
   }
 
+  // @Roles('CLIENT', 'BROKER', 'ADMIN')
   @PublicAccess()
   @Get('broker/:brokerId')
   public async getSinistersOfBroker(
@@ -306,6 +307,14 @@ export class SinisterController {
       page,
       limit,
     );
+  }
+  // @Roles('CLIENT', 'BROKER', 'ADMIN')
+  @PublicAccess()
+  @Get('broker-quantity/:brokerId')
+  public async getSinistersOfBrokerQuantity(
+    @Param('brokerId') brokerId: string,
+  ) {
+    return await this.sinisterService.getSinistersOfBrokerQuantity(brokerId);
   }
 
   // @Post('element/:elementId')
@@ -342,7 +351,7 @@ export class SinisterController {
 
     return result;
   }
-  
+
   // @AdminAccess()
   @PublicAccess()
   @Get('broker-detail/:userId')

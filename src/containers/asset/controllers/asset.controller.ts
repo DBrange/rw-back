@@ -111,6 +111,13 @@ export class AssetController {
 
   // @Roles('BROKER')
   @PublicAccess()
+  @Get('inspections-client-quantity/:brokerId')
+  public async getInspectionsQuantity(@Param('brokerId') brokerId: string) {
+    return await this.assetService.getInspectionsQuantity(brokerId);
+  }
+
+  // @Roles('BROKER')
+  @PublicAccess()
   @Get('broker-clients/:userBrokerId')
   public async getAllClientsInBroker(
     @Param('userBrokerId') userBrokerId: string,

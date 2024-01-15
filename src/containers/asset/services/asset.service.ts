@@ -430,12 +430,16 @@ export class AssetService {
       sender: null,
       receiver: brokerId,
     };
-    
-    const a =await this.notificationService.createNotification(bodyNotificationClient);
-    const b = await this.notificationService.createNotification(bodyNotificationBroker);
 
-    console.log(a)
-    console.log(b)
+    const a = await this.notificationService.createNotification(
+      bodyNotificationClient,
+    );
+    const b = await this.notificationService.createNotification(
+      bodyNotificationBroker,
+    );
+
+    console.log(a);
+    console.log(b);
   }
 
   public async createVehicleInAsset(
@@ -463,13 +467,24 @@ export class AssetService {
         },
       );
 
-      const asset: AssetDTO = {
-        ...assetDTO,
-        vehicle: newVehicle?.id,
-        user: brokerId,
-        client: clientId,
-        // inspection: inspection === false ? false : true,
-      };
+      let asset: AssetDTO;
+      if (inspection !== false) {
+        asset = {
+          ...assetDTO,
+          vehicle: newVehicle?.id,
+          user: brokerId,
+          client: clientId,
+          // inspection: inspection === false ? false : true,
+        };
+      } else {
+        asset = {
+          ...assetDTO,
+          vehicle: newVehicle?.id,
+          user: brokerId,
+          client: clientId,
+          inspection: false,
+        };
+      }
 
       if (inspection !== false) {
         await this.vehicleInspectionNotification(
@@ -517,13 +532,24 @@ export class AssetService {
         smartphone: newSmartphone ? newSmartphone.id : null,
       });
 
-      const asset = {
-        ...assetDTO,
-        electronic: newElectronic.id,
-        user: brokerId,
-        client: clientId,
-        // inspection: inspection === false ? false : true,
-      };
+      let asset: AssetDTO;
+      if (inspection !== false) {
+        asset = {
+          ...assetDTO,
+          electronic: newElectronic.id,
+          user: brokerId,
+          client: clientId,
+          // inspection: inspection === false ? false : true,
+        };
+      } else {
+        asset = {
+          ...assetDTO,
+          electronic: newElectronic.id,
+          user: brokerId,
+          client: clientId,
+          inspection: false,
+        };
+      }
 
       if (inspection !== false) {
         await this.electronicInspectionNotification(
@@ -669,6 +695,23 @@ export class AssetService {
       const paginatedInspections = filteredAndSearchedAssets.slice(start, end);
 
       return paginatedInspections;
+    } catch (err) {
+      throw ErrorManager.createSignaturError(err.message);
+    }
+  }
+
+  public async getInspectionsQuantity(brokerId: string) {
+    try {
+      const assets = (await this.userService.getInspectionsOfClients(
+        brokerId,
+      )) as unknown as AssetEntity[];
+
+      const assetsInspectionLength = assets.filter(
+        (el) => el.inspection,
+      ).length;
+      // Aplicar el filtro según el tipo
+
+      return { quantity: assetsInspectionLength };
     } catch (err) {
       throw ErrorManager.createSignaturError(err.message);
     }

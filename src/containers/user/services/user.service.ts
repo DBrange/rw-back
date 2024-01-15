@@ -879,7 +879,7 @@ export class UserService {
         [ACCESS_LEVEL.FREE]: 0,
         [ACCESS_LEVEL.BASIC]: 5,
         [ACCESS_LEVEL.PREMIUM]: 10,
-        [ACCESS_LEVEL.PRO]: 15,
+        [ACCESS_LEVEL.GOLD]: 15,
       };
 
       // Recorre los usuarios y cuenta las ganancias en los últimos 12 meses y semanas
@@ -1054,7 +1054,7 @@ export class UserService {
           months: Array(12).fill(0),
           weeks: Array(12).fill(0),
         },
-        [ACCESS_LEVEL.PRO]: {
+        [ACCESS_LEVEL.GOLD]: {
           months: Array(12).fill(0),
           weeks: Array(12).fill(0),
         },
@@ -1117,7 +1117,7 @@ export class UserService {
             case ACCESS_LEVEL.PREMIUM:
               serviceData[0].numbers[2]++;
               break;
-            case ACCESS_LEVEL.PRO:
+            case ACCESS_LEVEL.GOLD:
               serviceData[0].numbers[3]++;
               break;
             default:
@@ -1236,30 +1236,29 @@ export class UserService {
 
   public async createUserAndDelete(body: UserDTO, email: string) {
     try {
-console.log('6');
+      console.log('6');
       const users: UserEntity[] = await this.userRepository
         .createQueryBuilder('users')
-        .where({email})
+        .where({ email })
         .getMany();
       console.log('7');
       if (users.length) {
-        users.map( async (el) => await this.deleteUser(el.id));
-        
+        users.map(async (el) => await this.deleteUser(el.id));
       }
       console.log('8');
       body.password = await bcrypt.hash(body.password, +process.env.HASH_SALT);
-      
+
       const user = await this.userRepository.save(body);
 
       if (!user) {
-         throw new ErrorManager({
-           type: 'BAD_REQUEST',
-           message: 'In use',
-         });
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'In use',
+        });
       }
       console.log('9');
 
-      return user
+      return user;
       // return { message: 'The user has been created successfully.' };
     } catch (error) {
       throw ErrorManager.createSignaturError(error.message);
